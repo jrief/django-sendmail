@@ -1,0 +1,87 @@
+{% load sendmail %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Cards</title>
+    <style>
+      /* Inline styles for email client compatibility */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .email-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 20px;
+      }
+      .product-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #ffffff;
+        text-align: left;
+      }
+      .product-card h2 {
+        font-size: 18px;
+        margin: 0 0 10px 0;
+        color: #333333;
+      }
+      .product-card p {
+        font-size: 14px;
+        color: #666666;
+        margin: 0 0 10px 0;
+      }
+      .product-price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #1a73e8;
+      }
+      .product-link {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #1a73e8;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      /* Responsive styles */
+      @media screen and (max-width: 600px) {
+        .product-card {
+          padding: 10px;
+        }
+        .product-card h2 {
+          font-size: 16px;
+        }
+        .product-card p {
+          font-size: 13px;
+        }
+        .product-price {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <h1>Featured Products</h1>
+      {% for product in products %}
+      <div class="product-card">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.desc }}</p>
+        <p class="product-price">${{ product.price }}</p>
+        <a href="{{ product.url }}" class="product-link">View Product</a>
+        <img src="{% inline_image product.image %}" width=300>
+      </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>

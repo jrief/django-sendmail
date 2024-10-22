@@ -1,0 +1,7 @@
+# .coveragerc
+[run]
+omit =
+    */sendmail/migrations/*
+    */sendmail/tests/*
+    */sendmail/admin.py
+    */demoapp/*

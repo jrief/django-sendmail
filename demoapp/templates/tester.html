@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Send Requests</title>
+    <style>
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .button-container a {
+            margin: 10px 0;
+            text-decoration: none; /* Remove underline from links */
+        }
+
+        .button-container button {
+            width: 200px; /* Set a fixed width for the buttons */
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <a href="{% url 'index' %}"><button>Send single</button></a>
+        <a href="{% url 'send_many' %}"><button>Send many</button></a>
+        <a href="{% url 'send_image' %}"><button>Send image</button></a>
+        <a href="{% url 'send_attachment' %}"><button>Send attachment</button></a>
+        <a href="{% url 'on_delivery' %}"><button>Render on delivery</button></a>
+        <a href="{% url 'stress' %}"><button>Stress X100</button></a>
+        <a href="{% url 'stress_many' %}"><button>Stress Many</button></a>
+    </div>
+</body>
+</html>

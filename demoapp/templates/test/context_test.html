@@ -1,0 +1,16 @@
+{% load sendmail %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+</head>
+<body>
+    {{ recipient.first_name }}
+    {{ recipient.last_name }}
+    {% placeholder 'test1' %}
+    {% placeholder 'test2' %}
+    {{ test_var }}
+</body>
+</html>

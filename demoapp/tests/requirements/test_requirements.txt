@@ -1,0 +1,13 @@
+pytz
+nh3
+django-ckeditor
+psycopg2-binary
+pytest
+pytest-django
+celery
+lxml
+pytest-django
+pytest-mock
+pytest-cov
+redis
+requests

@@ -1,0 +1,76 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    name: Python${{ matrix.python-version }}/Django${{ matrix.django-version }}
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        django-version: ["4.2", "5.0"]
+        exclude:
+          - python-version: "3.9"
+            django-version: "5.0"
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mailpit:
+        image: axllent/mailpit:latest
+        ports:
+          - 1025:1025  # SMTP port
+          - 8025:8025  # Mailpit web interface
+
+
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r demoapp/tests/requirements/test_requirements.txt
+        pip install "Django==${{ matrix.django-version }}.*"
+
+    - name: Set up PostgreSQL DB User with CREATEDB Privilege
+      env:
+        PGPASSWORD: postgres
+      run: |
+        psql -U postgres -h localhost -c "CREATE USER post_office WITH PASSWORD 'post_office' CREATEDB;"
+
+    - name: Run Test
+      env:
+        DJANGO_SETTINGS_MODULE: demoapp.test_settings
+      run: |
+        pytest demoapp

@@ -1,0 +1,28 @@
+{% load sendmail %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% placeholder 'place1' %}
+
+    {% if 1 == 1 %}
+        {% placeholder 'place_true' %}
+        {% else %}
+        {% placeholder 'place_false' %}
+    {% endif %}
+
+    {% for i in list %}
+        {% placeholder 'place_loop' %}
+    {% endfor %}
+
+    {% include 'test/ini.html' %}
+
+    {% block nodes %}
+        {% placeholder 'place_block' %}
+    {% endblock %}
+</body>
+</html>
