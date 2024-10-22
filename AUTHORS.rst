@@ -1,9 +1,11 @@
 Author:
 
-* Selwin Ong (@selwin)
+* Mykhailo Poienko (@michaelpoi)
+* Jacob Rief (@jacobrief)
 
 Contributors:
 
+* Selwin Ong (@selwin)
 * Gilang Chandrasa (@gchandrasa)
 * Steven -only- (@SeiryuZ)
 * Wouter de Vries (@wadevries)
@@ -11,5 +13,4 @@ Contributors:
 * Ștefan Daniel Mihăilă (@stefan-mihaila)
 * Wojciech Banaś (@fizista)
 * Maestro Health
-* Jacob Rief (@jacobrief)
 * Alexandr Artemyev (@mogost)

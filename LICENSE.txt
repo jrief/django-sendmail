@@ -1,4 +1,4 @@
-Copyright (c) 2012 Selwin Ong
+Copyright (c) 2024 Mykhailo Poienko
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

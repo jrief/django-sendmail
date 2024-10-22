@@ -12,6 +12,9 @@ dist/
 eggs/
 sdist/
 tmp/
+workdir/
+post_office_attachments/
+sendmail_attachments/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -31,10 +34,14 @@ ghostdriver.log
 .python-version
 .ruby-version
 .settings/
+.idea/
 
 ## generic files to ignore
 *~
 *.lock
 .mypy_cache
-
-post_office_attachments
+*.sqlite3
+celerybeat-schedule
+staticfiles/
+static/
+.coverage

@@ -1,0 +1,320 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-10 13:07+0200\n"
+"PO-Revision-Date: 2017-08-07 16:49+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+"X-Generator: Poedit 1.8.11\n"
+
+#: admin.py:228 models.py:35
+msgid "To"
+msgstr "Кому"
+
+#: admin.py:239 admin.py:276 models.py:121 models.py:442
+msgid "Subject"
+msgstr "Тема"
+
+#: admin.py:245
+msgid "Use Template"
+msgstr "Шаблон письма"
+
+#: admin.py:264
+msgid "HTML Email"
+msgstr "HTML Письма"
+
+#: admin.py:266 admin.py:268
+msgid "Text Email"
+msgstr "Текст письма"
+
+#: admin.py:283
+msgid "Mail Body"
+msgstr "Контент"
+
+#: admin.py:294
+msgid "HTML Body"
+msgstr "HTML-Контент"
+
+#: admin.py:331 admin.py:354 models.py:68
+msgid "Language"
+msgstr "Язык"
+
+#: admin.py:332 admin.py:355
+msgid "Render template in alternative language"
+msgstr "Отправить письмо на другом языке"
+
+#: admin.py:337
+msgid "Base File"
+msgstr "Файл шаблона"
+
+#: admin.py:338
+msgid "Select the base email template file"
+msgstr "Выберите файл шаблона"
+
+#: admin.py:398 models.py:355
+msgid "Description"
+msgstr "Описание"
+
+#: admin.py:405
+msgid "Languages"
+msgstr "Языки"
+
+#: apps.py:7
+msgid "Post Office"
+msgstr "Менеджер почты"
+
+#: models.py:36
+msgid "Cc"
+msgstr "Копия"
+
+#: models.py:37
+msgid "Bcc"
+msgstr "Слепая копия"
+
+#: models.py:55
+msgid "Male"
+msgstr "Мужчина"
+
+#: models.py:56
+msgid "Female"
+msgstr "Женщина"
+
+#: models.py:57
+msgid "Other"
+msgstr "Другое"
+
+#: models.py:59 models.py:119
+msgid "Email From"
+msgstr "Отправитель"
+
+#: models.py:63
+msgid "First Name"
+msgstr "Имя"
+
+#: models.py:64
+msgid "Last Name"
+msgstr "Фамилия"
+
+#: models.py:65
+msgid "Gender"
+msgstr "Гендер"
+
+#: models.py:69
+msgid "Users preferred language"
+msgstr "Предпочитаемый язык"
+
+#: models.py:73
+msgid "Is blocked"
+msgstr "Заблокированый"
+
+#: models.py:107
+msgid "low"
+msgstr "низкий"
+
+#: models.py:108
+msgid "medium"
+msgstr "средний"
+
+#: models.py:109
+msgid "high"
+msgstr "высокий"
+
+#: models.py:110
+msgid "now"
+msgstr "сейчас"
+
+#: models.py:113 models.py:329
+msgid "sent"
+msgstr "отправлен"
+
+#: models.py:114 models.py:329
+msgid "failed"
+msgstr "ошибка"
+
+#: models.py:115
+msgid "queued"
+msgstr "в очереди"
+
+#: models.py:116
+msgid "requeued"
+msgstr "повторно в очереди"
+
+#: models.py:122 models.py:337
+msgid "Message"
+msgstr "Сообщение"
+
+#: models.py:123
+msgid "HTML Message"
+msgstr "HTML-сообщение"
+
+#: models.py:129 models.py:335
+msgid "Status"
+msgstr "Статус"
+
+#: models.py:130
+msgid "Priority"
+msgstr "Приоритет"
+
+#: models.py:134
+msgid "Scheduled Time"
+msgstr "Запланированное время отправки"
+
+#: models.py:134
+msgid "The scheduled sending time"
+msgstr "Запланированное время отправки"
+
+#: models.py:137
+msgid "Expires"
+msgstr "Срок действия"
+
+#: models.py:137
+msgid "Email won't be sent after this timestamp"
+msgstr "Емейл не будет отправлен после этого времени"
+
+#: models.py:141 models.py:481
+msgid "Headers"
+msgstr "Заголовки"
+
+#: models.py:143
+msgid "Email template"
+msgstr "Шаблон письма"
+
+#: models.py:146
+msgid "Context"
+msgstr "Контекст"
+
+#: models.py:147
+msgid "Backend alias"
+msgstr "Имя бекенда"
+
+#: models.py:151
+msgctxt "Email address"
+msgid "Email"
+msgstr "Письмо"
+
+#: models.py:152
+msgctxt "Email addresses"
+msgid "Emails"
+msgstr "Письма"
+
+#: models.py:317
+msgid "The scheduled time may not be later than the expires time."
+msgstr "Время отправки не может быть позже окончания срока действия"
+
+#: models.py:332
+msgid "Email address"
+msgstr "Email-адрес"
+
+#: models.py:336
+msgid "Exception type"
+msgstr "Тип исключения"
+
+#: models.py:341
+msgid "Log"
+msgstr "Лог"
+
+#: models.py:342
+msgid "Logs"
+msgstr "Логи"
+
+#: models.py:353 models.py:526
+msgid "File name"
+msgstr "Имя файл"
+
+#: models.py:354 models.py:478
+msgid "Name"
+msgstr "Имя"
+
+#: models.py:354
+msgid "e.g: 'welcome_email'"
+msgstr "например: 'welcome_email'"
+
+#: models.py:355
+msgid "Description of this template."
+msgstr "Описание шаблона."
+
+#: models.py:366
+msgid "Email Template"
+msgstr "Шаблон письма"
+
+#: models.py:367
+msgid "Email Templates"
+msgstr "Шаблоны писем"
+
+#: models.py:446 models.py:524
+msgid "Content"
+msgstr "Содержимое"
+
+#: models.py:458
+msgid "Email Template Content"
+msgstr " Наполнение Шаблона письма"
+
+#: models.py:459
+msgid "Email Template Contents"
+msgstr "Наполния Шаблонов письма"
+
+#: models.py:477
+msgid "File"
+msgstr "Файл"
+
+#: models.py:478
+msgid "The original filename"
+msgstr "Исходное имя файла"
+
+#: models.py:479
+msgid "Emails"
+msgstr "Письма"
+
+#: models.py:485
+msgid "Attachment"
+msgstr "Вложение"
+
+#: models.py:486
+msgid "Attachments"
+msgstr "Вложения"
+
+#: models.py:522
+msgid "Placeholder name"
+msgstr "Название заполнителя"
+
+#: sanitizer.py:8
+msgid "Install 'nh3' to render HTML properly."
+msgstr "Установите 'nh3' для коректного рендеринга HTML"
+
+#: templates/admin/post_office/email/change_form.html:4
+msgid "Resend"
+msgstr "Отправить заново"
+
+#~ msgid "Default Content"
+#~ msgstr "Содержимое по умолчанию"
+
+#~ msgid "Comma-separated emails"
+#~ msgstr "Список адресов, разделенных запятыми"
+
+#~ msgid "Only comma separated emails are allowed."
+#~ msgstr "Разрешен только разделенный запятыми список адресов."
+
+#~ msgid "Email To"
+#~ msgstr "Получатель"
+
+#~ msgid "HTML content"
+#~ msgstr "HTML-содержимое"
+
+#~ msgid "Default template"
+#~ msgstr "Шаблон по умолчанию"
+
+#~ msgid "Email addresses"
+#~ msgstr "Email адреса"
