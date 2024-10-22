@@ -4,12 +4,8 @@ from os.path import dirname, join
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
-
-
-with open(join(dirname(__file__), 'post_office/version.txt'), 'r') as fh:
+with open(join(dirname(__file__), 'sendmail/version.txt'), 'r') as fh:
     VERSION = '.'.join(map(str, literal_eval(fh.read())))
-
-
 
 setup(
     name='django-sendmail',
@@ -25,7 +21,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     package_data={'': ['README.md']},
-    install_requires=['django>=4.0',],
+    install_requires=['django>=4.0', ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
