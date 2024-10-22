@@ -16,7 +16,7 @@ sendmail provides a set of powerful features, such as:
 
 ## Dependencies
 
-- [django \>= 2.2](https://djangoproject.com/)
+- [django \>= 4.0](https://djangoproject.com/)
 - [django-ckeditor](https://pypi.org/project/django-ckeditor/)
 - [nh3](https://pypi.org/project/nh3/)
 - [lxml](https://pypi.org/project/lxml/)
@@ -26,9 +26,9 @@ Installing nh3 is strongly encouraged for security reasons. Only with installed 
 ## Installation
 
 [![Build Status](https://github.com/ui/django-post_office/actions/workflows/test.yml/badge.svg)](https://github.com/michaelpoi/django-post_office/actions)
-[![PyPI](https://img.shields.io/pypi/pyversions/django-post_office.svg)]()
-[![PyPI version](https://img.shields.io/pypi/v/django-post_office.svg)](https://pypi.python.org/pypi/django-post_office)
-[![PyPI](https://img.shields.io/pypi/l/django-post_office.svg)]()
+[![PyPI](https://img.shields.io/pypi/pyversions/django-sendmail.svg)]()
+[![PyPI version](https://img.shields.io/pypi/v/django-sendmail.svg)](https://pypi.org/project/django-sendmail/)
+[![PyPI](https://img.shields.io/pypi/l/django-sendmail.svg)]()
 
 
 ```sh
