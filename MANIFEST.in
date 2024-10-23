@@ -1,7 +1,9 @@
 include LICENSE.txt
-include README.rst
+include README.md
 include AUTHORS.rst
 include sendmail/version.txt
 recursive-include sendmail *.py
 recursive-include sendmail/locale *.po
 recursive-include sendmail/locale *.mo
+recursive-include sendmail/templates *.html
+prune demoapp/tests

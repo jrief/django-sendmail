@@ -1,8 +1,7 @@
 from ast import literal_eval
-import sys
 from os.path import dirname, join
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
+from setuptools import find_packages
 
 with open(join(dirname(__file__), 'sendmail/version.txt'), 'r') as fh:
     VERSION = '.'.join(map(str, literal_eval(fh.read())))
@@ -12,7 +11,7 @@ setup(
     version=VERSION,
     author='Mykhailo Poienko, Jacob Rief',
     author_email='22IMC10258@fh-krems.ac.at',
-    packages=['sendmail'],
+    packages=find_packages(exclude=['demoapp', 'demoapp.tests']),
     url='https://github.com/jrief/django-sendmail',
     license='MIT',
     description='A Django app to monitor and send mail asynchronously, complete with template support.',
