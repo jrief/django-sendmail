@@ -20,7 +20,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     package_data={'': ['README.md']},
-    install_requires=['django>=4.0', ],
+    install_requires=['Django>=4', 'django-ckeditor', 'lxml', 'nh3'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
