@@ -52,6 +52,15 @@ Add ``CKEDITOR_UPLOAD_PATH``. This path will be used to store ckeditor uploaded 
 
     CKEDITOR_UPLOAD_PATH = 'ckeditor_uploads'
 
+To your main ``urls.py`` add ``ckeditor_uploader`` urls.
+
+.. code-block::
+
+    urlpatterns = [
+        ...
+        path('ckeditor/', include('ckeditor_uploader.urls')),
+    ]
+
 Add ``STATIC_URL`` and ``STATIC_ROOT``
 
 .. code-block::

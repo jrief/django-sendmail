@@ -396,6 +396,12 @@ Multilingual Templates
 
 In sendmail you can create and send templates in multiple languages. For this simply edit your ``settings.py``:
 
+Verify that internalization is enabled:
+
+.. code-block:: python
+
+    USE_I18N = True
+
 Default templates language can be changed in ``settings.LANGUAGE_CODE``
 
 .. code-block:: python

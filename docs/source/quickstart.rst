@@ -35,7 +35,7 @@ If you want to use templates:
     </body>
     </html>
 
-Register your template in ``settings.py``:
+- Register your template in ``settings.py``:
 
 .. code-block:: python
 
@@ -47,6 +47,8 @@ Register your template in ``settings.py``:
     }
 
 You can use relative path from your ``templates`` folder or absolute file path.
+
+- Specify list of translation languages in ``settings.LANGUAGES`` or disable internalization by setting ``settings.USE_I18N`` to ``False``.
 
 - Open your admin interface and create a new EmailMergeModel instance:
     - Enter name. This will be used as identifier for your template and click "Save and continue editing".

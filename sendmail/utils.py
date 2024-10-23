@@ -288,7 +288,7 @@ def get_language_from_code(code, log=True) -> str:
     else:
         if code not in get_languages_list():
             if log:
-                logger.warning(f'Language "{code}" is not found in LANGUAGES configuration.')
+                logger.warning(f'Language "{code}" is not found in LANGUAGES configuration or I18N is disabled.')
             code = get_default_language()
 
     return code

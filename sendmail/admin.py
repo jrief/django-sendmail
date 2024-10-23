@@ -389,7 +389,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
         (None, {'fields': ('name', 'description', 'base_file', 'extra_recipients')}),
         # (_('Default Content'), {'fields': ('subject', 'content')}),
     ]
-    inlines = (EmailTemplateInline, EmailContentInline) if settings.USE_I18N else (EmailContentInline,)
+    inlines = (EmailTemplateInline, EmailContentInline)
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
 
     filter_horizontal = ('extra_recipients',)

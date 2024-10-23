@@ -82,8 +82,11 @@ def get_config():
 
 
 def get_languages_list():
-    lang_conf = getattr(settings, 'LANGUAGES', [])
-    return [lang[0] for lang in lang_conf]
+    if settings.USE_I18N:
+        lang_conf = getattr(settings, 'LANGUAGES', [])
+        return [lang[0] for lang in lang_conf]
+    else:
+        return [get_default_language(),]
 
 
 def get_default_language():

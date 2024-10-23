@@ -445,7 +445,7 @@ def test_internalization(caplog, template):
             recipients=[en_recipient, de_recipient, ua_recipient, nullable_recipient],
             template=template)
 
-        assert 'Language "ua" is not found in LANGUAGES configuration.' in caplog.text
+        assert 'Language "ua" is not found in LANGUAGES configuration' in caplog.text
 
     assert len(emails) == 4
     assert emails[0].language == 'en'

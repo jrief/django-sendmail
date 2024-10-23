@@ -84,6 +84,16 @@ Add `CKEDITOR_UPLOAD_PATH`. This path will be used to store ckeditor uploaded im
 CKEDITOR_UPLOAD_PATH = 'ckeditor_uploads'
 ```
 
+To your main `urls.py` add `ckeditor_uploader` urls:
+
+```python
+urlpatterns = [
+        ...,
+        path('ckeditor/', include('ckeditor_uploader.urls')),
+    ]
+```
+
+
 Add `STATIC_URL` and `STATIC_ROOT`
 
 ```python
@@ -163,6 +173,8 @@ SENDMAIL = {
 ```
 
 You can use relative path from your `templates` folder or absolute file path.
+
+- Specify list of translation languages in `settings.LANGUAGES` or disable internalization by setting `settings.USE_I18N` to `False`.
 
 - Open your admin interface and create a new EmailMergeModel instance:
     - Enter name. This will be used as identifier for your template and click “Save and continue editing”.
