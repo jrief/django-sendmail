@@ -2,6 +2,8 @@
 
 **Asynchronous email sending library for Django with enhanced templating options.**
 
+Full documentation can be found [here](https://django-sendmail.readthedocs.io/en/latest/) 
+
 sendmail provides a set of powerful features, such as:
 
 - Handling millions of emails efficiently. 
@@ -208,4 +210,4 @@ You can schedule this management command to run regularly via cron:
 * * * * * (/usr/bin/python manage.py send_queued_mail >> send_mail.log 2>&1)
 ```
 
-Full documentation can be found [here](https://michaelpoi.github.io/django-post_office/)
+Full documentation can be found [here](https://django-sendmail.readthedocs.io/en/latest/)
