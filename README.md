@@ -152,7 +152,7 @@ If you want to use templates:
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">#var#
+    <meta charset="UTF-8">
     <title>Example email template</title>
 </head>
 <body>

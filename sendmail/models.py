@@ -411,7 +411,6 @@ class EmailMergeModel(models.Model):
                                                   )
 
         placeholder_names = process_template(self.base_file)
-        print(placeholder_names)
 
         existing_placeholders = set(
             self.contents.filter(base_file=self.base_file).values_list('placeholder_name',
