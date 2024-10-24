@@ -36,5 +36,6 @@ sendmail provides a set of powerful features, such as:
    uwsgi
    signals
    testing
+   about
 
 
