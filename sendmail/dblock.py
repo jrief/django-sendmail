@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError, DatabaseError
 from django.utils.timezone import now
 
-from .models.dblock import DBMutex
+from .models.dbmutex import DBMutex
 
 
 class LockedException(Exception):

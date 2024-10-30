@@ -22,3 +22,7 @@ class DBMutex(models.Model):
 
     def __str__(self):
         return f"<DBMutex(pk={self.pk}, lock_id={self.lock_id}>"
+
+    class Meta:
+        app_label = 'sendmail'
+

@@ -4,7 +4,7 @@ from datetime import timedelta
 from multiprocessing import Process
 
 from sendmail.dblock import db_lock, TimeoutException, LockedException
-from sendmail.models.dblock import DBMutex
+from sendmail.models.dbmutex import DBMutex
 
 
 @pytest.mark.django_db
