@@ -1,8 +1,8 @@
 from email.mime.image import MIMEImage
 
 import pytest
-from sendmail.models import EmailModel
-from sendmail.models import STATUS, PRIORITY, EmailAddress, render_message
+from sendmail.models.emailmodel import EmailModel, STATUS, PRIORITY, render_message
+from sendmail.models.emailaddress import EmailAddress
 from sendmail.utils import set_recipients
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from sendmail.settings import get_template_engine
@@ -42,7 +42,7 @@ def test_no_cache(simple_email):
 
 
 @pytest.mark.django_db
-def test_get_message(settings, simple_email):
+def test_get_message(settings, simple_email, upload_images):
     email = simple_email.get_message_object(simple_email.html_message,
                                             simple_email.message,
                                             headers=None,
@@ -83,7 +83,7 @@ def test_get_message(settings, simple_email):
     assert isinstance(email, EmailMessage)
 
     html_with_inlines = (f"{{% load sendmail %}}\n "
-                         f"<img src='{{% inline_image '{settings.BASE_DIR / 'demoapp' / 'tests' / 'assets' / 'logo.png'}'%}}'"
+                         f"<img src='{{% inline_image '{'logo.png'}'%}}'"
                          f"{simple_email.html_message}")
     simple_email.html_message = html_with_inlines
 

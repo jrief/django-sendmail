@@ -5,8 +5,10 @@ from zoneinfo import ZoneInfo
 
 import pytest
 from sendmail.mail import create, send, send_many, split_into_batches, get_queued, _send_bulk
-from sendmail.models import PRIORITY, EmailModel, EmailAddress, EmailMergeModel, PlaceholderContent, STATUS, \
-    Attachment, Recipient
+from sendmail.models.emailmodel import PRIORITY, EmailModel, STATUS
+from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
+from sendmail.models.attachment import Attachment
+from sendmail.models.emailaddress import EmailAddress, Recipient
 from django.core.exceptions import ValidationError
 import tempfile
 from django.test.utils import CaptureQueriesContext

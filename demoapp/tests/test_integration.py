@@ -2,11 +2,11 @@ from typing import List
 import requests
 from sendmail.mail import send, send_many, _send_bulk
 import pytest
-from sendmail.models import EmailAddress, EmailMergeModel, PlaceholderContent, EmailModel
+from sendmail.models.emailaddress import EmailAddress
+from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
 import tempfile
 from multiprocessing import Pool
 from sendmail.utils import get_recipients_objects
-from sendmail.models import STATUS
 
 from sendmail.utils import split_emails
 

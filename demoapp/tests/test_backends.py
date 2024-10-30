@@ -7,7 +7,7 @@ import pytest
 from django.core.files.images import File
 from django.core.mail import EmailMultiAlternatives, send_mail, EmailMessage
 
-from sendmail.models import EmailModel, STATUS, PRIORITY
+from sendmail.models.emailmodel import EmailModel, STATUS, PRIORITY
 
 
 @pytest.mark.django_db

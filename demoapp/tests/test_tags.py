@@ -30,7 +30,7 @@ def test_absolute_path(settings):
     template._attached_images = []
     context = Context({'dry_run': False})
     context.template = template
-    path = str(settings.BASE_DIR / 'demoapp' / 'tests' / 'assets' / 'logo.png')
+    path = settings.MEDIA_ROOT / 'logo.png'
     print(path)
     result = inline_image(context, path)
     assert result.startswith('cid:')
@@ -78,7 +78,7 @@ def test_static(settings):
     context.template = template
     filename = 'logo.png'
     abs_path = str(settings.BASE_DIR / 'demoapp' / 'tests' / 'assets' / filename)
-    result = inline_image(context, pathlib.Path('assets') / filename)
+    result = inline_image(context,  filename)
     assert result.startswith('cid:')
     assert len(template._attached_images) == 1
     assert template._attached_images[0].get_payload(decode=True) == open(abs_path, 'rb').read()

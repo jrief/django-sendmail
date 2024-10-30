@@ -6,7 +6,10 @@ from django.core.files.base import ContentFile
 import pytest
 from sendmail.utils import set_recipients, get_recipients_objects, parse_emails, parse_priority, split_emails, \
     create_attachments, send_mail, get_email_template, cleanup_expired_mails, get_language_from_code
-from sendmail.models import EmailAddress, EmailModel, PRIORITY, Attachment, STATUS, EmailMergeModel
+from sendmail.models.emailmodel import EmailModel, PRIORITY,  STATUS
+from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.attachment import Attachment
+from sendmail.models.emailaddress import EmailAddress
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage, FileSystemStorage
 
@@ -195,7 +198,8 @@ def test_create_attachment_with_mimetype():
 
 @pytest.mark.django_db
 def test_create_attachments_open_file():
-    attachments = create_attachments({'attachment_file.py': __file__})
+
+    attachments = create_attachments({'attachment_file.py': 'test.py'})
 
     assert len(attachments) == 1
     assert isinstance(attachments[0], Attachment)

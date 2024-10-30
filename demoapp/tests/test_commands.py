@@ -10,7 +10,9 @@ from django.core.management import call_command
 from django.utils.timezone import now
 
 from sendmail.mail import send
-from sendmail.models import EmailModel, Attachment, STATUS, EmailAddress
+from sendmail.models.emailmodel import EmailModel, STATUS
+from sendmail.models.emailaddress import EmailAddress
+from sendmail.models.attachment import Attachment
 from sendmail.utils import set_recipients
 
 
