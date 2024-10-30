@@ -1,25 +1,26 @@
 import pathlib
 import re
 from lxml import html
+
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
 from django.core.mail.message import SafeMIMEText
 from django.db import models
+from django.db.models import Case, When, Value, IntegerField
 from django.forms import BaseInlineFormSet
 from django.forms.widgets import TextInput, HiddenInput
 from django.http.response import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.urls import re_path, reverse
 from django.utils.html import format_html
 from django.utils.text import Truncator
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, override as translation_override
 from django.utils.safestring import mark_safe
-from django.db.models import Case, When, Value, IntegerField
 
 from .models import STATUS, Attachment, EmailModel, EmailMergeModel, Log, EmailAddress, PlaceholderContent, \
     EmailMergeContentModel, Recipient
 from .sanitizer import clean_html
-from .settings import get_default_language, get_template_engine, get_base_files
+from .settings import get_default_language, get_template_engine, get_email_templates
 
 
 def get_message_preview(instance):
@@ -133,7 +134,7 @@ class EmailContentInlineFormset(forms.BaseInlineFormSet):
         super().__init__(*args, **kwargs)
 
 
-class EmailContentInline(admin.TabularInline):
+class PlaceholderContentInline(admin.TabularInline):
     model = PlaceholderContent
     formset = EmailContentInlineFormset
     form = EmailContentInlineForm
@@ -146,7 +147,7 @@ class EmailContentInline(admin.TabularInline):
 
     def get_formset(self, request, obj=None, **kwargs):
         self.parent_obj = obj
-        formset = super(EmailContentInline, self).get_formset(request, obj, **kwargs)
+        formset = super().get_formset(request, obj, **kwargs)
         formset.request = request
         return formset
 
@@ -323,7 +324,7 @@ class EmailTemplateAdminFormSet(BaseInlineFormSet):
         super().__init__(*args, **kwargs)
 
 
-class EmailTemplateAdminForm(forms.ModelForm):
+class EmailMergeAdminForm(forms.ModelForm):
     change_form_template = 'admin/sendmail/emailtemplate/change_form.html'
     language = forms.ChoiceField(
         choices=settings.LANGUAGES,
@@ -332,7 +333,7 @@ class EmailTemplateAdminForm(forms.ModelForm):
         help_text=_('Render template in alternative language'),
     )
     base_file = forms.ChoiceField(
-        choices=get_base_files(),  # Set choices to the result of get_email_templates
+        choices=get_email_templates(),  # Set choices to the result of get_email_templates
         required=False,
         label=_('Base File'),
         help_text=_('Select the base email template file'),
@@ -364,11 +365,11 @@ class EmailMergeContentForm(forms.ModelForm):
         self.fields['language'].disabled = True
 
 
-class EmailTemplateInline(admin.StackedInline):
+class EmailMergeContentInline(admin.StackedInline):
     form = EmailMergeContentForm
     # formset = EmailTemplateAdminFormSet
     model = EmailMergeContentModel
-    extra = 0
+    extra = 1
     fields = ('language', 'subject', 'content', 'extra_attachments')
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
 
@@ -381,15 +382,15 @@ class EmailTemplateInline(admin.StackedInline):
         return False
 
 
-class EmailTemplateAdmin(admin.ModelAdmin):
-    form = EmailTemplateAdminForm
+class EmailMergeAdmin(admin.ModelAdmin):
+    form = EmailMergeAdminForm
     list_display = ('name', 'created')
     search_fields = ('name', 'description', 'subject')
     fieldsets = [
         (None, {'fields': ('name', 'description', 'base_file', 'extra_recipients')}),
         # (_('Default Content'), {'fields': ('subject', 'content')}),
     ]
-    inlines = (EmailTemplateInline, EmailContentInline)
+    inlines = [EmailMergeContentInline, PlaceholderContentInline]
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
 
     filter_horizontal = ('extra_recipients',)
@@ -406,16 +407,18 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
     languages_compact.short_description = _('Languages')
 
-    # def save_model(self, request, obj, form, change):
-    #
-    #     if not obj.language:
-    #         obj.language = get_default_language()
-    #
-    #     obj.save()
-    #
-    #     # if the name got changed, also change the translated templates to match again
-    #     if 'name' in form.changed_data:
-    #         obj.translated_templates.update(name=obj.name)
+    def save_model(self, request, obj, form, change):
+        obj.save()
+        if not change:
+            # the first time the object is saved, create a content object for the default language
+            default_language = get_default_language()
+            with translation_override(default_language):
+                EmailMergeContentModel.objects.create(
+                    subject=f'Subject, language: {default_language}',
+                    content=f'Content, language: {default_language}',
+                    emailmerge=obj,
+                    language=default_language,
+                )
 
 
 class AttachmentAdmin(admin.ModelAdmin):
@@ -438,5 +441,5 @@ class EmailAddressAdmin(admin.ModelAdmin):
 
 admin.site.register(EmailModel, EmailAdmin)
 admin.site.register(Log, LogAdmin)
-admin.site.register(EmailMergeModel, EmailTemplateAdmin)
+admin.site.register(EmailMergeModel, EmailMergeAdmin)
 admin.site.register(Attachment, AttachmentAdmin)

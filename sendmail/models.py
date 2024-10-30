@@ -3,22 +3,28 @@ from collections import namedtuple
 from typing import Union
 from uuid import uuid4
 from email.mime.nonmultipart import MIMENonMultipart
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db import models
+from django.template import loader
 from django.utils.translation import pgettext_lazy, gettext_lazy as _
 from django.utils import timezone
+
 from ckeditor_uploader.fields import RichTextUploadingField
+
 from sendmail import cache
-from .cache_utils import get_placeholders
-from django.conf import settings
-from .connections import connections
-from .logutils import setup_loghandlers
-from .parser import process_template
-from .sanitizer import clean_html
-from .settings import get_log_level, get_template_engine, get_languages_list, get_attachments_storage
-from .validators import validate_email_with_name, validate_template_syntax
-from django.template import loader
+from sendmail.cache_utils import get_placeholders
+from sendmail.connections import connections
+from sendmail.logutils import setup_loghandlers
+from sendmail.parser import process_template
+from sendmail.sanitizer import clean_html
+from sendmail.settings import (
+    get_email_templates, get_log_level, get_template_engine, get_languages_list, get_attachments_storage
+)
+from sendmail.validators import validate_email_with_name, validate_template_syntax
+
 
 logger = setup_loghandlers('INFO')
 
@@ -349,7 +355,11 @@ class EmailMergeModel(models.Model):
     Model to hold template information from db
     """
 
-    base_file = models.CharField(max_length=255, verbose_name=_('File name'))
+    base_file = models.CharField(
+        max_length=255,
+        verbose_name=_('File name'),
+        # choices=get_email_templates(),  # Set choices to the result of get_email_templates
+    )
     name = models.CharField(_('Name'), max_length=255, help_text=_("e.g: 'welcome_email'"), unique=True)
     description = models.TextField(_('Description'), blank=True, help_text=_('Description of this template.'))
     created = models.DateTimeField(auto_now_add=True)
@@ -362,8 +372,8 @@ class EmailMergeModel(models.Model):
 
     class Meta:
         app_label = 'sendmail'
-        verbose_name = _('EmailMergeModel')
-        verbose_name_plural = _('EmailMergeModels')
+        verbose_name = _('Email Merge Object')
+        verbose_name_plural = _('Email Merge Objects')
         ordering = ['name']
 
     def __str__(self):
