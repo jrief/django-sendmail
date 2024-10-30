@@ -143,5 +143,5 @@ def get_batch_delivery_timeout():
     return get_config().get('BATCH_DELIVERY_TIMEOUT', 180)
 
 
-def get_base_files():
-    return get_config().get('BASE_FILES', [])
+def get_email_templates():
+    return get_config().get('EMAIL_TEMPLATES', [])

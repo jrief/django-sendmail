@@ -41,7 +41,7 @@ If you want to use templates:
 
     SENDMAIL = {
         ...
-        'BASE_FILES': [
+        'EMAIL_TEMPLATES': [
             ('your-file/path', _('Your-Name')),
         ]
     }

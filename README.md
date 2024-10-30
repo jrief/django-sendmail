@@ -168,7 +168,7 @@ If you want to use templates:
 
 ```python
 SENDMAIL = {
-    'BASE_FILES': [
+    'EMAIL_TEMPLATES': [
         ('your-file/path', _('Your-Name')),
     ]
 }
