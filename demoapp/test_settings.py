@@ -39,8 +39,7 @@ INSTALLED_APPS = [
 CKEDITOR_UPLOAD_PATH = 'ckeditor_uploads'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'demoapp' / 'tests'
-print(MEDIA_ROOT)
+MEDIA_ROOT = BASE_DIR / 'workdir/tests' / 'media'
 
 LANGUAGE_CODE = 'en'
 
@@ -51,12 +50,8 @@ LANGUAGES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'post_office',  # Your database name
-        'USER': 'post_office',  # Your database user
-        'PASSWORD': 'post_office',  # Your database password
-        'HOST': 'localhost',  # Or the database server's IP address
-        'PORT': '5432',  # Default PostgreSQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'workdir/tests/db.sqlite3',
     }
 }
 

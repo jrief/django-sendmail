@@ -9,13 +9,9 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-import sys
 from pathlib import Path
-# from dotenv import load_dotenv
 import os
 from django.utils.translation import gettext_lazy as _
-
-# load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,14 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.staticfiles',
     'django.contrib.messages',
-    'storages',
     'ckeditor',
     'ckeditor_uploader',
     'sendmail',
 ]
 
-USE_S3 = False
-if USE_S3:
+if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:
+    INSTALLED_APPS.append('storages')
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -103,20 +98,14 @@ LANGUAGES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'new_post_office',  # Your database name
-        'USER': 'post_office',  # Your database user
-        'PASSWORD': 'post_office',  # Your database password
-        'HOST': 'localhost',  # Or the database server's IP address
-        'PORT': '5432',  # Default PostgreSQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'workdir/db.sqlite3',
     }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 USE_TZ = False
-# POST_OFFICE_CACHE = False
-
 
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
@@ -194,7 +183,7 @@ SENDMAIL = {
         'default': 'django.core.mail.backends.smtp.EmailBackend',
         'ses': 'django_ses.SESBackend'
     },
-    'BASE_FILES': [
+    'EMAIL_TEMPLATES': [
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
     ]
@@ -230,13 +219,13 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+if CELERY_BROKER_URL := os.getenv('CELERY_BROKER_URL', ''):
+    # Celery - prefix with CELERY_
+    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+    CELERY_ACCEPT_CONTENT = ["json"]
+    CELERY_TASK_SERIALIZER = "json"
+    CELERY_TASK_TRACK_STARTED = True
 
-# Celery - prefix with CELERY_
-CELERY_BROKER_URL = "redis://localhost:6379/"
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_TASK_TRACK_STARTED = True
 
 CKEDITOR_CONFIGS = {
     'default': {
@@ -254,12 +243,13 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',  # Use the appropriate Redis server URL
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+if REDIS_BACKEND_URL := os.getenv('REDIS_BACKEND_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': f'redis://{REDIS_BACKEND_URL}',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
         }
     }
-}
