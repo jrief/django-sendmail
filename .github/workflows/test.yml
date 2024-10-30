@@ -47,8 +47,6 @@ jobs:
           - 1025:1025  # SMTP port
           - 8025:8025  # Mailpit web interface
 
-
-
     steps:
     - uses: actions/checkout@v4
 
