@@ -17,8 +17,12 @@ from django.utils.text import Truncator
 from django.utils.translation import gettext, gettext_lazy as _, override as translation_override
 from django.utils.safestring import mark_safe
 
-from .models import STATUS, Attachment, EmailModel, EmailMergeModel, Log, EmailAddress, PlaceholderContent, \
-    EmailMergeContentModel, Recipient
+from .models.emailmodel import STATUS, EmailModel
+from .models.emailaddress import EmailAddress, Recipient
+from .models.attachment import Attachment
+from .models.emailmerge import PlaceholderContent
+from .models.log import Log
+from .models.emailmerge import EmailMergeModel, EmailMergeContentModel
 from .sanitizer import clean_html
 from .settings import get_default_language, get_template_engine, get_email_templates
 

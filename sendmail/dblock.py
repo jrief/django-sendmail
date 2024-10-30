@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError, DatabaseError
 from django.utils.timezone import now
 
-from sendmail.models import DBMutex
+from .models.dblock import DBMutex
 
 
 class LockedException(Exception):

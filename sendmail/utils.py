@@ -6,7 +6,10 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.utils.encoding import force_str
 from sendmail import cache
-from .models import EmailModel, PRIORITY, STATUS, EmailMergeModel, Attachment, EmailAddress, Recipient
+from .models.emailmodel import EmailModel, PRIORITY, STATUS
+from .models.emailaddress import Recipient, EmailAddress
+from .models.attachment import Attachment
+from .models.emailmerge import EmailMergeModel
 from .settings import get_default_priority, get_default_language, get_languages_list
 from .signals import email_queued
 from .validators import validate_email_with_name

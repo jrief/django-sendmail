@@ -7,7 +7,10 @@ from email.utils import make_msgid
 
 from .connections import connections
 from .logutils import setup_loghandlers
-from .models import EmailModel, EmailMergeModel, Log, PRIORITY, STATUS, Recipient, EmailAddress
+from .models.emailmodel import EmailModel, PRIORITY, STATUS
+from .models.emailaddress import EmailAddress, Recipient
+from .models.log import Log
+from .models.emailmerge import EmailMergeModel
 from .settings import (
     get_available_backends,
     get_batch_size,

@@ -3,6 +3,7 @@
 import ckeditor_uploader.fields
 import django.db.models.deletion
 import sendmail.models
+import sendmail.models.attachment
 import sendmail.validators
 from django.db import migrations, models
 
@@ -88,7 +89,7 @@ class Migration(migrations.Migration):
             name='Attachment',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to=sendmail.models.get_upload_path, verbose_name='File')),
+                ('file', models.FileField(upload_to=sendmail.models.attachment.get_upload_path, verbose_name='File')),
                 ('name', models.CharField(help_text='The original filename', max_length=255, verbose_name='Name')),
                 ('mimetype', models.CharField(blank=True, default='', max_length=255)),
                 ('headers', models.JSONField(blank=True, null=True, verbose_name='Headers')),

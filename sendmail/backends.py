@@ -18,7 +18,7 @@ class EmailBackend(BaseEmailBackend):
         email messages sent.
         """
         from .mail import create
-        from .models import STATUS, EmailModel
+        from .models.emailmodel import STATUS, EmailModel
         from .utils import create_attachments
         from .signals import email_queued
 
