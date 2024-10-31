@@ -1,26 +1,24 @@
+import os
+import pytest
 import time
 
-import pytest
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.mail.backends.base import BaseEmailBackend
 from django.conf import settings
+from .mailpit import MailpitConnector
+
+os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
 
-class ErrorRaisingBackend(BaseEmailBackend):
-    """
-    An EmailBackend that always raises an error during sending
-    to test if django_mailer handles sending error correctly
-    """
-
-    def send_messages(self, email_messages):
-        raise Exception('Fake Error')
+@pytest.fixture
+def locale():
+    return 'en-US'
 
 
-class SlowTestBackend(BaseEmailBackend):
-    """
-    An EmailBackend that sleeps for 10 seconds when sending messages
-    """
+@pytest.fixture
+def language():
+    return 'en'
 
     def send_messages(self, email_messages):
         time.sleep(5)
@@ -42,3 +40,9 @@ def upload_images():
     for filepath in uploaded_files:
         if default_storage.exists(filepath):
             default_storage.delete(filepath)
+
+
+@pytest.fixture(scope='session')
+def email_testing():
+    with MailpitConnector() as mailpit:
+        yield mailpit

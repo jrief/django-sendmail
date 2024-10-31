@@ -1,6 +1,7 @@
 import pytest
 from sendmail.connections import connections
-from .conftest import ErrorRaisingBackend, SlowTestBackend
+
+from .backends import ErrorRaisingBackend, SlowTestBackend
 
 
 def test_connections():
