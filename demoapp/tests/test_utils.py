@@ -1,21 +1,24 @@
 import logging
 import tempfile
 from datetime import datetime
+
+import pytest
+from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.base import ContentFile
-import pytest
-from sendmail.utils import set_recipients, get_recipients_objects, parse_emails, parse_priority, split_emails, \
-    create_attachments, send_mail, get_email_template, cleanup_expired_mails, get_language_from_code
-from sendmail.models.emailmodel import EmailModel, PRIORITY,  STATUS
-from sendmail.models.emailmerge import EmailMergeModel
+from django.core.files.storage import FileSystemStorage, default_storage
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress
-from django.core.exceptions import ValidationError
-from django.core.files.storage import default_storage, FileSystemStorage
-
+from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.settings import get_attachments_storage
-
-from sendmail.validators import validate_email_with_name, validate_template_syntax
+from sendmail.utils import (cleanup_expired_mails, create_attachments,
+                            get_email_template, get_language_from_code,
+                            get_recipients_objects, parse_emails,
+                            parse_priority, send_mail, set_recipients,
+                            split_emails)
+from sendmail.validators import (validate_email_with_name,
+                                 validate_template_syntax)
 
 
 @pytest.mark.django_db
@@ -137,29 +140,12 @@ def test_split_emails():
     assert split_emails([]) == []
 
 
-@pytest.fixture
-def test_template():
-    template = EmailMergeModel.objects.create(
-        base_file='test/test.html',
-        name='test_name',
-        description='test_description',
-        # subject='test_subject',
-        # content='test_content',
-        # language='en',
-    )
-
-    en_content = template.translated_contents.get(language='en')
-    en_content.subject = 'test_subject'
-    en_content.content = 'test_content'
-    en_content.save()
-    return template
-
 
 @pytest.mark.django_db
-def test_get_template(settings, test_template):
-    assert get_email_template('test_name') == test_template
+def test_get_template(settings, template):
+    assert get_email_template('test_template') == template
     settings.POST_OFFICE_TEMPLATE_CACHE = False
-    assert get_email_template('test_name') == test_template
+    assert get_email_template('test_template') == template
 
 
 @pytest.mark.django_db

@@ -1,47 +1,25 @@
 import logging
+import tempfile
 from datetime import timedelta
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
 import pytest
-from sendmail.mail import create, send, send_many, split_into_batches, get_queued, _send_bulk
-from sendmail.models.emailmodel import PRIORITY, EmailModel, STATUS
-from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
+from django.core.exceptions import ValidationError
+from django.db import connection
+from django.db.utils import InterfaceError
+from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
+from sendmail.mail import (_send_bulk, create, get_queued, send, send_many,
+                           split_into_batches)
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress, Recipient
-from django.core.exceptions import ValidationError
-import tempfile
-from django.test.utils import CaptureQueriesContext
-from django.db import connection
-from django.utils import timezone
-from django.db.utils import InterfaceError
-
+from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
+from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.settings import get_available_backends
 
 
 #from django.conf import settings
-
-
-@pytest.fixture
-def template():
-    template_context = EmailMergeModel.objects.create(
-        base_file='test/context_test.html',
-        name='test_template',
-        description='test_description',
-    )
-
-    en_translation = template_context.translated_contents.get(language='en')
-    en_translation.subject = 'template_subject'
-    en_translation.content = 'template_content'
-    en_translation.save()
-
-    de_translation = template_context.translated_contents.get(language='de')
-    de_translation.subject = 'DE test_subject'
-    de_translation.content = 'DE test_content'
-
-    de_translation.save()
-
-    return template_context
 
 
 @pytest.fixture
@@ -558,9 +536,8 @@ def test_errors(settings, template):
 
     assert email.status == STATUS.failed
 
-    with pytest.raises(InterfaceError):
-        # Connection already closed
-        _send_bulk([email], uses_multiprocessing=True)
+    _send_bulk([email], uses_multiprocessing=True)
+    assert email.status == STATUS.failed
 
 
 @pytest.mark.django_db
@@ -619,7 +596,7 @@ def template_with_extra_attachments(settings, template):
 
 
 @pytest.mark.django_db
-def test_extra_attachments(settings, template_with_extra_attachments):
+def test_extra_attachments(template_with_extra_attachments):
     # Retrieve the template with the extra attachments already set up
     template = template_with_extra_attachments
     en_translation = template.translated_contents.get(language='en')
@@ -700,5 +677,18 @@ def test_many_extra_attachments(settings, template_with_extra_attachments):
     assert len((en_attachments := list(emails[0].attachments.all()))) == 2  # Check English attachments
     assert len((de_attachments := list(emails[1].attachments.all()))) == 2  # Check German attachments
 
-    assert sorted([en_attachments[0].name, en_attachments[1].name]) == sorted(['en_attachment.txt','defau.txt'])
-    assert sorted([de_attachments[0].name, de_attachments[1].name]) == sorted(['de_attachment.txt','defau.txt'])
+    assert sorted([en_attachments[0].name, en_attachments[1].name]) == sorted(['en_attachment.txt', 'defau.txt'])
+    assert sorted([de_attachments[0].name, de_attachments[1].name]) == sorted(['de_attachment.txt', 'defau.txt'])
+
+
+@pytest.mark.django_db
+def test_unavailable_language(template):
+    template.translated_contents.get(language='de').delete()
+    email = send(recipients=['test1@exmaple.com'])
+    assert email.language == 'en'
+
+    test1 = EmailAddress.objects.get(email='test1@exmaple.com')
+    test1.preferred_language = 'de'
+    test1.save()
+    emails = send_many(recipients=['test1@exmaple.com', 'test2@exmaple.com'], template='test_template')
+    assert emails[0].language == emails[1].language == 'en'

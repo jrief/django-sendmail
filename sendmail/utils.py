@@ -1,16 +1,20 @@
 from typing import List, Optional, Union
-from .logutils import setup_loghandlers
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.utils.encoding import force_str
+
 from sendmail import cache
-from .models.emailmodel import EmailModel, PRIORITY, STATUS
-from .models.emailaddress import Recipient, EmailAddress
+
+from .logutils import setup_loghandlers
 from .models.attachment import Attachment
+from .models.emailaddress import EmailAddress, Recipient
 from .models.emailmerge import EmailMergeModel
-from .settings import get_default_priority, get_default_language, get_languages_list
+from .models.emailmodel import PRIORITY, STATUS, EmailModel
+from .settings import (get_default_language, get_default_priority,
+                       get_languages_list)
 from .signals import email_queued
 from .validators import validate_email_with_name
 

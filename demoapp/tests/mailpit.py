@@ -1,9 +1,9 @@
 import os
-import requests
 import subprocess
-
-from packaging.version import Version
 from time import sleep
+
+import requests
+from packaging.version import Version
 
 MAILPIT_BINARY = os.getenv('MAILPIT_BINARY', '/usr/local/bin/mailpit')
 
@@ -48,6 +48,10 @@ class MailpitConnector:
 
     def get_message(self, message_id):
         response = requests.get(f'{self.base_url}/api/v1/message/{message_id}')
+        return response.json()
+
+    def search_by_recipient(self, recipient):
+        response = requests.get(f'{self.base_url}/api/v1/search?query=to:{recipient}')
         return response.json()
 
     def get_attachment(self, message_id, partid):

@@ -1,13 +1,12 @@
 import os
+import pathlib
 from datetime import timedelta
 from email.mime.image import MIMEImage
-import pathlib
+
 import pytest
-
 from django.core.files.images import File
-from django.core.mail import EmailMultiAlternatives, send_mail, EmailMessage
-
-from sendmail.models.emailmodel import EmailModel, STATUS, PRIORITY
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
+from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 
 
 @pytest.mark.django_db

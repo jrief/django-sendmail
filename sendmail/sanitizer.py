@@ -1,4 +1,4 @@
-from django.utils.html import mark_safe, format_html
+from django.utils.html import format_html, mark_safe
 from django.utils.translation import gettext_lazy
 
 try:

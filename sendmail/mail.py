@@ -1,36 +1,27 @@
+from email.utils import make_msgid
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection as db_connection
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from email.utils import make_msgid
 
 from .connections import connections
 from .logutils import setup_loghandlers
-from .models.emailmodel import EmailModel, PRIORITY, STATUS
 from .models.emailaddress import EmailAddress, Recipient
-from .models.log import Log
 from .models.emailmerge import EmailMergeModel
-from .settings import (
-    get_available_backends,
-    get_batch_size,
-    get_log_level,
-    get_max_retries,
-    get_message_id_enabled,
-    get_message_id_fqdn,
-    get_retry_timedelta,
-    get_sending_order, get_default_language
-)
+from .models.emailmodel import PRIORITY, STATUS, EmailModel
+from .models.log import Log
+from .settings import (get_available_backends, get_batch_size,
+                       get_default_language, get_log_level, get_max_retries,
+                       get_message_id_enabled, get_message_id_fqdn,
+                       get_retry_timedelta, get_sending_order)
 from .signals import email_queued
-from .utils import (
-    create_attachments,
-    get_email_template,
-    parse_emails,
-    parse_priority,
-    get_recipients_objects, set_recipients,
-    get_or_create_recipient, get_language_from_code,
-)
-from django.db import transaction
+from .utils import (create_attachments, get_email_template,
+                    get_language_from_code, get_or_create_recipient,
+                    get_recipients_objects, parse_emails, parse_priority,
+                    set_recipients)
 
 logger = setup_loghandlers('INFO')
 
@@ -175,6 +166,11 @@ def send(
         if not isinstance(template, EmailMergeModel):
             template = get_email_template(template)
 
+        if language not in template.get_available_languages():
+            language = get_default_language()
+
+        translated_content = template.translated_contents.get(language=language)
+
     if backend and backend not in get_available_backends().keys():
         raise ValueError('%s is not a valid backend alias' % backend)
 
@@ -194,7 +190,7 @@ def send(
         priority,
         commit=commit,
         backend=backend,
-        language=language
+        language=language,
     )
 
     if attachments and commit:
@@ -202,7 +198,7 @@ def send(
         email.attachments.add(*attachments)
 
     if template and commit:
-        extra_attachments = template.translated_contents.get(language=language).extra_attachments.all()
+        extra_attachments = translated_content.extra_attachments.all()
         email.attachments.add(*extra_attachments)
 
     if priority == PRIORITY.now:

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from sendmail.models.emailaddress import Recipient, EmailAddress
+from sendmail.models.emailaddress import EmailAddress, Recipient
 
 
 class RecipientInline(admin.TabularInline):

@@ -5,9 +5,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailmodel import EmailModel
 from sendmail.settings import get_attachments_storage
-from sendmail.logutils import setup_loghandlers
 
 logger = setup_loghandlers('INFO')
 

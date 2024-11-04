@@ -51,5 +51,6 @@ jobs:
     - name: Run Test
       env:
         DJANGO_SETTINGS_MODULE: demoapp.test_settings
+        PYTHONPATH: ${{ github.workspace }}:/demoapp
       run: |
         pytest demoapp

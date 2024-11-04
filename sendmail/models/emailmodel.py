@@ -5,14 +5,15 @@ from typing import Union
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db import models
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 from sendmail.connections import connections
+from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailaddress import EmailAddress, Recipient
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_template_engine, get_log_level
+from sendmail.settings import get_log_level, get_template_engine
 from sendmail.validators import validate_email_with_name
-from sendmail.logutils import setup_loghandlers
 
 logger = setup_loghandlers('INFO')
 

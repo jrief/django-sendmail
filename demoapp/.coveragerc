@@ -3,5 +3,5 @@
 omit =
     */sendmail/migrations/*
     */sendmail/tests/*
-    */sendmail/admin.py
+    */sendmail/admin/*
     */demoapp/*

@@ -1,14 +1,13 @@
+import datetime
 import warnings
-from django.core.files.storage import default_storage
-from django.core.files.storage import storages, InvalidStorageError
 
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.files.storage import (InvalidStorageError, default_storage,
+                                       storages)
 from django.core.mail.utils import DNS_NAME
 from django.template import engines as template_engines
-
-import datetime
 
 
 def get_attachments_storage():

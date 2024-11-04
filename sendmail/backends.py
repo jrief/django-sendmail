@@ -1,7 +1,9 @@
 from collections import OrderedDict
 from email.mime.base import MIMEBase
+
 from django.core.files.base import ContentFile
 from django.core.mail.backends.base import BaseEmailBackend
+
 from .settings import get_default_priority
 
 
@@ -19,8 +21,8 @@ class EmailBackend(BaseEmailBackend):
         """
         from .mail import create
         from .models.emailmodel import STATUS, EmailModel
-        from .utils import create_attachments
         from .signals import email_queued
+        from .utils import create_attachments
 
         if not email_messages:
             return

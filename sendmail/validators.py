@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.template import Template, TemplateSyntaxError, TemplateDoesNotExist
+from django.template import Template, TemplateDoesNotExist, TemplateSyntaxError
 from django.utils.encoding import force_str
 
 

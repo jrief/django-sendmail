@@ -4,19 +4,22 @@ from django import forms
 from django.contrib import admin, messages
 from django.core.mail import SafeMIMEText
 from django.forms import HiddenInput
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import (HttpResponse, HttpResponseNotFound,
+                         HttpResponseRedirect)
 from django.urls import re_path, reverse
 from django.utils.html import format_html
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from sendmail.admin.admin_utils import render_placeholder_content, convert_media_urls_to_tags
+from sendmail.admin.admin_utils import (convert_media_urls_to_tags,
+                                        render_placeholder_content)
+from sendmail.admin.attachment import AttachmentInline
 from sendmail.admin.emailaddress import RecipientInline
 from sendmail.admin.log import LogInline
-from sendmail.admin.attachment import AttachmentInline
 from sendmail.models.emailmerge import PlaceholderContent
+from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.sanitizer import clean_html
-from sendmail.models.emailmodel import EmailModel, STATUS
+
 
 def requeue(modeladmin, request, queryset):
     """An admin action to requeue emails."""

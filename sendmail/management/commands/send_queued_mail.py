@@ -1,11 +1,12 @@
 from multiprocessing import Pool
 
-from django.db import connection as db_connection
 from django.core.management.base import BaseCommand
-from sendmail.dblock import db_lock, TimeoutException, LockedException
-from sendmail.mail import get_queued, _send_bulk
-from sendmail.utils import split_emails
+from django.db import connection as db_connection
+
+from sendmail.dblock import LockedException, TimeoutException, db_lock
+from sendmail.mail import _send_bulk, get_queued
 from sendmail.settings import get_batch_delivery_timeout
+from sendmail.utils import split_emails
 
 
 class Command(BaseCommand):

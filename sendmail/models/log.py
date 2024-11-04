@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.logutils import setup_loghandlers
+from sendmail.models.emailmodel import STATUS, EmailModel
 
 logger = setup_loghandlers('INFO')
 

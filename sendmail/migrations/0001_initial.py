@@ -2,10 +2,11 @@
 
 import ckeditor_uploader.fields
 import django.db.models.deletion
+from django.db import migrations, models
+
 import sendmail.models
 import sendmail.models.attachment
 import sendmail.validators
-from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

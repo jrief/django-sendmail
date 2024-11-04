@@ -9,12 +9,9 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-import sys
-from pathlib import Path
-# from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-# load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -122,9 +119,9 @@ SENDMAIL = {
     'BACKENDS': {
         'default': 'django.core.mail.backends.dummy.EmailBackend',
         'locmem': 'django.core.mail.backends.locmem.EmailBackend',
-        'error': 'demoapp.tests.conftest.ErrorRaisingBackend',
+        'error': 'demoapp.tests.backends.ErrorRaisingBackend',
         'smtp': 'django.core.mail.backends.smtp.EmailBackend',
-        'slow_backend': 'demoapp.tests.conftest.SlowTestBackend',
+        'slow_backend': 'demoapp.tests.backends.SlowTestBackend',
     },
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': False,

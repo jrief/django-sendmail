@@ -1,11 +1,13 @@
 from email.mime.image import MIMEImage
 
 import pytest
-from sendmail.models.emailmodel import EmailModel, STATUS, PRIORITY, render_message
-from sendmail.models.emailaddress import EmailAddress
-from sendmail.utils import set_recipients
 from django.core.mail import EmailMessage, EmailMultiAlternatives
+from sendmail.models.emailaddress import EmailAddress
+from sendmail.models.emailmodel import (PRIORITY, STATUS, EmailModel,
+                                        render_message)
 from sendmail.settings import get_template_engine
+from sendmail.utils import set_recipients
+
 #from django.conf import settings
 
 

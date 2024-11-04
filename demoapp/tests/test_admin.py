@@ -1,6 +1,9 @@
-import pytest
-from sendmail.admin.admin_utils import get_message_preview, render_placeholder_content, convert_media_urls_to_tags
 from dataclasses import dataclass
+
+import pytest
+from sendmail.admin.admin_utils import (convert_media_urls_to_tags,
+                                        get_message_preview,
+                                        render_placeholder_content)
 
 
 def test_message_preview():

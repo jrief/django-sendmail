@@ -2,7 +2,8 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import TemplateDoesNotExist
 from django.template.backends.base import BaseEngine
-from django.template.backends.django import Template as DjangoTemplate, reraise, get_installed_libraries
+from django.template.backends.django import Template as DjangoTemplate
+from django.template.backends.django import get_installed_libraries, reraise
 from django.template.engine import Engine
 
 

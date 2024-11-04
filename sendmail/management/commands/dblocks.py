@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.utils.timezone import now, localtime
+from django.utils.timezone import localtime, now
 
 from sendmail.models.dbmutex import DBMutex
 

@@ -6,12 +6,12 @@ from django.utils.translation import gettext_lazy as _
 
 from sendmail import cache
 from sendmail.cache_utils import get_placeholders
+from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.parser import process_template
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_template_engine, get_languages_list
+from sendmail.settings import get_languages_list, get_template_engine
 from sendmail.validators import validate_template_syntax
-from sendmail.logutils import setup_loghandlers
 
 logger = setup_loghandlers('INFO')
 
@@ -75,34 +75,31 @@ class EmailMergeModel(models.Model):
 
         return final_content
 
+    def get_available_languages(self):
+        return list(self.translated_contents.values_list('language', flat=True))
+
     def save(self, *args, **kwargs):
         template = super().save(*args, **kwargs)
         cache.delete(self.name)
-        existing_languages = set(self.translated_contents.values_list('language', flat=True))
-        for lang in set(get_languages_list()) - existing_languages:
-            EmailMergeContentModel.objects.create(subject=f'Subject, language: {lang}',
-                                                  content=f'Content, language: {lang}',
-                                                  emailmerge=self,
-                                                  language=lang
-                                                  )
 
-        placeholder_names = process_template(self.base_file)
-
-        existing_placeholders = set(
-            self.contents.filter(base_file=self.base_file).values_list('placeholder_name',
-                                                                       'language'))
-        placeholder_objs = []
-        for placeholder_name in placeholder_names:
-            for lang in get_languages_list():
-                if (placeholder_name, lang) not in existing_placeholders:
-                    placeholder_objs.append(PlaceholderContent(placeholder_name=placeholder_name,
-                                                               language=lang,
-                                                               base_file=self.base_file,
-                                                               emailmerge=self,
-                                                               content=f"Placeholder: {placeholder_name}, "
-                                                                       f"Language: {lang}", ), )
-
-        PlaceholderContent.objects.bulk_create(placeholder_objs)
+        # placeholder_names = process_template(self.base_file)
+        #
+        # existing_placeholders = set(
+        #     self.contents.filter(base_file=self.base_file).values_list('placeholder_name',
+        #                                                                'language'))
+        #
+        # placeholder_objs = []
+        # for placeholder_name in placeholder_names:
+        #     for lang in get_languages_list():
+        #         if (placeholder_name, lang) not in existing_placeholders:
+        #             placeholder_objs.append(PlaceholderContent(placeholder_name=placeholder_name,
+        #                                                        language=lang,
+        #                                                        base_file=self.base_file,
+        #                                                        emailmerge=self,
+        #                                                        content=f"Placeholder: {placeholder_name}, "
+        #                                                                f"Language: {lang}", ), )
+        #
+        # PlaceholderContent.objects.bulk_create(placeholder_objs)
 
         return template
 
@@ -128,6 +125,41 @@ class EmailMergeContentModel(models.Model):
 
     def __str__(self):
         return f"{self.emailmerge.name}: {self.language}"
+
+    def save(self, *args, **kwargs):
+        # cache.delete('placeholders %s:%s:%s' % (self.emailmerge.name, self.language, self.base_file))
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+        template = self.emailmerge
+
+        placeholders_names = set(process_template(template.base_file))
+
+        existing_placeholders = set(template.contents.
+                                    filter(base_file=template.base_file).
+                                    filter(language=self.language).
+                                    values_list('placeholder_name', flat=True))
+
+        placeholder_objs = []
+
+        for placeholder_name in (placeholders_names - existing_placeholders):
+            placeholder_objs.append(PlaceholderContent(placeholder_name=placeholder_name,
+                                                       language=self.language,
+                                                       base_file=template.base_file,
+                                                       emailmerge=template,
+                                                       content=f"Placeholder: {placeholder_name}, "
+                                                               f"Language: {self.language}", ), )
+
+        PlaceholderContent.objects.bulk_create(placeholder_objs)
+
+        return self
+
+    def delete(self, *args, **kwargs):
+        deleted = (PlaceholderContent.objects.
+                   filter(emailmerge=self.emailmerge).
+                   filter(language=self.language).
+                   delete())
+        return super().delete(*args, **kwargs)
 
     class Meta:
         constraints = [

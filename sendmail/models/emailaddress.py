@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from sendmail.validators import validate_email_with_name
 from sendmail.logutils import setup_loghandlers
+from sendmail.validators import validate_email_with_name
 
 logger = setup_loghandlers('INFO')
 

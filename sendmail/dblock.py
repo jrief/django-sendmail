@@ -1,11 +1,11 @@
 import atexit
-from datetime import timedelta
 import signal
 import time
+from datetime import timedelta
 from uuid import uuid4
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import IntegrityError, DatabaseError
+from django.db import DatabaseError, IntegrityError
 from django.utils.timezone import now
 
 from .models.dbmutex import DBMutex

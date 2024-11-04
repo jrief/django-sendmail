@@ -7,12 +7,12 @@ of auto-discovering tasks in "tasks" submodules.
 
 import datetime
 
+from django.db import connection as db_connection
+from django.db import transaction
 from django.utils.timezone import now
 
 from sendmail.mail import _send_bulk, get_queued
 from sendmail.utils import cleanup_expired_mails
-from django.db import connection as db_connection
-from django.db import transaction
 
 from .settings import get_celery_enabled
 

@@ -1,6 +1,6 @@
+from django.template import loader
 from django.template.base import NodeList
 from django.template.loader_tags import IncludeNode
-from django.template import loader
 
 
 def get_placeholders_names_from_nodes(nodelist):

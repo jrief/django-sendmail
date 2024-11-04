@@ -1,10 +1,10 @@
 import uuid
 from email.mime.image import MIMEImage
-from django.core.files.storage import default_storage
 
 from django import template
 from django.conf import settings
 from django.core.files.images import ImageFile
+from django.core.files.storage import default_storage
 from django.utils.html import SafeString
 
 register = template.Library()

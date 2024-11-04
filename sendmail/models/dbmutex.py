@@ -1,4 +1,5 @@
 from django.db import models
+
 from sendmail.logutils import setup_loghandlers
 
 logger = setup_loghandlers('INFO')

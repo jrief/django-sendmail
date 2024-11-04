@@ -1,64 +1,24 @@
-from typing import List
-import requests
-
-from demoapp.tests.conftest import email_testing
-from sendmail.mail import send, send_many, _send_bulk
-import pytest
-from sendmail.models.emailaddress import EmailAddress
-from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
 import tempfile
 from multiprocessing import Pool
-from sendmail.utils import get_recipients_objects
+from typing import List
 
-from sendmail.utils import split_emails
+import pytest
+import requests
+from sendmail.mail import _send_bulk, send, send_many
+from sendmail.models.emailaddress import EmailAddress
+from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
+from sendmail.utils import get_recipients_objects, split_emails
+
+from demoapp.tests.conftest import email_testing
 
 
 @pytest.fixture
 def recipient():
-    return EmailAddress.objects.create(email='john@gmail.com',
+    return EmailAddress.objects.create(email='john@example.com',
                                        first_name='John',
                                        last_name='Doe',
                                        gender='male',
                                        preferred_language='en')
-
-
-@pytest.fixture
-def template():
-    template_context = EmailMergeModel.objects.create(
-        base_file='test/context_test.html',
-        name='test_name',
-        description='test_description',
-    )
-
-    en_translation = template_context.translated_contents.get(language='en')
-    en_translation.subject = 'test_subject'
-    en_translation.content = 'test_content'
-    en_translation.save()
-
-    de_translation = template_context.translated_contents.get(language='de')
-    de_translation.subject = 'DE test_subject'
-    de_translation.content = 'DE test_content'
-
-    de_translation.save()
-
-    return template_context
-
-
-# def get_all_messages(limit=None):
-#     if not limit:
-#         data = requests.get('http://127.0.0.1:8025/api/v1/messages').json()
-#
-#     else:
-#         data = requests.get(f'http://127.0.0.1:8025/api/v1/messages?limit={limit}').json()
-#
-#     return data['messages'], data['messages_count']
-#
-#
-# def get_message(message_id):
-#     return requests.get(f'http://127.0.0.1:8025/api/v1/message/{message_id}').json()
-
-# def get_attachment(message_id, partid):
-#     return requests.get(f'http://127.0.0.1:8025/api/v1/message/{message_id}/part/{partid}').content
 
 
 def extract_html_message_for_recipient(recipient_email, email_testing):
@@ -91,7 +51,7 @@ def test_index(settings, email_testing, recipient):
         )
     messages = email_testing.all_messages()
     assert messages['count'] == 1
-    id = messages['messages']['ID']
+    id = messages['messages'][0]['ID']
     message_info = email_testing.get_message(id)
     assert message_info['MessageID'] == email.message_id.strip('<').strip('>')
 
@@ -123,7 +83,7 @@ def test_index(settings, email_testing, recipient):
     part_id = attachment['PartID']
     assert attachment['FileName'] == 'test.txt'
     assert attachment['ContentType'] == 'text/plain'
-    assert email_testing(id, part_id).content == b'This is a sample message.'
+    assert email_testing.get_attachment(id, part_id).content == b'This is a sample message.'
 
 
 @pytest.mark.django_db
@@ -173,8 +133,8 @@ def test_send_many(settings, email_testing, template):
         all_recipients.add(recipients[0])
 
     assert all_recipients == {john.email, gudrun.email}
-    assert sorted([info['Subject'] for info in message_infos]) == sorted(['test_subject', 'DE test_subject'])
-    assert sorted([info['Text'] for info in message_infos]) == sorted(['test_content', 'DE test_content'])
+    assert sorted([info['Subject'] for info in message_infos]) == sorted(['template_subject', 'DE test_subject'])
+    assert sorted([info['Text'] for info in message_infos]) == sorted(['template_content', 'DE test_content'])
 
     # john_msg = get_html_message_for_recipient('john@gmail.com', messages)
     # assert john_msg.count('John') > 0
@@ -187,6 +147,8 @@ def test_send_many(settings, email_testing, template):
     placeholder.content = '#test_var#'
     placeholder.save()
 
+    email_testing.delete_all()
+
     emails = send_many(
         recipients=[john, gudrun, ben],
         template=template,
@@ -197,20 +159,28 @@ def test_send_many(settings, email_testing, template):
     _send_bulk(emails, uses_multiprocessing=False)
 
     messages = email_testing.all_messages()
-    assert messages['count'] == 4
+    assert messages['count'] == 2
 
-    # assert get_html_message_for_recipient('john@gmail.com', messages).count('test_value') == 2
-    # assert get_html_message_for_recipient('marry@gmail.com', messages).count('test_value') == 1
-    # assert get_html_message_for_recipient('john@gmail.com', messages).count('#test_var#') == 0
-    # assert get_html_message_for_recipient('marry@gmail.com', messages).count('#test_var#') == 0
+    john_mailbox = email_testing.search_by_recipient('john@example.com')
+    gudrun_mailbox = email_testing.search_by_recipient('gudrun@example.com')
+
+    assert john_mailbox['count'] == gudrun_mailbox['count'] == 1
+
+    john_message = email_testing.get_message(john_mailbox['messages'][0]['ID'])
+    gudrun_message = email_testing.get_message(gudrun_mailbox['messages'][0]['ID'])
+
+    assert john_message['HTML'].count('test_value') == 2
+    assert gudrun_message['HTML'].count('test_value') == 1
+    assert john_message['HTML'].count('#test_var#') == 0
+    assert gudrun_message['HTML'].count('#test_var#') == 0
 
 
-@pytest.mark.skip
 @pytest.mark.django_db
 def test_simulate_mp(email_testing, template):
-    recipients = [f"{i}@email.com" for i in range(50)]
+    email_testing.delete_all()
+    recipients = [f"{i}@email.com" for i in range(10, 60)]
     recipient_objects = get_recipients_objects(recipients)
-    for index, recipient in enumerate(recipient_objects):
+    for index, recipient in zip(range(10, 60), recipient_objects):
         recipient.first_name = f"Recipient {index}"
         if index > 25:
             recipient.preferred_language = 'de'
@@ -238,15 +208,13 @@ def test_simulate_mp(email_testing, template):
 
     messages = email_testing.all_messages(limit=51)
     assert messages['count'] == 50
-    seen = set()
 
     for recipient in recipients:
         num = int(recipient.split('@')[0])
-        html = get_html_message_for_recipient(recipient, messages)
-        assert html, recipient
+        mailbox = email_testing.search_by_recipient(recipient)
 
-        assert recipient not in seen
-        seen.add(recipient)
+        assert mailbox['count'] == 1
+        html = email_testing.get_message(mailbox['messages'][0]['ID'])['HTML']
 
         assert html.count(f'Recipient {num}') == 1
 

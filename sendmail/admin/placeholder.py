@@ -1,7 +1,8 @@
 from django.contrib import admin
-from django.db.models import Case, When, Value, IntegerField
+from django.db.models import Case, IntegerField, Value, When
 
-from sendmail.admin.emailmodel import EmailContentInlineFormset, EmailContentInlineForm
+from sendmail.admin.emailmodel import (EmailContentInlineForm,
+                                       EmailContentInlineFormset)
 from sendmail.models.emailmerge import PlaceholderContent
 from sendmail.settings import get_default_language
 
