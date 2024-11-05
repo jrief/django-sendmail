@@ -27,7 +27,7 @@ Installing nh3 is strongly encouraged for security reasons. Only with installed 
 
 ## Installation
 
-[![Build Status](https://github.com/ui/django-post_office/actions/workflows/test.yml/badge.svg)](https://github.com/michaelpoi/django-post_office/actions)
+[![Build Status](https://github.com/jrief/django-sendmail/actions/workflows/test.yml/badge.svg)](https://github.com/jrief/django-sendmail/actions)
 [![PyPI](https://img.shields.io/pypi/pyversions/django-sendmail.svg)]()
 [![PyPI version](https://img.shields.io/pypi/v/django-sendmail.svg)](https://pypi.org/project/django-sendmail/)
 [![PyPI](https://img.shields.io/pypi/l/django-sendmail.svg)]()
@@ -185,7 +185,12 @@ You can use relative path from your `templates` folder or absolute file path.
         You can specify variables to be filled with the context.
         Syntax is `#var#`.
         Example: This is a simple mail created by #generator#
-    - If you have more than 1 language configured you will be requested to fill values for all languages in `LANGUAGES`.
+    - If you have more than 1 language configured you will be able to fill values for all languages in `LANGUAGES`:
+    
+        - Create element in inline with desired language
+        - Click `Save and Continue Editing`
+        - Fill in placeholders
+
     - Save your instance.
 - To send an email with the created template:
 

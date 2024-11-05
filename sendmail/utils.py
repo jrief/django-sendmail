@@ -289,14 +289,15 @@ def cleanup_expired_mails(cutoff_date, delete_attachments=True, batch_size=1000)
     return total_deleted_emails, attachments_count
 
 
-def get_language_from_code(code, log=True) -> str:
+def get_language_from_code(code, log=True, template=None) -> str:
     if not code:
-        code = get_default_language()
+        return get_default_language()
     else:
         if code not in get_languages_list():
             if log:
                 logger.warning(f'Language "{code}" is not found in LANGUAGES configuration or I18N is disabled.')
-            code = get_default_language()
+            return get_default_language()
+        if template and code not in template.get_available_languages():
+            return get_default_language()
 
     return code
-

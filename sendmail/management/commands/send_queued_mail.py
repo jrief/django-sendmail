@@ -42,7 +42,6 @@ class Command(BaseCommand):
                     except Exception as e:
                         self.stderr.write(str(e))
 
-
                     db_connection.close()
 
                     if not get_queued().exists():

@@ -19,4 +19,4 @@ class SlowTestBackend(BaseEmailBackend):
     """
 
     def send_messages(self, email_messages):
-        time.sleep(5)
+        time.sleep(1)

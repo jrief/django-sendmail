@@ -140,19 +140,19 @@ def test_failed_deliveries_logging():
 #     def slowly_send_2_emails(processes):
 #         recipient = EmailAddress.objects.create(email=f'to{processes}@example.com')
 #         email1 = EmailModel.objects.create(
-#             from_email='from@example.com', status=STATUS.queued, backend_alias='slow_backend'
+#             from_email='from@example.com', status=STATUS.queued, backend_alias='slow_backend', language='en'
 #         )
 #         set_recipients(email1, [recipient])
 #         email2 = EmailModel.objects.create(
-#             from_email='from@example.com', status=STATUS.queued, backend_alias='slow_backend'
+#             from_email='from@example.com', status=STATUS.queued, backend_alias='slow_backend', language='en'
 #         )
 #
 #         set_recipients(email2, [recipient])
 #
-#         call_command('send_queued_mail', processes=processes, prevent_db_close=True)
+#         call_command('send_queued_mail', processes=processes)
 #
-#     execution_time = timeit.timeit(lambda: slowly_send_2_emails(1), number=1)
-#     assert execution_time > 10 <= 11
+#     # execution_time = timeit.timeit(lambda: slowly_send_2_emails(1), number=1)
+#     # assert execution_time > 2 <= 3
 #
 #     execution_time = timeit.timeit(lambda: slowly_send_2_emails(2), number=1)
-#     assert execution_time > 5 <= 6
+#     assert execution_time > 1 <= 1.5

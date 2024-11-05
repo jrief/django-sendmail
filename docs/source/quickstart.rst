@@ -61,7 +61,12 @@ You can use relative path from your ``templates`` folder or absolute file path.
 
         Example: This is a simple mail created by #generator#
 
-    - If you have more than 1 language configured you will be requested to fill values for all languages in ``LANGUAGES``.
+    - If you have more than 1 language configured you will be able to fill values for all languages in ``LANGUAGES``.
+
+        - Create element in inline with desired language
+        - Click `Save and Continue Editing`
+        - Fill in placeholders
+
     - Save your instance.
 
 - To send an email with the created template:

@@ -127,7 +127,7 @@ SENDMAIL = {
     'CELERY_ENABLED': False,
     'MAX_RETRIES': 2,
     'MESSAGE_ID_ENABLED': True,
-    'BATCH_DELIVERY_TIMEOUT': 2,
+    'BATCH_DELIVERY_TIMEOUT': 100,
     'MESSAGE_ID_FQDN': 'example.com',
 }
 
