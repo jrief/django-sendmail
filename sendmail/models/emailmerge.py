@@ -10,8 +10,10 @@ from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.parser import process_template
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_languages_list, get_template_engine
+from sendmail.settings import get_languages_list, get_template_engine, get_email_address_model
 from sendmail.validators import validate_template_syntax
+from django.db.models.signals import post_delete, pre_delete
+from django.dispatch import receiver
 
 logger = setup_loghandlers('INFO')
 
@@ -31,7 +33,7 @@ class EmailMergeModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     extra_recipients = models.ManyToManyField(
-        EmailAddress,
+        get_email_address_model(),
         blank=True,
         help_text='extra bcc recipients',
     )
@@ -127,6 +129,7 @@ class EmailMergeContentModel(models.Model):
         return f"{self.emailmerge.name}: {self.language}"
 
     def save(self, *args, **kwargs):
+        print("SAVE CALLED")
         # cache.delete('placeholders %s:%s:%s' % (self.emailmerge.name, self.language, self.base_file))
         self.full_clean()
         super().save(*args, **kwargs)
@@ -155,11 +158,8 @@ class EmailMergeContentModel(models.Model):
         return self
 
     def delete(self, *args, **kwargs):
-        deleted = (PlaceholderContent.objects.
-                   filter(emailmerge=self.emailmerge).
-                   filter(language=self.language).
-                   delete())
-        return super().delete(*args, **kwargs)
+        # print('DELETE CALLED')
+        super().delete(*args, **kwargs)
 
     class Meta:
         constraints = [
@@ -169,6 +169,12 @@ class EmailMergeContentModel(models.Model):
         app_label = 'sendmail'
         verbose_name = _('Email Template Content')
         verbose_name_plural = _('Email Template Contents')
+
+
+# @receiver(pre_delete, sender=EmailMergeContentModel)
+# def cleanup_placeholders(sender, instance, **kwargs):
+#     print("Trigerred")
+#     PlaceholderContent.objects.filter(emailmerge=instance.emailmerge).filter(language=instance.language).delete()
 
 
 class PlaceholderContent(models.Model):

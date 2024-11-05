@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'sendmail',
+    'custom_user'
 ]
 
 if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:
@@ -187,7 +188,8 @@ SENDMAIL = {
     'EMAIL_TEMPLATES': [
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
-    ]
+    ],
+    'EMAIL_ADDRESS_MODEL': 'custom_user.models.CustomEmailAddress',
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
 

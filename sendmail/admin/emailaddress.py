@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from sendmail.models.emailaddress import EmailAddress, Recipient
+from sendmail.settings import get_email_address_model
 
 
 class RecipientInline(admin.TabularInline):
@@ -17,7 +18,7 @@ class RecipientInline(admin.TabularInline):
         return False
 
 
-@admin.register(EmailAddress)
+@admin.register(get_email_address_model())
 class EmailAddressAdmin(admin.ModelAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     list_display = ('email', 'first_name', 'last_name', 'gender', 'is_blocked')

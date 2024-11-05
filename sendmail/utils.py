@@ -10,11 +10,11 @@ from sendmail import cache
 
 from .logutils import setup_loghandlers
 from .models.attachment import Attachment
-from .models.emailaddress import EmailAddress, Recipient
+from .models.emailaddress import Recipient
 from .models.emailmerge import EmailMergeModel
 from .models.emailmodel import PRIORITY, STATUS, EmailModel
 from .settings import (get_default_language, get_default_priority,
-                       get_languages_list)
+                       get_languages_list, get_email_address_model)
 from .signals import email_queued
 from .validators import validate_email_with_name
 
@@ -178,12 +178,13 @@ def parse_emails(emails):
     return emails
 
 
-def get_or_create_recipient(email: str) -> EmailAddress:
-    obj, _ = EmailAddress.objects.get_or_create(email=email)
+def get_or_create_recipient(email: str):
+    obj, _ = get_email_address_model().objects.get_or_create(email=email)
     return obj
 
 
-def get_recipients_objects(emails: List[Union[str, EmailAddress]]) -> List[EmailAddress]:
+def get_recipients_objects(emails):
+    EmailAddress = get_email_address_model()
     unique_emails = []
     seen = set()
 
@@ -230,9 +231,9 @@ def get_recipients_objects(emails: List[Union[str, EmailAddress]]) -> List[Email
 
 
 def set_recipients(email: EmailModel,
-                   to_addresses: List[EmailAddress],
-                   cc_addresses: Optional[List[EmailAddress]] = None,
-                   bcc_addresses: Optional[List[EmailAddress]] = None, ):
+                   to_addresses,
+                   cc_addresses=None,
+                   bcc_addresses=None, ):
     to_recipients = [Recipient(email=email,
                                address=addr,
                                send_type='to')

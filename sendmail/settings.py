@@ -1,6 +1,7 @@
 import datetime
 import warnings
 
+from django.utils.module_loading import import_string
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
@@ -85,7 +86,7 @@ def get_languages_list():
         lang_conf = getattr(settings, 'LANGUAGES', [])
         return [lang[0] for lang in lang_conf]
     else:
-        return [get_default_language(),]
+        return [get_default_language(), ]
 
 
 def get_default_language():
@@ -115,6 +116,11 @@ def get_sending_order():
 def get_template_engine():
     using = get_config().get('TEMPLATE_ENGINE', 'sendmail')
     return template_engines[using]
+
+
+def get_email_address_model():
+    model_name = get_config().get('EMAIL_ADDRESS_MODEL', 'sendmail.models.emailaddress.EmailAddress')
+    return import_string(model_name)
 
 
 # def get_override_recipients():

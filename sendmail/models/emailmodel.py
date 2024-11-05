@@ -10,10 +10,11 @@ from django.utils.translation import pgettext_lazy
 
 from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
-from sendmail.models.emailaddress import EmailAddress, Recipient
+from sendmail.models.emailaddress import Recipient
 from sendmail.sanitizer import clean_html
 from sendmail.settings import get_log_level, get_template_engine
 from sendmail.validators import validate_email_with_name
+from ..settings import get_email_address_model
 
 logger = setup_loghandlers('INFO')
 
@@ -40,7 +41,7 @@ class EmailModel(models.Model):
     ]
 
     from_email = models.CharField(_('Email From'), max_length=254, validators=[validate_email_with_name])
-    recipients = models.ManyToManyField(EmailAddress, related_name='to_emails', through=Recipient)
+    recipients = models.ManyToManyField(get_email_address_model(), related_name='to_emails', through=Recipient)
     subject = models.CharField(_('Subject'), max_length=989, blank=True)
     message = models.TextField(_('Message'), blank=True)
     html_message = models.TextField(_('HTML Message'), blank=True)
@@ -140,7 +141,7 @@ class EmailModel(models.Model):
         # Replace recipient id with EmailAddress object
         if self.context:
             context = {**self.context}
-            context['recipient'] = EmailAddress.objects.get(id=self.context['recipient'])
+            context['recipient'] = get_email_address_model().objects.get(id=self.context['recipient'])
         else:
             context = {}
 
@@ -242,7 +243,6 @@ class EmailModel(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
-
 
 
 def render_message(html_str, context):
