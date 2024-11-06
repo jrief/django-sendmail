@@ -169,3 +169,11 @@ class EmailMergeAdmin(admin.ModelAdmin):
                     emailmerge=obj,
                     language=default_language,
                 )
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+
+        obj = form.instance
+
+        if obj and change:
+            obj.remove_extra_placeholders()

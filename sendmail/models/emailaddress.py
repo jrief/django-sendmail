@@ -1,11 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
 
 from sendmail.logutils import setup_loghandlers
 from sendmail.validators import validate_email_with_name
 from .base import AbstractEmailAddress
-from ..settings import get_email_address_model
+from ..settings import get_email_address_setting
 
 logger = setup_loghandlers('INFO')
 
@@ -52,7 +51,7 @@ class Recipient(models.Model):
         ('bcc', _('Bcc')),
     ]
     email = models.ForeignKey('sendmail.EmailModel', on_delete=models.CASCADE)
-    address = models.ForeignKey(settings.EMAIL_ADDRESS_MODEL, on_delete=models.CASCADE)
+    address = models.ForeignKey(get_email_address_setting(), on_delete=models.CASCADE)
     send_type = models.CharField(max_length=12, choices=SEND_TYPES, default='to')
 
     def __str__(self):

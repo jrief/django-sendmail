@@ -115,7 +115,7 @@ TEMPLATES = [
 
 ]
 POST_OFFICE_PLACEHOLDERS_CACHE = False
-EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
+#EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
 SENDMAIL = {
     'BACKENDS': {
         'default': 'django.core.mail.backends.dummy.EmailBackend',

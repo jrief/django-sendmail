@@ -120,8 +120,12 @@ def get_template_engine():
 
 
 def get_email_address_model():
-    model_name = getattr(settings, 'EMAIL_ADDRESS_MODEL') or 'sendmail.model.EmailAddress'
+    model_name = get_email_address_setting()
     return apps.get_model(model_name)
+
+
+def get_email_address_setting():
+    return getattr(settings, 'EMAIL_ADDRESS_MODEL', 'sendmail.EmailAddress')
 
 
 # def get_override_recipients():

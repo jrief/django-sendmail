@@ -13,7 +13,7 @@ from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailaddress import Recipient
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_log_level, get_template_engine
+from sendmail.settings import get_log_level, get_template_engine, get_email_address_setting
 from sendmail.validators import validate_email_with_name
 from ..settings import get_email_address_model
 
@@ -42,7 +42,7 @@ class EmailModel(models.Model):
     ]
 
     from_email = models.CharField(_('Email From'), max_length=254, validators=[validate_email_with_name])
-    recipients = models.ManyToManyField(settings.EMAIL_ADDRESS_MODEL, related_name='to_emails', through=Recipient)
+    recipients = models.ManyToManyField(get_email_address_setting(), related_name='to_emails', through=Recipient)
     subject = models.CharField(_('Subject'), max_length=989, blank=True)
     message = models.TextField(_('Message'), blank=True)
     html_message = models.TextField(_('HTML Message'), blank=True)

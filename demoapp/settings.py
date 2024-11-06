@@ -191,8 +191,8 @@ SENDMAIL = {
     ],
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
-EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
-#EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
+#EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
+EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

@@ -21,5 +21,10 @@ class Settings:
         config.setdefault('MESSAGE_ID_FQDN', DNS_NAME)
         return config
 
+    @property
+    def EMAIL_ADDRESS_MODEL(self):
+        return 'pisun'
+        return getattr(django_settings, 'EMAIL_ADDRESS_MODEL', 'sendmail.model.EmailAddress')
+
 
 settings = Settings()

@@ -3,29 +3,30 @@
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
+from sendmail.settings import get_email_address_setting
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
         ('sendmail', '0008_alter_emailmergemodel_options'),
-        migrations.swappable_dependency(settings.EMAIL_ADDRESS_MODEL),
+        migrations.swappable_dependency(get_email_address_setting()),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='emailmergemodel',
             name='extra_recipients',
-            field=models.ManyToManyField(blank=True, help_text='extra bcc recipients', to=settings.EMAIL_ADDRESS_MODEL),
+            field=models.ManyToManyField(blank=True, help_text='extra bcc recipients', to=get_email_address_setting()),
         ),
         migrations.AlterField(
             model_name='emailmodel',
             name='recipients',
-            field=models.ManyToManyField(related_name='to_emails', through='sendmail.Recipient', to=settings.EMAIL_ADDRESS_MODEL),
+            field=models.ManyToManyField(related_name='to_emails', through='sendmail.Recipient', to=get_email_address_setting()),
         ),
         migrations.AlterField(
             model_name='recipient',
             name='address',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.EMAIL_ADDRESS_MODEL),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=get_email_address_setting()),
         ),
     ]
