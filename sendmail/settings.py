@@ -1,6 +1,7 @@
 import datetime
 import warnings
 
+from django.apps import apps
 from django.utils.module_loading import import_string
 from django.conf import settings
 from django.core.cache import caches
@@ -119,8 +120,8 @@ def get_template_engine():
 
 
 def get_email_address_model():
-    model_name = get_config().get('EMAIL_ADDRESS_MODEL', 'sendmail.models.emailaddress.EmailAddress')
-    return import_string(model_name)
+    model_name = getattr(settings, 'EMAIL_ADDRESS_MODEL') or 'sendmail.model.EmailAddress'
+    return apps.get_model(model_name)
 
 
 # def get_override_recipients():

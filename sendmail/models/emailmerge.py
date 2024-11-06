@@ -7,13 +7,10 @@ from django.utils.translation import gettext_lazy as _
 from sendmail import cache
 from sendmail.cache_utils import get_placeholders
 from sendmail.logutils import setup_loghandlers
-from sendmail.models.emailaddress import EmailAddress
 from sendmail.parser import process_template
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_languages_list, get_template_engine, get_email_address_model
+from sendmail.settings import get_template_engine, get_email_address_model
 from sendmail.validators import validate_template_syntax
-from django.db.models.signals import post_delete, pre_delete
-from django.dispatch import receiver
 
 logger = setup_loghandlers('INFO')
 
@@ -33,7 +30,7 @@ class EmailMergeModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     extra_recipients = models.ManyToManyField(
-        get_email_address_model(),
+        settings.EMAIL_ADDRESS_MODEL,
         blank=True,
         help_text='extra bcc recipients',
     )

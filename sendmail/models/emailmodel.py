@@ -7,6 +7,7 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
+from django.conf import settings
 
 from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
@@ -41,7 +42,7 @@ class EmailModel(models.Model):
     ]
 
     from_email = models.CharField(_('Email From'), max_length=254, validators=[validate_email_with_name])
-    recipients = models.ManyToManyField(get_email_address_model(), related_name='to_emails', through=Recipient)
+    recipients = models.ManyToManyField(settings.EMAIL_ADDRESS_MODEL, related_name='to_emails', through=Recipient)
     subject = models.CharField(_('Subject'), max_length=989, blank=True)
     message = models.TextField(_('Message'), blank=True)
     html_message = models.TextField(_('HTML Message'), blank=True)

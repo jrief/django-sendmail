@@ -189,9 +189,10 @@ SENDMAIL = {
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
     ],
-    'EMAIL_ADDRESS_MODEL': 'custom_user.models.CustomEmailAddress',
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
+EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
+#EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -228,7 +229,6 @@ if CELERY_BROKER_URL := os.getenv('CELERY_BROKER_URL', ''):
     CELERY_ACCEPT_CONTENT = ["json"]
     CELERY_TASK_SERIALIZER = "json"
     CELERY_TASK_TRACK_STARTED = True
-
 
 CKEDITOR_CONFIGS = {
     'default': {
