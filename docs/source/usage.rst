@@ -220,6 +220,46 @@ You can use this context when filling subject, content or placeholders values in
         html_message = '<h1>#recipient.first_name# #recipient.last_name#</h1>'
     )
 
+Overriding EmailAddress
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to add your custom fields to EmailAddress and use it in recipients context
+for email personalization, you can define your own swapping model based on EmailAddress:
+
+In ``models.py`` of your app:
+
+.. code-block:: python
+
+    from sendmail.models.base import AbstractEmailAddress
+    from django.db import models
+    from sendmail.mixins import SwappableMetaMixin
+
+    class CustomEmailAddress(AbstractEmailAddress, SwappableMetaMixin):
+        phone_number = models.CharField(max_length=20, blank=True, null=True)
+        # Any custom fields
+
+Note that your app has to be listed in ``INSTALLED_APPS``.
+
+Then, you need to specify your custom model using ``EMAIL_ADDRESS_MODEL`` setting in ``settings.py``
+
+.. code-block:: python
+
+    EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
+
+The default value is ``sendmail.EmailAddress``.
+
+Now if you restart your server you will be able to see updated model in admin interface and fill it with your data.
+Also, your entered data will be passed to templates and can be used like {{ recipient.field_name }} in html and #recipient.field_name# in rich contents.
+
+.. warning::
+
+    It is not recommended to swap models in an operational database,
+    as doing so may lead to inconsistencies, particularly in ForeignKey relationships.
+    Swapping models can break existing references and constraints, resulting in data integrity issues.
+    Always ensure that appropriate migrations and data adjustments are in place before making such changes.
+
+
+
 mail.send_many()
 -----------------
 
