@@ -29,10 +29,10 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.staticfiles',
     'django.contrib.messages',
+    'demoapp.custom_user',
     'ckeditor',
     'ckeditor_uploader',
     'sendmail',
-    'custom_user'
 ]
 
 if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:
