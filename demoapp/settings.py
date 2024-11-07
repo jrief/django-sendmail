@@ -176,6 +176,7 @@ TEMPLATES = [
 SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': False,
+    'DJANGO_TASKS_ENABLED': True,
     'MAX_RETRIES': 3,
     'BATCH_SIZE': 20,
     'BATCH_DELIVERY_TIMEOUT': 30,
@@ -256,3 +257,9 @@ if REDIS_BACKEND_URL := os.getenv('REDIS_BACKEND_URL'):
             }
         }
     }
+
+TASKS = {
+    "default": {
+        "BACKEND": "django.tasks.backends.immediate.ImmediateBackend"
+    }
+}

@@ -155,3 +155,7 @@ def get_batch_delivery_timeout():
 
 def get_email_templates():
     return get_config().get('EMAIL_TEMPLATES', [])
+
+
+def get_django_tasks_enabled():
+    return get_config().get('DJANGO_TASKS_ENABLED', False)

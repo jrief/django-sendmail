@@ -12,8 +12,12 @@ class PostOfficeConfig(AppConfig):
 
     def ready(self):
         from sendmail import tasks
-        from sendmail.settings import get_celery_enabled
+        from sendmail import django_tasks
+        from sendmail.settings import get_celery_enabled, get_django_tasks_enabled
         from sendmail.signals import email_queued
 
         if get_celery_enabled():
             email_queued.connect(tasks.queued_mail_handler)
+
+        if get_django_tasks_enabled():
+            email_queued.connect(django_tasks.queued_mail_handler)
