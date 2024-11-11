@@ -12,7 +12,7 @@ class PlaceholderContentInline(admin.TabularInline):
     formset = EmailContentInlineFormset
     form = EmailContentInlineForm
     extra = 0
-    fields = ['content', 'base_file']
+    fields = ['content', 'used_template_file']
 
     def get_formset(self, request, obj=None, **kwargs):
         self.parent_obj = obj
@@ -25,7 +25,7 @@ class PlaceholderContentInline(admin.TabularInline):
         default_language = get_default_language()
 
         if self.parent_obj and self.parent_obj.template_file:
-            return queryset.filter(base_file=self.parent_obj.template_file).annotate(
+            return queryset.filter(used_template_file=self.parent_obj.template_file).annotate(
                 is_default_lang=Case(
                     When(language=default_language, then=Value(0)),
                     default=Value(1),

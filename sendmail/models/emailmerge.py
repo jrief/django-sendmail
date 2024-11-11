@@ -34,7 +34,7 @@ class EmailMergeModel(models.Model):
     )
     template_file = models.CharField(
         max_length=255,
-        verbose_name=_("File template"),
+        verbose_name=_("Template file"),
         # choices=get_email_templates(),  # Set choices to the result of get_email_templates
     )
     created = models.DateTimeField(auto_now_add=True)
@@ -67,7 +67,7 @@ class EmailMergeModel(models.Model):
         context = {'recipient': recipient, 'dry_run': True, **context_dict} \
             if recipient else {'dry_run': True, **context_dict}
 
-        django_template_first_pass = loader.get_template(self.base_file, using='sendmail')
+        django_template_first_pass = loader.get_template(self.template_file, using='sendmail')
 
         # Replace all {% placeholder <name> %} to {{ name }}
         first_pass_content = django_template_first_pass.render(context)
@@ -102,23 +102,29 @@ class EmailMergeContentModel(models.Model):
     """
     Model to hold EmailMerge data exclusive for every language.
     """
-    emailmerge = models.ForeignKey(EmailMergeModel,
-                                   related_name='translated_contents',
-                                   on_delete=models.CASCADE)
+    emailmerge = models.ForeignKey(
+        EmailMergeModel,
+        related_name='translated_contents',
+        on_delete=models.CASCADE,
+    )
     language = models.CharField(max_length=12)
-    subject = models.CharField(max_length=255,
-                               blank=True,
-                               verbose_name=_('Subject'),
-                               validators=[validate_template_syntax]
-                               )
-    content = models.TextField(blank=True,
-                               verbose_name=_('Content'),
-                               validators=[validate_template_syntax])
-    extra_attachments = models.ManyToManyField('Attachment',
-                                               related_name='extra_attachments',
-                                               verbose_name=_('Extra Attachments'),
-                                               blank=True,
-                                               )
+    subject = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('Subject'),
+        validators=[validate_template_syntax]
+    )
+    content = models.TextField(
+        blank=True,
+        verbose_name=_('Content'),
+        validators=[validate_template_syntax],
+    )
+    extra_attachments = models.ManyToManyField(
+        'Attachment',
+        related_name='extra_attachments',
+        verbose_name=_('Extra Attachments'),
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.emailmerge.name}: {self.language}"
@@ -130,33 +136,36 @@ class EmailMergeContentModel(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-        template = self.emailmerge
+        emailmerge = self.emailmerge
 
-        placeholders_names = set(process_template(template.base_file))
-
-        existing_placeholders = set(template.contents.
-                                    filter(base_file=template.base_file).
-                                    filter(language=self.language).
-                                    values_list('placeholder_name', flat=True))
+        placeholders_names = set(process_template(emailmerge.template_file))
+        existing_placeholders = set(
+            emailmerge.contents.
+            filter(used_template_file=emailmerge.template_file).
+            filter(language=self.language).values_list('placeholder_name', flat=True)
+        )
 
         placeholder_objs = []
-
         for placeholder_name in (placeholders_names - existing_placeholders):
-            placeholder_objs.append(PlaceholderContent(placeholder_name=placeholder_name,
-                                                       language=self.language,
-                                                       base_file=template.base_file,
-                                                       emailmerge=template,
-                                                       content=f"Placeholder: {placeholder_name}, "
-                                                               f"Language: {self.language}", ), )
-
+            placeholder_objs.append(
+                PlaceholderContent(
+                    placeholder_name=placeholder_name,
+                    language=self.language,
+                    used_template_file=emailmerge.template_file,
+                    emailmerge=emailmerge,
+                    content=f"Placeholder: {placeholder_name}, Language: {self.language}",
+                )
+            )
         PlaceholderContent.objects.bulk_create(placeholder_objs)
 
         return self
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['emailmerge', 'language'],
-                                    name='unique_content'),
+            models.UniqueConstraint(
+                fields=['emailmerge', 'language'],
+                name='unique_content'
+            ),
         ]
         app_label = 'sendmail'
         verbose_name = _('Email Template Content')
@@ -187,7 +196,7 @@ class PlaceholderContent(models.Model):
         verbose_name=_("Content"),
         default='',
     )
-    base_file = models.CharField(
+    used_template_file = models.CharField(
         verbose_name="Template File",
         max_length=255,
         # editable=False,  TODO: make it non-editable
@@ -198,7 +207,7 @@ class PlaceholderContent(models.Model):
         app_label = 'sendmail'
         constraints = [
             models.UniqueConstraint(
-                fields=['emailmerge', 'placeholder_name', 'language', 'base_file'],
+                fields=['emailmerge', 'placeholder_name', 'language', 'used_template_file'],
                 name='unique_placeholder',
             ),
         ]
@@ -207,6 +216,6 @@ class PlaceholderContent(models.Model):
         return f"{self.placeholder_name} ({self.get_language_display()})"
 
     def save(self, *args, **kwargs):
-        cache_key = 'placeholders {0}:{1}:{2}'.format(self.emailmerge.name, self.language, self.base_file)
+        cache_key = f'placeholders {self.emailmerge.name}:{self.language}:{self.used_template_file}'
         cache.delete(cache_key)
         return super().save(*args, **kwargs)

@@ -40,9 +40,9 @@ class EmailContentInlineForm(forms.ModelForm):
 
     class Meta:
         model = PlaceholderContent
-        fields = ['language', 'placeholder_name', 'content', 'base_file']
+        fields = ['language', 'placeholder_name', 'content', 'used_template_file']
         widgets = {
-            'base_file': HiddenInput(),  # Make base_file hidden
+            'used_template_file': HiddenInput(),  # TODO: never trust user input, this should be done during save()
         }
 
     def __init__(self, *args, **kwargs):
