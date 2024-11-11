@@ -21,13 +21,22 @@ class EmailMergeModel(models.Model):
     Model to hold template information from db
     """
 
-    base_file = models.CharField(
+    name = models.CharField(
+        verbose_name=_("Name"),
         max_length=255,
-        verbose_name=_('File name'),
+        help_text=_("e.g: 'welcome_email'"),
+        unique=True,
+    )
+    description = models.TextField(
+        verbose_name=_("Description"),
+        blank=True,
+        help_text=_("Description of this mail merge object."),
+    )
+    template_file = models.CharField(
+        max_length=255,
+        verbose_name=_("File template"),
         # choices=get_email_templates(),  # Set choices to the result of get_email_templates
     )
-    name = models.CharField(_('Name'), max_length=255, help_text=_("e.g: 'welcome_email'"), unique=True)
-    description = models.TextField(_('Description'), blank=True, help_text=_('Description of this template.'))
     created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     extra_recipients = models.ManyToManyField(

@@ -24,8 +24,8 @@ class PlaceholderContentInline(admin.TabularInline):
         queryset = super().get_queryset(request)
         default_language = get_default_language()
 
-        if self.parent_obj and self.parent_obj.base_file:
-            return queryset.filter(base_file=self.parent_obj.base_file).annotate(
+        if self.parent_obj and self.parent_obj.template_file:
+            return queryset.filter(base_file=self.parent_obj.template_file).annotate(
                 is_default_lang=Case(
                     When(language=default_language, then=Value(0)),
                     default=Value(1),
