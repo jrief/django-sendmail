@@ -6,6 +6,9 @@ logger = setup_loghandlers('INFO')
 
 
 class DBMutex(models.Model):
+    """
+    Model to store Database Locks.
+    """
     lock_id = models.CharField(
         max_length=50,
         unique=True,
