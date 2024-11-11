@@ -93,7 +93,10 @@ class EmailMergeContentFormSet(BaseInlineFormSet):
 class EmailMergeContentInline(admin.StackedInline):
     form = EmailMergeContentForm
     model = EmailMergeContentModel
-    fields = ('language', 'subject', 'content', 'extra_attachments')
+    fieldsets = [
+        (None, {'fields': ['language', 'subject', 'content']}),
+        (_("Extra Attachements"), {'fields': ['extra_attachments'], 'classes': ['collapse']}),
+    ]
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
     filter_horizontal = ('extra_attachments',)
     extra = 0
@@ -134,16 +137,15 @@ class EmailMergeContentInline(admin.StackedInline):
 @admin.register(EmailMergeModel)
 class EmailMergeAdmin(admin.ModelAdmin):
     form = EmailMergeAdminForm
-    list_display = ('name', 'created')
-    search_fields = ('name', 'description', 'subject')
+    list_display = ['name', 'created']
+    search_fields = ['name', 'description', 'subject']
     fieldsets = [
-        (None, {'fields': ('name', 'description', 'base_file', 'extra_recipients')}),
-        # (_('Default Content'), {'fields': ('subject', 'content')}),
+        (None, {'fields': ['name', 'description', 'base_file']}),
+        (_("Extra Recipients"), {'fields': ['extra_recipients'], 'classes': ['collapse']}),
     ]
     inlines = [EmailMergeContentInline, PlaceholderContentInline]
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
-
-    filter_horizontal = ('extra_recipients',)
+    filter_horizontal = ['extra_recipients']
 
     def description_shortened(self, instance):
         return Truncator(instance.description.split('\n')[0]).chars(200)

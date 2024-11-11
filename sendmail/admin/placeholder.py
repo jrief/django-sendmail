@@ -12,11 +12,7 @@ class PlaceholderContentInline(admin.TabularInline):
     formset = EmailContentInlineFormset
     form = EmailContentInlineForm
     extra = 0
-    readonly_fields = ('get_language_display', 'placeholder_name')
-    fields = ['content', 'get_language_display', 'placeholder_name', 'base_file']
-
-    def get_language_display(self, obj):
-        return obj.get_language_display()
+    fields = ['content', 'base_file']
 
     def get_formset(self, request, obj=None, **kwargs):
         self.parent_obj = obj

@@ -242,7 +242,6 @@ CKEDITOR_CONFIGS = {
             ['Format']  # Adding headers (e.g., Heading 1, Heading 2, etc.)
         ],
         'format_tags': 'p;h1;h2;h3;pre',  # Define the available formats (headers and others)
-        'width': 1000
     }
 }
 

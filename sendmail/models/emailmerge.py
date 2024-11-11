@@ -1,4 +1,5 @@
 from ckeditor_uploader.fields import RichTextUploadingField
+
 from django.conf import settings
 from django.db import models
 from django.template import loader
@@ -155,28 +156,45 @@ class EmailMergeContentModel(models.Model):
 
 
 class PlaceholderContent(models.Model):
-    emailmerge = models.ForeignKey(EmailMergeModel,
-                                   on_delete=models.CASCADE,
-                                   related_name='contents', )
+    emailmerge = models.ForeignKey(
+        EmailMergeModel,
+        on_delete=models.CASCADE,
+        related_name='contents',
+    )
     language = models.CharField(
         max_length=12,
         default='',
         blank=True,
         choices=settings.LANGUAGES,
     )
-    placeholder_name = models.CharField(_('Placeholder name'),
-                                        max_length=63, )
-    content = RichTextUploadingField(_('Content'), default='')
-
-    base_file = models.CharField(max_length=255, verbose_name=_('File name'))
+    placeholder_name = models.CharField(
+        verbose_name=_("Placeholder name"),
+        max_length=63,
+    )
+    content = RichTextUploadingField(
+        verbose_name=_("Content"),
+        default='',
+    )
+    base_file = models.CharField(
+        verbose_name="Template File",
+        max_length=255,
+        # editable=False,  TODO: make it non-editable
+        help_text="Template file used when creating this placeholder.",
+    )
 
     class Meta:
         app_label = 'sendmail'
         constraints = [
-            models.UniqueConstraint(fields=['emailmerge', 'placeholder_name', 'language', 'base_file'],
-                                    name='unique_placeholder'),
+            models.UniqueConstraint(
+                fields=['emailmerge', 'placeholder_name', 'language', 'base_file'],
+                name='unique_placeholder',
+            ),
         ]
 
+    def __str__(self):
+        return f"{self.placeholder_name} ({self.get_language_display()})"
+
     def save(self, *args, **kwargs):
-        cache.delete('placeholders %s:%s:%s' % (self.emailmerge.name, self.language, self.base_file))
+        cache_key = 'placeholders {0}:{1}:{2}'.format(self.emailmerge.name, self.language, self.base_file)
+        cache.delete(cache_key)
         return super().save(*args, **kwargs)

@@ -1,5 +1,7 @@
 import re
 
+from ckeditor_uploader.fields import RichTextUploadingFormField
+
 from django import forms
 from django.contrib import admin, messages
 from django.core.mail import SafeMIMEText
@@ -28,7 +30,14 @@ def requeue(modeladmin, request, queryset):
 requeue.short_description = 'Requeue selected emails'
 
 
+class CKEditorFormField(RichTextUploadingFormField):
+    def widget(self, **kwargs):
+        return super().widget(template_name='admin/ckeditor/widget.html', **kwargs)
+
+
 class EmailContentInlineForm(forms.ModelForm):
+    content = CKEditorFormField()
+
     class Meta:
         model = PlaceholderContent
         fields = ['language', 'placeholder_name', 'content', 'base_file']
@@ -37,7 +46,6 @@ class EmailContentInlineForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         if 'content' in self.initial:
