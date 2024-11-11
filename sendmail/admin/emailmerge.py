@@ -22,22 +22,23 @@ class SubjectField(TextInput):
 
 class EmailMergeAdminForm(forms.ModelForm):
     change_form_template = 'admin/sendmail/emailtemplate/change_form.html'
+
     language = forms.ChoiceField(
         choices=settings.LANGUAGES,
         required=False,
-        label=_('Language'),
-        help_text=_('Render template in alternative language'),
+        label=_("Language"),
+        help_text=_("Render template in alternative language"),
     )
-    base_file = forms.ChoiceField(
+    template_file = forms.ChoiceField(
         choices=get_email_templates(),  # Set choices to the result of get_email_templates
         required=False,
-        label=_('Base File'),
+        label=_("Base template file for email"),
         help_text=_('Select the base email template file'),
     )
 
     class Meta:
         model = EmailMergeModel
-        fields = ['name', 'description', 'base_file']
+        fields = ['name', 'description', 'template_file']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -140,7 +141,7 @@ class EmailMergeAdmin(admin.ModelAdmin):
     list_display = ['name', 'created']
     search_fields = ['name', 'description', 'subject']
     fieldsets = [
-        (None, {'fields': ['name', 'description', 'base_file']}),
+        (None, {'fields': ['name', 'description', 'template_file']}),
         (_("Extra Recipients"), {'fields': ['extra_recipients'], 'classes': ['collapse']}),
     ]
     inlines = [EmailMergeContentInline, PlaceholderContentInline]
