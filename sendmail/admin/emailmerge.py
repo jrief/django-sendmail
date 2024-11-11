@@ -112,7 +112,6 @@ class EmailMergeContentInline(admin.StackedInline):
     def get_max_num(self, request, obj=None, **kwargs):
         return len(get_languages_list())
 
-
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         default_language = get_default_language()
@@ -124,7 +123,6 @@ class EmailMergeContentInline(admin.StackedInline):
         )
         ).order_by('is_default_lang')
 
-
     def get_formset(self, request, obj=None, **kwargs):
         # Get used languages if an instance exists
         used_languages = obj.get_available_languages() if obj else []
@@ -134,8 +132,31 @@ class EmailMergeContentInline(admin.StackedInline):
         return formset
 
 
+from django.contrib import messages
+from sendmail.mail import send
+
+
+def send_email_action(modeladmin, request, queryset):
+    admin_user = request.user
+    admin_email = admin_user.email
+
+    if not admin_email:
+        messages.error(request, _("Current user does not have email address."))
+
+    try:
+        send(recipients=admin_email, template=queryset.first(), priority='now')
+        messages.success(request,"Email sent successfully to {admin_email}".format(admin_email=admin_email))
+
+    except Exception as e:
+        messages.error(request, f"An error has occurred: {e}")
+
+
+send_email_action.short_description = _("Send Test Email")
+
+
 @admin.register(EmailMergeModel)
 class EmailMergeAdmin(admin.ModelAdmin):
+    actions = [send_email_action]
     form = EmailMergeAdminForm
     list_display = ['name', 'created']
     search_fields = ['name', 'description', 'subject']

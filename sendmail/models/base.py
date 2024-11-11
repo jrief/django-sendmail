@@ -12,7 +12,7 @@ class AbstractEmailAddress(models.Model):
         ('female', _('Female')),
         ('other', _('Other')),
     ]
-    email = models.CharField(_('Email From'),
+    email = models.CharField(_('Email'),
                              max_length=254,
                              validators=[validate_email_with_name],
                              unique=True)
