@@ -5,7 +5,7 @@ from sendmail.validators import validate_email_with_name
 
 class AbstractEmailAddress(models.Model):
     """
-    A model to hold Email recipient information.
+    Abstract model to hold email recipient information.
     """
     GENDERS = [
         ('male', _('Male')),

@@ -46,7 +46,7 @@ class EmailMergeModel(models.Model):
 
     def render_email_template(self, language='', recipient=None, context_dict=None):
         """
-        Function to render an email template. Takes an EmailAddress object.
+        Function to render an email template. Takes an EmailAddress object and a dictionary of context variables.
         """
         if not language:
             raise
@@ -89,6 +89,9 @@ class EmailMergeModel(models.Model):
 
 
 class EmailMergeContentModel(models.Model):
+    """
+    Model to hold EmailMerge data exclusive for every language.
+    """
     emailmerge = models.ForeignKey(EmailMergeModel,
                                    related_name='translated_contents',
                                    on_delete=models.CASCADE)
@@ -111,7 +114,9 @@ class EmailMergeContentModel(models.Model):
         return f"{self.emailmerge.name}: {self.language}"
 
     def save(self, *args, **kwargs):
-        # cache.delete('placeholders %s:%s:%s' % (self.emailmerge.name, self.language, self.base_file))
+        """
+        On save of EmailMergeContent parses the template file and create a set of placeholders.
+        """
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -148,13 +153,10 @@ class EmailMergeContentModel(models.Model):
         verbose_name_plural = _('Email Template Contents')
 
 
-# @receiver(pre_delete, sender=EmailMergeContentModel)
-# def cleanup_placeholders(sender, instance, **kwargs):
-#     print("Trigerred")
-#     PlaceholderContent.objects.filter(emailmerge=instance.emailmerge).filter(language=instance.language).delete()
-
-
 class PlaceholderContent(models.Model):
+    """
+    Model to store user added placeholders data.
+    """
     emailmerge = models.ForeignKey(EmailMergeModel,
                                    on_delete=models.CASCADE,
                                    related_name='contents', )

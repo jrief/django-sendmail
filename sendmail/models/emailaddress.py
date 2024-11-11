@@ -11,7 +11,7 @@ logger = setup_loghandlers('INFO')
 
 class EmailAddress(AbstractEmailAddress):
     """
-    A model to hold Email recipient information.
+    Default implementation of EmailAddress model. Used by default if EMAIL_ADDRESS_MODEL is not provided.
     """
 
     class Meta:
