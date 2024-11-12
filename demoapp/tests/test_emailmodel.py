@@ -85,7 +85,7 @@ def test_get_message(settings, simple_email, upload_images):
     assert isinstance(email, EmailMessage)
 
     html_with_inlines = (f"{{% load sendmail %}}\n "
-                         f"<img src='{{% inline_image '{'logo.png'}'%}}'"
+                         f"<img src='{{% inline_image '{'images/logo.png'}'%}}'"
                          f"{simple_email.html_message}")
     simple_email.html_message = html_with_inlines
 

@@ -5,6 +5,7 @@ from django import template
 from django.conf import settings
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.html import SafeString
 
 register = template.Library()
@@ -12,7 +13,7 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def inline_image(context, file):
+def inline_image(context, file, auto=False):
     if context.get('dry_run'):
         return SafeString(f"{{% inline_image '{file}' %}}")
 
@@ -22,24 +23,34 @@ def inline_image(context, file):
 
     assert hasattr(
         context.template, '_attached_images'
-    ), "You must use template engine 'post_office' when rendering images using templatetag 'inline_image'."
+    ), "You must use template engine 'sendmail' when rendering images using templatetag 'inline_image'."
     if isinstance(file, ImageFile):
         fileobj = file
     else:
-        if default_storage.exists(file):
-            fileobj = default_storage.open(file)
-        else:
-            if settings.DEBUG:
-                raise FileNotFoundError(f"No such file or directory: {file}")
+        if auto:
+            if default_storage.exists(file):
+                fileobj = default_storage.open(file)
             else:
-                return ''
+                if settings.DEBUG:
+                    raise FileNotFoundError(f"No such file in media/: {file}")
+                else:
+                    return ''
+
+        else:
+            if staticfiles_storage.exists(file):
+                fileobj = staticfiles_storage.open(file)
+            else:
+                if settings.DEBUG:
+                    raise FileNotFoundError(f"No such file in static: {file}")
+                else:
+                    return ''
     raw_data = fileobj.read()
     image = MIMEImage(raw_data)
-    md5sum = uuid.uuid4().hex
-    image.add_header('Content-Disposition', 'inline', filename=md5sum)
-    image.add_header('Content-ID', f'<{md5sum}>')
+    cid = uuid.uuid4().hex
+    image.add_header('Content-Disposition', 'inline', filename=cid)
+    image.add_header('Content-ID', f'<{cid}>')
     context.template._attached_images.append(image)
-    return f'cid:{md5sum}'
+    return f'cid:{cid}'
 
 
 @register.simple_tag

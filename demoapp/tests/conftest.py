@@ -7,6 +7,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.mail.backends.base import BaseEmailBackend
 from sendmail.models.emailmerge import EmailMergeModel
+from django.core.management import call_command
 
 from .mailpit import MailpitConnector
 
@@ -28,7 +29,7 @@ def upload_images():
     source_dir = settings.BASE_DIR / 'demoapp/tests/assets'
     uploaded_files = []
 
-    for filename in source_dir.glob("*"):
+    for filename in source_dir.glob("*.*"):
         with filename.open('rb') as f:
             django_file = File(f)
             filepath = default_storage.save(str(filename.name), django_file)
@@ -39,6 +40,10 @@ def upload_images():
     for filepath in uploaded_files:
         if default_storage.exists(filepath):
             default_storage.delete(filepath)
+
+@pytest.fixture(scope='session', autouse=True)
+def collectstatic():
+    call_command('collectstatic', interactive=False, verbosity=0)
 
 
 @pytest.fixture(scope='session')

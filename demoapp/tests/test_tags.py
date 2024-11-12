@@ -32,7 +32,7 @@ def test_absolute_path(settings):
     context.template = template
     path = settings.MEDIA_ROOT / 'logo.png'
     print(path)
-    result = inline_image(context, path)
+    result = inline_image(context, path, auto=True)
     assert result.startswith('cid:')
     assert len(template._attached_images) == 1
     assert template._attached_images[0].get_payload(decode=True) == open(path, 'rb').read()
@@ -60,7 +60,7 @@ def test_media_urls(settings):
     context.template = template
     filename = 'logo.png'
     abs_path = f"{settings.MEDIA_ROOT}/{filename}"
-    result = inline_image(context, filename)
+    result = inline_image(context, filename, auto=True)
     assert result.startswith('cid:')
     assert len(template._attached_images) == 1
     assert template._attached_images[0].get_payload(decode=True) == open(abs_path, 'rb').read()
@@ -71,13 +71,13 @@ def test_placeholders():
 
 
 def test_static(settings):
-    settings.STATICFILES_DIRS = [str(settings.BASE_DIR / 'demoapp' / 'tests' / 'assets')]
+    #settings.STATICFILES_DIRS = [str(settings.BASE_DIR / 'demoapp' / 'tests' / 'assets')]
     template = mock.Mock()
     template._attached_images = []
     context = Context({'dry_run': False})
     context.template = template
-    filename = 'logo.png'
-    abs_path = str(settings.BASE_DIR / 'demoapp' / 'tests' / 'assets' / filename)
+    filename = 'images/logo.png'
+    abs_path = str(settings.STATIC_ROOT / 'images/logo.png')
     result = inline_image(context,  filename)
     assert result.startswith('cid:')
     assert len(template._attached_images) == 1
