@@ -3,19 +3,17 @@ from django.conf import settings
 from django.contrib import admin
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
-from django.forms import BaseInlineFormSet, TextInput, formset_factory
+from django.forms import BaseInlineFormSet, TextInput
 from django.urls import reverse, path
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.utils.translation import override as translation_override
 
 from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
-from django.urls import reverse
 
 from ..models import EmailMergeModel
 from ..mail import send
@@ -180,8 +178,10 @@ class EmailMergeAdmin(admin.ModelAdmin):
         messages_list = messages.get_messages(request)
         extra_context['messages'] = messages_list
         send_email_url = reverse('admin:send_email_action', args=[object_id])
+        email = request.user.email
         extra_context['send_email_button'] = format_html(
-            f'<a class="button" href="{send_email_url}">Send Email to {request.user.email}</a>'
+            '<a class="closelink" href="{0}">{1}</a>',
+            send_email_url, gettext(f"Send test email to {email}").format(email=email),
         )
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
