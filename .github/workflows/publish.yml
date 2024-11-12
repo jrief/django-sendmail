@@ -1,5 +1,4 @@
-name: Publish django-post_office
-
+name: Publish django-sendmail
 on:
   push:
     tags:
