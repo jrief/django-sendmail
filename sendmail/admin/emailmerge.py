@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput, formset_factory
 from django.urls import reverse, path
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +15,12 @@ from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
-from ..views import send_email_view
+from django.urls import reverse
+
+from ..models import EmailMergeModel
+from ..mail import send
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 
 
 class SubjectField(TextInput):
@@ -149,19 +155,40 @@ class EmailMergeAdmin(admin.ModelAdmin):
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
     filter_horizontal = ['extra_recipients']
 
+    def send_email_view(self, request, object_id):
+        obj = get_object_or_404(self.model, pk=object_id)
+        admin_user = request.user
+        admin_email = admin_user.email
+
+        if not admin_email:
+            messages.error(request, "Current admin user does not have an email address set.")
+            return redirect(
+                reverse('admin:%s_%s_change' % (self.model._meta.app_label, EmailMergeModel._meta.model_name),
+                        args=[object_id]))
+
+        try:
+            send(recipients=admin_email, template=obj, priority='now')
+            messages.success(request, "Email sent successfully to {admin_email}".format(admin_email=admin_email))
+
+        except Exception as e:
+            messages.error(request, f"An error has occurred: {e}")
+
+        return self.change_view(request, object_id)
+
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
-        # Generate the send email URL and button HTML
+        messages_list = messages.get_messages(request)
+        extra_context['messages'] = messages_list
         send_email_url = reverse('admin:send_email_action', args=[object_id])
-        extra_context['send_email_button'] = mark_safe(
-            f'<a class="button" href="{send_email_url}">Send Email to Admin</a>'
+        extra_context['send_email_button'] = format_html(
+            f'<a class="button" href="{send_email_url}">Send Email to {request.user.email}</a>'
         )
-        return super().change_view(request, object_id, form_url=form_url, extra_context=extra_context)
+        return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            path('<int:object_id>/send-email/', self.admin_site.admin_view(send_email_view), name='send_email_action'),
+            path('<int:object_id>/send-email/', self.admin_site.admin_view(self.send_email_view), name='send_email_action'),
         ]
         return custom_urls + urls
 

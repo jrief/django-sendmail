@@ -1,4 +1,3 @@
-
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from pathlib import Path
@@ -18,8 +17,6 @@ def get_cache_key(name, category='template', template_path=None):
         full_path = Path(get_template(template_path).origin.name)
         if full_path.exists():
             timestamp = str(int(full_path.stat().st_mtime))
-
-    print(f"Timestamp: {timestamp}")
 
     return f'sendmail:{category}:{slugify(name)}:{timestamp}'
 
