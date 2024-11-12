@@ -13,15 +13,15 @@ def get_placeholders(template, language=''):
         use_cache = getattr(settings, 'SENDMAIL_PLACEHOLDERS_CACHE', True)
     if not use_cache:
         return template.contents.filter(language=language,
-                                        base_file=template.base_file)
+                                        used_template_file=template.template_file)
     else:
-        composite_name = '%s:%s:%s' % (template.name, language, template.base_file)
+        composite_name = '%s:%s:%s' % (template.name, language, template.template_file)
         placeholders = cache.get(composite_name, category='placeholders')
         print(composite_name)
         if placeholders is None:
             print('Placeholders from db')
             placeholders = template.contents.filter(language=language,
-                                                    base_file=template.base_file)
+                                                    used_template_file=template.template_file)
             cache.set(composite_name, list(placeholders), category='placeholders')
         else:
             print('Placeholders from cache')
@@ -35,16 +35,16 @@ def get_placeholder_names(template):
         use_cache = getattr(settings, 'SENDMAIL_PLACEHOLDERS_NAME_CACHE', True)
 
     if not use_cache:
-        return set(process_template(template.base_file))
+        return set(process_template(template.template_file))
 
-    composite_name = '%s' % template.base_file
+    composite_name = '%s' % template.template_file
 
-    placeholders_names = cache.get(composite_name, category='names', template_path=template.base_file)
+    placeholders_names = cache.get(composite_name, category='names', template_path=template.template_file)
 
     if placeholders_names is None:
-        placeholders_names = process_template(template.base_file)
+        placeholders_names = process_template(template.template_file)
         print('PARSED')
-        cache.set(composite_name, list(placeholders_names), category='names', template_path=template.base_file)
+        cache.set(composite_name, list(placeholders_names), category='names', template_path=template.template_file)
     else:
         print('CACHED')
 

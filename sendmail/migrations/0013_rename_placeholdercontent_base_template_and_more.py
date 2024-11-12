@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sendmail', '0011_rename_emailmergemodel_base_file_and_more'),
+        ('sendmail', '0012_rename_emailmergemodel_base_file_and_more'),
     ]
 
     operations = [

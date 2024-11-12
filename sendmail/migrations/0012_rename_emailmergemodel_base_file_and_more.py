@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sendmail', '0010_alter_placeholdercontent_base_file'),
+        ('sendmail', '0011_alter_emailaddress_email'),
     ]
 
     operations = [

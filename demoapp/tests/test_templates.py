@@ -7,12 +7,9 @@ from sendmail.models.emailmerge import (EmailMergeContentModel,
 @pytest.fixture
 def test_template():
     template = EmailMergeModel.objects.create(
-        base_file='test/test.html',
+        template_file='test/test.html',
         name='test_name',
         description='test_description',
-        # subject='test_subject',
-        # content='test_content',
-        # language='en',
     )
 
     en_content = template.translated_contents.create(language='en')
@@ -41,7 +38,7 @@ def test_creation(test_template):
     #
     # assert de_content.content == 'Content, language: de'
 
-    placeholders_base = PlaceholderContent.objects.values_list('base_file', flat=True)
+    placeholders_base = PlaceholderContent.objects.values_list('used_template_file', flat=True)
 
     assert len(placeholders_base) == 4
 
@@ -73,7 +70,7 @@ def test_render_template(test_template):
     assert clean == html_string
 
     template_context = EmailMergeModel.objects.create(
-        base_file='test/context_test.html',
+        template_file='test/context_test.html',
         name='test',
         description='test_description',
     )

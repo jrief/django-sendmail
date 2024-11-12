@@ -22,9 +22,6 @@ def locale():
 def language():
     return 'en'
 
-    def send_messages(self, email_messages):
-        time.sleep(5)
-
 
 @pytest.fixture(scope='session', autouse=True)
 def upload_images():
@@ -53,7 +50,7 @@ def email_testing():
 @pytest.fixture
 def template():
     template_context = EmailMergeModel.objects.create(
-        base_file='test/context_test.html',
+        template_file='test/context_test.html',
         name='test_template',
         description='test_description',
     )

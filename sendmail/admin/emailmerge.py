@@ -4,6 +4,8 @@ from django.contrib import admin
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput, formset_factory
+from django.urls import reverse, path
+from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
@@ -12,6 +14,7 @@ from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
+from ..views import send_email_view
 
 
 class SubjectField(TextInput):
@@ -21,7 +24,7 @@ class SubjectField(TextInput):
 
 
 class EmailMergeAdminForm(forms.ModelForm):
-    change_form_template = 'admin/sendmail/emailtemplate/change_form.html'
+    change_form_template = 'admin/sendmail/emailmergemodel/change_form.html'
 
     language = forms.ChoiceField(
         choices=settings.LANGUAGES,
@@ -133,31 +136,8 @@ class EmailMergeContentInline(admin.StackedInline):
         return formset
 
 
-from django.contrib import messages
-from sendmail.mail import send
-
-
-def send_email_action(modeladmin, request, queryset):
-    admin_user = request.user
-    admin_email = admin_user.email
-
-    if not admin_email:
-        messages.error(request, _("Current user does not have email address."))
-
-    try:
-        send(recipients=admin_email, template=queryset.first(), priority='now')
-        messages.success(request,"Email sent successfully to {admin_email}".format(admin_email=admin_email))
-
-    except Exception as e:
-        messages.error(request, f"An error has occurred: {e}")
-
-
-send_email_action.short_description = _("Send Test Email")
-
-
 @admin.register(EmailMergeModel)
 class EmailMergeAdmin(admin.ModelAdmin):
-    actions = [send_email_action]
     form = EmailMergeAdminForm
     list_display = ['name', 'created']
     search_fields = ['name', 'description', 'subject']
@@ -168,6 +148,23 @@ class EmailMergeAdmin(admin.ModelAdmin):
     inlines = [EmailMergeContentInline, PlaceholderContentInline]
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
     filter_horizontal = ['extra_recipients']
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        # Generate the send email URL and button HTML
+        send_email_url = reverse('admin:send_email_action', args=[object_id])
+        extra_context['send_email_button'] = mark_safe(
+            f'<a class="button" href="{send_email_url}">Send Email to Admin</a>'
+        )
+        return super().change_view(request, object_id, form_url=form_url, extra_context=extra_context)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:object_id>/send-email/', self.admin_site.admin_view(send_email_view), name='send_email_action'),
+        ]
+        return custom_urls + urls
+
 
     def description_shortened(self, instance):
         return Truncator(instance.description.split('\n')[0]).chars(200)
