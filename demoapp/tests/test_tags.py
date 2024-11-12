@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 from django.core.files.images import ImageFile
 from django.template import Context, Template
+
 from sendmail.templatetags.sendmail import inline_image, placeholder
 
 

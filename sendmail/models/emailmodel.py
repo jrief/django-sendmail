@@ -2,19 +2,21 @@ from collections import namedtuple
 from email.mime.nonmultipart import MIMENonMultipart
 from typing import Union
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
-from django.conf import settings
 
 from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailaddress import Recipient
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_log_level, get_template_engine, get_email_address_setting
+from sendmail.settings import (get_email_address_setting, get_log_level,
+                               get_template_engine)
 from sendmail.validators import validate_email_with_name
+
 from ..settings import get_email_address_model
 
 logger = setup_loghandlers('INFO')

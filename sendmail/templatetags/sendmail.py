@@ -3,9 +3,9 @@ from email.mime.image import MIMEImage
 
 from django import template
 from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.html import SafeString
 
 register = template.Library()

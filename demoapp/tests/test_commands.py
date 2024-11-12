@@ -7,6 +7,7 @@ import pytest
 from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.utils.timezone import now
+
 from sendmail.mail import send
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress

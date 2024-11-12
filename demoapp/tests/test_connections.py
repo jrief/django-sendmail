@@ -1,4 +1,5 @@
 import pytest
+
 from sendmail.connections import connections
 
 from .backends import ErrorRaisingBackend, SlowTestBackend

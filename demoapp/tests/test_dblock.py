@@ -3,6 +3,7 @@ from datetime import timedelta
 from multiprocessing import Process
 
 import pytest
+
 from sendmail.dblock import LockedException, TimeoutException, db_lock
 from sendmail.models.dbmutex import DBMutex
 

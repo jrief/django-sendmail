@@ -1,7 +1,7 @@
 from ast import literal_eval
 from os.path import dirname, join
-from setuptools import setup
-from setuptools import find_packages
+
+from setuptools import find_packages, setup
 
 with open(join(dirname(__file__), 'sendmail/version.txt'), 'r') as fh:
     VERSION = '.'.join(map(str, literal_eval(fh.read())))

@@ -6,6 +6,7 @@ from email.mime.image import MIMEImage
 import pytest
 from django.core.files.images import File
 from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
+
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 
 

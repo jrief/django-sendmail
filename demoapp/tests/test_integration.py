@@ -4,12 +4,12 @@ from typing import List
 
 import pytest
 import requests
+
+from demoapp.tests.conftest import email_testing
 from sendmail.mail import _send_bulk, send, send_many
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
 from sendmail.utils import get_recipients_objects, split_emails
-
-from demoapp.tests.conftest import email_testing
 
 
 @pytest.fixture

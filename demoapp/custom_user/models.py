@@ -1,6 +1,7 @@
-from sendmail.models.base import AbstractEmailAddress
 from django.db import models
+
 from sendmail.mixins import SwappableMetaMixin
+from sendmail.models.base import AbstractEmailAddress
 
 
 class CustomEmailAddress(AbstractEmailAddress, SwappableMetaMixin):

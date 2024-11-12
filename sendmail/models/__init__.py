@@ -1,7 +1,8 @@
-from .dbmutex import DBMutex
 from .attachment import Attachment
-from .emailmodel import EmailModel
-from .emailmerge import EmailMergeModel, EmailMergeContentModel, PlaceholderContent
-from .emailaddress import EmailAddress
-from .log import Log
 from .base import AbstractEmailAddress
+from .dbmutex import DBMutex
+from .emailaddress import EmailAddress
+from .emailmerge import (EmailMergeContentModel, EmailMergeModel,
+                         PlaceholderContent)
+from .emailmodel import EmailModel
+from .log import Log

@@ -3,6 +3,7 @@
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
+
 from sendmail.settings import get_email_address_setting
 
 

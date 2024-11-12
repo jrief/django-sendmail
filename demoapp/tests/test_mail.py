@@ -10,6 +10,7 @@ from django.db import connection
 from django.db.utils import InterfaceError
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+
 from sendmail.mail import (_send_bulk, create, get_queued, send, send_many,
                            split_into_batches)
 from sendmail.models.attachment import Attachment
@@ -17,7 +18,6 @@ from sendmail.models.emailaddress import EmailAddress, Recipient
 from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.settings import get_available_backends
-
 
 #from django.conf import settings
 

@@ -6,8 +6,9 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.mail.backends.base import BaseEmailBackend
-from sendmail.models.emailmerge import EmailMergeModel
 from django.core.management import call_command
+
+from sendmail.models.emailmerge import EmailMergeModel
 
 from .mailpit import MailpitConnector
 

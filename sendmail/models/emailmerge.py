@@ -1,5 +1,4 @@
 from ckeditor_uploader.fields import RichTextUploadingField
-
 from django.conf import settings
 from django.db import models
 from django.template import loader
@@ -10,7 +9,7 @@ from sendmail.cache_utils import get_placeholders
 from sendmail.logutils import setup_loghandlers
 from sendmail.parser import process_template
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_template_engine, get_email_address_setting
+from sendmail.settings import get_email_address_setting, get_template_engine
 from sendmail.validators import validate_template_syntax
 
 logger = setup_loghandlers('INFO')

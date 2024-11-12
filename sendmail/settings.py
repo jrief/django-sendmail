@@ -2,7 +2,6 @@ import datetime
 import warnings
 
 from django.apps import apps
-from django.utils.module_loading import import_string
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
@@ -10,6 +9,7 @@ from django.core.files.storage import (InvalidStorageError, default_storage,
                                        storages)
 from django.core.mail.utils import DNS_NAME
 from django.template import engines as template_engines
+from django.utils.module_loading import import_string
 
 
 def get_attachments_storage():

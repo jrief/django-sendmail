@@ -1,13 +1,15 @@
 from django import forms
 from django.conf import settings
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput
-from django.urls import reverse, path
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.text import Truncator
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
 
 from sendmail.admin.placeholder import PlaceholderContentInline
@@ -15,10 +17,8 @@ from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
 
-from ..models import EmailMergeModel
 from ..mail import send
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
+from ..models import EmailMergeModel
 
 
 class SubjectField(TextInput):
@@ -27,7 +27,7 @@ class SubjectField(TextInput):
         self.attrs.update({'style': 'width: 610px;'})
 
 
-class EmailMergeAdminForm(forms.ModelForm):
+class EmailMergeForm(forms.ModelForm):
     change_form_template = 'admin/sendmail/emailmergemodel/change_form.html'
 
     language = forms.ChoiceField(
@@ -142,7 +142,7 @@ class EmailMergeContentInline(admin.StackedInline):
 
 @admin.register(EmailMergeModel)
 class EmailMergeAdmin(admin.ModelAdmin):
-    form = EmailMergeAdminForm
+    form = EmailMergeForm
     list_display = ['name', 'created']
     search_fields = ['name', 'description', 'subject']
     fieldsets = [

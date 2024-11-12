@@ -1,6 +1,8 @@
+from pathlib import Path
+
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
-from pathlib import Path
+
 from .settings import get_cache_backend
 
 # Stripped down version of caching functions from django-dbtemplates

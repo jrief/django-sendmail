@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import pytest
+
 from sendmail.admin.admin_utils import (convert_media_urls_to_tags,
                                         get_message_preview,
                                         render_placeholder_content)

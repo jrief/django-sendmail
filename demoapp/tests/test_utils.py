@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, default_storage
+
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmerge import EmailMergeModel
