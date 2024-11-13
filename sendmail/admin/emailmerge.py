@@ -183,27 +183,18 @@ class EmailMergeAdmin(admin.ModelAdmin):
             '<input type="submit" value="{0}" name="_send_email"></input>',
             gettext(f"Send test email to {email}").format(email=email),
         )
+        return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
+
+    def response_change(self, request, obj):
         if "_send_email" in request.POST:
-            obj = self.get_object(request, object_id)
-            form = self.get_form(request, obj=obj)(request.POST, request.FILES, instance=obj)
-            inline_formsets = []
-            self.get_inline_formsets(request, formsets=inline_formsets,
-                                     inline_instances=self.get_inline_instances(request, obj))
-            if form.is_valid() and all([inline.is_valid() for inline in inline_formsets]):
-                obj = form.save(commit=True)
-                form.save_m2m = form._save_m2m
-                self.save_related(request, form, inline_formsets, change=True)
-                self.send_email_view(request, obj)
-                return redirect(
+            self.send_email_view(request, obj)
+
+        return redirect(
                     reverse(
                         'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
-                        args=[object_id]
-                    ))
-
-            else:
-                messages.error(request, str(form.errors))
-        return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
+                        args=[obj.pk]
+                   ))
 
     def description_shortened(self, instance):
         return Truncator(instance.description.split('\n')[0]).chars(200)
