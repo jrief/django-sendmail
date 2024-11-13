@@ -25,9 +25,12 @@ def inline_image(context, file):
         fileobj = file.open('rb')
     else:
         if settings.DEBUG:
-            fullpath = Path(find(file))
+            path = find(file)
+            fullpath = Path(path) if path else None
+            if not fullpath:
+                raise FileNotFoundError(f"No such file in static: {file}")
             if not fullpath.is_file():
-                raise FileNotFoundError(f"No such file in media/: {file}")
+                raise IsADirectoryError(f"File {file} is not a file")
             fileobj = fullpath.open('rb')
         else:
             if staticfiles_storage.exists(file):
@@ -45,7 +48,7 @@ def inline_image(context, file):
 
 
 @register.simple_tag(takes_context=True)
-def inline_media_image(context, file, auto=False):
+def inline_media_image(context, file):
     if context.get('dry_run'):
         return SafeString(f"{{% inline_media_image '{file}' %}}")
 
@@ -63,7 +66,7 @@ def inline_media_image(context, file, auto=False):
             fileobj = default_storage.open(file)
         else:
             if settings.DEBUG:
-                raise FileNotFoundError(f"No such file in static: {file}")
+                raise FileNotFoundError(f"No such file in media: {file}")
             else:
                 return ''
     raw_data = fileobj.read()

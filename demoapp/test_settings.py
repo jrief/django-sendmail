@@ -74,7 +74,7 @@ SILENCED_SYSTEM_CHECKS = ['admin.E408']
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    BASE_DIR / 'demoapp/tests/assets/static_assets/',
+    BASE_DIR / 'demoapp/static/',
 ]
 
 EMAIL_HOST = '127.0.0.1'
