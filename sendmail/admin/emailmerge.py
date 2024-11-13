@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput
@@ -13,12 +14,13 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
 
 from sendmail.admin.placeholder import PlaceholderContentInline
-from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
+from sendmail.models.emailmerge import EmailMergeContentModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
 
 from ..mail import send
 from ..models import EmailMergeModel
+from ..models.emailmodel import STATUS
 
 
 class SubjectField(TextInput):
@@ -153,45 +155,55 @@ class EmailMergeAdmin(admin.ModelAdmin):
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
     filter_horizontal = ['extra_recipients']
 
-    def send_email_view(self, request, object_id):
-        obj = get_object_or_404(self.model, pk=object_id)
+    def send_email_view(self, request, obj):
+        # obj = get_object_or_404(self.model, pk=object_id)
         admin_user = request.user
         admin_email = admin_user.email
 
         if not admin_email:
             messages.error(request, "Current admin user does not have an email address set.")
-            return redirect(
-                reverse('admin:%s_%s_change' % (self.model._meta.app_label, EmailMergeModel._meta.model_name),
-                        args=[object_id]))
+            return
 
         try:
-            send(recipients=admin_email, template=obj, priority='now')
-            messages.success(request, "Email sent successfully to {admin_email}".format(admin_email=admin_email))
+            email = send(recipients=admin_email, template=obj, priority='now')
+            if email.status == STATUS.sent:
+                messages.success(request, "Email sent successfully to {admin_email}".format(admin_email=admin_email))
+            else:
+                messages.error(request, email.logs.last().message)
 
         except Exception as e:
             messages.error(request, f"An error has occurred: {e}")
-
-        return self.change_view(request, object_id)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
         messages_list = messages.get_messages(request)
         extra_context['messages'] = messages_list
-        send_email_url = reverse('admin:send_email_action', args=[object_id])
         email = request.user.email
         extra_context['send_email_button'] = format_html(
-            '<a class="closelink" href="{0}">{1}</a>',
-            send_email_url, gettext(f"Send test email to {email}").format(email=email),
+            '<input type="submit" value="{0}" name="_send_email"></input>',
+            gettext(f"Send test email to {email}").format(email=email),
         )
+
+        if "_send_email" in request.POST:
+            obj = self.get_object(request, object_id)
+            form = self.get_form(request, obj=obj)(request.POST, request.FILES, instance=obj)
+            inline_formsets = []
+            self.get_inline_formsets(request, formsets=inline_formsets,
+                                     inline_instances=self.get_inline_instances(request, obj))
+            if form.is_valid() and all([inline.is_valid() for inline in inline_formsets]):
+                obj = form.save(commit=True)
+                form.save_m2m = form._save_m2m
+                self.save_related(request, form, inline_formsets, change=True)
+                self.send_email_view(request, obj)
+                return redirect(
+                    reverse(
+                        'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
+                        args=[object_id]
+                    ))
+
+            else:
+                messages.error(request, str(form.errors))
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
-
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('<int:object_id>/send-email/', self.admin_site.admin_view(self.send_email_view), name='send_email_action'),
-        ]
-        return custom_urls + urls
-
 
     def description_shortened(self, instance):
         return Truncator(instance.description.split('\n')[0]).chars(200)
