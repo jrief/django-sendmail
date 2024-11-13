@@ -185,16 +185,17 @@ class EmailMergeAdmin(admin.ModelAdmin):
         )
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
-
     def response_change(self, request, obj):
         if "_send_email" in request.POST:
             self.send_email_view(request, obj)
+            return redirect(
+                reverse(
+                    'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
+                    args=[obj.pk]
+                ))
 
-        return redirect(
-                    reverse(
-                        'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
-                        args=[obj.pk]
-                   ))
+        return super().response_change(request, obj)
+
 
     def description_shortened(self, instance):
         return Truncator(instance.description.split('\n')[0]).chars(200)
