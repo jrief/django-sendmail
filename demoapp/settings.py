@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'sendmail',
+    'demoapp',
 ]
 
 if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:

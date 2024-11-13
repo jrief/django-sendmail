@@ -43,6 +43,5 @@ ghostdriver.log
 *.sqlite3
 celerybeat-schedule
 staticfiles/
-static/
 .coverage
 new_venv/
