@@ -5,9 +5,8 @@ from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
 from sendmail import cache
-from sendmail.cache_utils import get_placeholders
+from sendmail.cache_utils import get_placeholders, get_placeholder_names
 from sendmail.logutils import setup_loghandlers
-from sendmail.parser import process_template
 from sendmail.sanitizer import clean_html
 from sendmail.settings import get_email_address_setting, get_template_engine
 from sendmail.validators import validate_template_syntax
@@ -92,7 +91,7 @@ class EmailMergeModel(models.Model):
 
     def save(self, *args, **kwargs):
         template = super().save(*args, **kwargs)
-        cache.delete(self.name)
+        cache.delete(self.name, category='template')
 
         return template
 
@@ -135,9 +134,12 @@ class EmailMergeContentModel(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+        cache_key = f'{self.emailmerge.name}:{self.language}:{self.emailmerge.template_file}'
+        cache.delete(cache_key, category='placeholders')
+
         emailmerge = self.emailmerge
 
-        placeholders_names = set(process_template(emailmerge.template_file))
+        placeholders_names = get_placeholder_names(emailmerge)
         existing_placeholders = set(
             emailmerge.contents.
             filter(used_template_file=emailmerge.template_file).
@@ -215,6 +217,6 @@ class PlaceholderContent(models.Model):
         return f"{self.placeholder_name} ({self.get_language_display()})"
 
     def save(self, *args, **kwargs):
-        cache_key = f'placeholders {self.emailmerge.name}:{self.language}:{self.used_template_file}'
-        cache.delete(cache_key)
+        cache_key = f'{self.emailmerge.name}:{self.language}:{self.used_template_file}'
+        cache.delete(cache_key, category='placeholders')
         return super().save(*args, **kwargs)

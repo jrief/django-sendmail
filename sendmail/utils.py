@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -71,9 +71,9 @@ def get_email_template(name):
     """
     Function that returns an email template instance, from cache or DB.
     """
-    use_cache = getattr(settings, 'POST_OFFICE_CACHE', False)
+    use_cache = getattr(settings, 'SENDMAIL_CACHE', True)
     if use_cache:
-        use_cache = getattr(settings, 'POST_OFFICE_TEMPLATE_CACHE', True)
+        use_cache = getattr(settings, 'SENDMAIL_TEMPLATE_CACHE', True)
     if not use_cache:
         return EmailMergeModel.objects.get(name=name)
     else:

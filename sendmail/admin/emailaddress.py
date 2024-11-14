@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from sendmail.models.emailaddress import EmailAddress, Recipient
+from sendmail.models.emailaddress import Recipient
 from sendmail.settings import get_email_address_model
 
 

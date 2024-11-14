@@ -106,3 +106,20 @@ def test_static(settings):
 
     with pytest.raises(IsADirectoryError):
         inline_image(context, 'images')
+
+
+def test_staticfiles(settings, collectstatic):
+    settings.DEBUG = False
+    template = mock.Mock()
+    template._attached_images = []
+    context = Context({'dry_run': False})
+    context.template = template
+
+    filename = 'images/logo.jpg'
+    result = inline_image(context, filename)
+    assert result.startswith('cid:')
+    assert len(template._attached_images) == 1
+
+    assert inline_image(context, 'invalid') == ''
+
+

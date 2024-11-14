@@ -9,7 +9,6 @@ from django.core.files.storage import (InvalidStorageError, default_storage,
                                        storages)
 from django.core.mail.utils import DNS_NAME
 from django.template import engines as template_engines
-from django.utils.module_loading import import_string
 
 
 def get_attachments_storage():
@@ -70,6 +69,10 @@ def get_cache_backend():
             except InvalidCacheBackendError:
                 pass
     return None
+
+
+def get_placeholders_names_timeout():
+    return getattr(settings, 'PLACEHOLDERS_NAMES_CACHE_TIMEOUT', None)
 
 
 def get_config():

@@ -189,3 +189,91 @@ Adjust this to meet your needs.
     Edited content is cleaned before rendering in email templates to avoid XSS vulnerabilities.
     However it is still not recommended to have buttons like ``Source`` in your config.
 
+Caching
+-------------
+
+For caching ``django-sendmail`` uses backend with ``sendmail`` alias set in ``CACHES``:
+
+.. code-block:: python
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': f'redis://{REDIS_BACKEND_URL}',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        },
+        'sendmail': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': f'redis://{REDIS_BACKEND_URL}',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
+    }
+
+If ``sendmail`` is not provided fallback to ``default``.
+
+``django-sendmail`` caches 3 types of instances:
+
+1. EmailMergeModel objects
+2. Placeholders
+3. Placeholder names
+
+By default caching is enabled only for EmailMergeModel and can be controlled by:
+
+.. code-block:: python
+
+    SENDMAIL_CACHE = True
+
+In ``settings.py``.
+
+
+If you want also to cache Placeholder values, that can significantly optimize number of db queries add this to your settings:
+
+.. code-block:: python
+
+    SENDMAIL_PLACEHOLDERS_CACHE = True
+
+.. warning::
+
+    This setting should not be enabled if you're using an in-memory or file system cache,
+    as it may cause inconsistencies when rendering emails in worker processes.
+
+Caching placeholder names is a useful feature to avoid re-evaluating file-based HTML templates for each email.
+It can be enabled by setting:
+
+.. code-block:: python
+
+    SENDMAIL_PLACEHOLDERS_NAME_CACHE = True
+
+For this setting you can also override companion setting ``PLACEHOLDERS_CACHE_TIMEOUT``:
+
+.. code-block:: python
+
+    PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 10
+
+Code above will set timeout for placeholder names cache for 10 seconds.
+Setting defaults to ``default_timeout`` set in your caching backend.
+
+To disable EmailMerge objects cache, you can set:
+
+.. code-block:: python
+
+    SENDMAIL_TEMPLATE_CACHE = False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

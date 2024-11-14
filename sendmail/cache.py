@@ -3,33 +3,31 @@ from pathlib import Path
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 
-from .settings import get_cache_backend
+from .settings import get_cache_backend, get_placeholders_names_timeout
 
 # Stripped down version of caching functions from django-dbtemplates
 # https://github.com/jezdez/django-dbtemplates/blob/develop/dbtemplates/utils/cache.py
 cache_backend = get_cache_backend()
 
 
-def get_cache_key(name, category='template', template_path=None):
+def get_cache_key(name, category='template'):
     """
     Prefixes and slugify the key name
     """
-    timestamp = ""
-    if template_path:
-        full_path = Path(get_template(template_path).origin.name)
-        if full_path.exists():
-            timestamp = str(int(full_path.stat().st_mtime))
 
-    return f'sendmail:{category}:{slugify(name)}:{timestamp}'
+    return f'sendmail:{category}:{slugify(name)}'
 
 
-def set(name, content, category='template', template_path=None):
-    return cache_backend.set(get_cache_key(name, category, template_path), content)
+def set(name, content, category='template'):
+    if category == 'names' and (timeout := get_placeholders_names_timeout()):
+        return cache_backend.set(get_cache_key(name, category), content, timeout=timeout)
+    return cache_backend.set(get_cache_key(name, category), content)
 
 
-def get(name, category='template', template_path=None):
-    return cache_backend.get(get_cache_key(name, category, template_path))
+def get(name, category='template'):
+    return cache_backend.get(get_cache_key(name, category))
 
 
-def delete(name, category='template', template_path=None):
-    return cache_backend.delete(get_cache_key(name, category, template_path))
+def delete(name, category='template'):
+    return cache_backend.delete(get_cache_key(name, category))
+

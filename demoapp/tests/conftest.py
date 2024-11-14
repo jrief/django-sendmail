@@ -42,9 +42,10 @@ def upload_images():
         if default_storage.exists(filepath):
             default_storage.delete(filepath)
 
-# @pytest.fixture(scope='session', autouse=True)
-# def collectstatic():
-#     call_command('collectstatic', interactive=False, verbosity=0)
+@pytest.fixture()
+def collectstatic():
+    call_command('collectstatic', interactive=False, verbosity=0)
+
 
 
 @pytest.fixture(scope='session')
