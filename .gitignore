@@ -45,3 +45,4 @@ celerybeat-schedule
 staticfiles/
 .coverage
 new_venv/
+.env
