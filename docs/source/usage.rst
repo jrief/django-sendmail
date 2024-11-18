@@ -251,6 +251,18 @@ The default value is ``sendmail.EmailAddress``.
 Now if you restart your server you will be able to see updated model in admin interface and fill it with your data.
 Also, your entered data will be passed to templates and can be used like {{ recipient.field_name }} in html and #recipient.field_name# in rich contents.
 
+If you have to get active model class:
+
+.. code-block:: python
+
+    from sendmail.settings import get_email_address_model
+
+    EmailAddress = get_email_address_model()
+
+    print(EmailAddress.objects.first()) # Use your model
+
+
+
 .. warning::
 
     It is not recommended to swap models in an operational database,

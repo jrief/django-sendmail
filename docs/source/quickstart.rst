@@ -86,7 +86,11 @@ You can use relative path from your ``templates`` folder or absolute file path.
 
 The above command will put your email on the queue so you can use the command in
 your webapp without slowing down the request/response cycle too much.
-To actually send them out, run python manage.py send_queued_mail.
+To actually send them out, run:
+
+``python manage.py send_queued_mail``
+
+
 You can schedule this management command to run regularly via cron:
 
 .. code-block::

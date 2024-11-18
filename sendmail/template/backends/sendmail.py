@@ -28,12 +28,12 @@ class SendMailTemplates(BaseEngine):
     app_dirname = 'templates'
 
     def __init__(self, params):
+        params = params.copy()
         self.options = self._initialize_options(params)
         super().__init__(params)
         self.engine = self._create_engine(self.options)
 
     def _initialize_options(self, params):
-        #params = params.copy()
         options = params.pop('OPTIONS').copy()
         options.setdefault('autoescape', True)
         options.setdefault('debug', settings.DEBUG)
