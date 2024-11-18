@@ -1,5 +1,5 @@
-from django.core.checks import Warning, register
 from django.conf import settings
+from django.core.checks import Warning, register
 
 from sendmail.settings import get_cache_backend
 

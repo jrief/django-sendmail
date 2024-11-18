@@ -3,7 +3,7 @@ import datetime
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 
-from ...utils import cleanup_expired_mails
+from sendmail.utils import cleanup_expired_mails
 
 
 class Command(BaseCommand):

@@ -1,5 +1,4 @@
 
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -7,16 +6,15 @@ from django.core.files.storage import default_storage
 from django.utils.encoding import force_str
 
 from sendmail import cache
-
-from .logutils import setup_loghandlers
-from .models.attachment import Attachment
-from .models.emailaddress import Recipient
-from .models.emailmerge import EmailMergeModel
-from .models.emailmodel import PRIORITY, STATUS, EmailModel
-from .settings import (get_default_language, get_default_priority,
-                       get_email_address_model, get_languages_list)
-from .signals import email_queued
-from .validators import validate_email_with_name
+from sendmail.logutils import setup_loghandlers
+from sendmail.models.attachment import Attachment
+from sendmail.models.emailaddress import Recipient
+from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
+from sendmail.settings import (get_default_language, get_default_priority,
+                               get_email_address_model, get_languages_list)
+from sendmail.signals import email_queued
+from sendmail.validators import validate_email_with_name
 
 logger = setup_loghandlers('WARN')
 

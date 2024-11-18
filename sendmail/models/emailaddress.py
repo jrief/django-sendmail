@@ -2,10 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from sendmail.logutils import setup_loghandlers
-from sendmail.validators import validate_email_with_name
-
-from ..settings import get_email_address_setting
-from .base import AbstractEmailAddress
+from sendmail.models.base import AbstractEmailAddress
+from sendmail.settings import get_email_address_setting
 
 logger = setup_loghandlers('INFO')
 

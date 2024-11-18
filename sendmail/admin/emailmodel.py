@@ -1,7 +1,5 @@
 import re
 
-from ckeditor_uploader.fields import RichTextUploadingFormField
-from django import forms
 from django.contrib import admin, messages
 from django.core.mail import SafeMIMEText
 from django.http import (HttpResponse, HttpResponseNotFound,

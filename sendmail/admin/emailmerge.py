@@ -5,8 +5,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import path, reverse
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.text import Truncator
 from django.utils.translation import gettext

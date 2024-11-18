@@ -1,9 +1,6 @@
-from pathlib import Path
-
 from django.template.defaultfilters import slugify
-from django.template.loader import get_template
 
-from .settings import get_cache_backend, get_placeholders_names_timeout
+from sendmail.settings import get_cache_backend, get_placeholders_names_timeout
 
 # Stripped down version of caching functions from django-dbtemplates
 # https://github.com/jezdez/django-dbtemplates/blob/develop/dbtemplates/utils/cache.py

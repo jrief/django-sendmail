@@ -12,9 +12,8 @@ from django.db import transaction
 from django.utils.timezone import now
 
 from sendmail.mail import _send_bulk, get_queued
+from sendmail.settings import get_celery_enabled
 from sendmail.utils import cleanup_expired_mails
-
-from .settings import get_celery_enabled
 
 try:
     if get_celery_enabled():

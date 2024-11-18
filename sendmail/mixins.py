@@ -1,4 +1,4 @@
-from .settings import get_email_address_setting
+from sendmail.settings import get_email_address_setting
 
 
 class SwappableMetaMixin:

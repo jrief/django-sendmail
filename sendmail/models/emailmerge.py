@@ -5,7 +5,7 @@ from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
 from sendmail import cache
-from sendmail.cache_utils import get_placeholders, get_placeholder_names
+from sendmail.cache_utils import get_placeholder_names, get_placeholders
 from sendmail.logutils import setup_loghandlers
 from sendmail.sanitizer import clean_html
 from sendmail.settings import get_email_address_setting, get_template_engine

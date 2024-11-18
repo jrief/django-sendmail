@@ -23,7 +23,6 @@ class Settings:
 
     @property
     def EMAIL_ADDRESS_MODEL(self):
-        return 'pisun'
         return getattr(django_settings, 'EMAIL_ADDRESS_MODEL', 'sendmail.model.EmailAddress')
 
 

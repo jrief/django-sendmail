@@ -7,22 +7,22 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from .connections import connections
-from .logutils import setup_loghandlers
-from .models.emailaddress import Recipient
-from .models.emailmerge import EmailMergeModel
-from .models.emailmodel import PRIORITY, STATUS, EmailModel
-from .models.log import Log
-from .settings import (get_available_backends, get_batch_size,
-                       get_default_language, get_email_address_model,
-                       get_log_level, get_max_retries, get_message_id_enabled,
-                       get_message_id_fqdn, get_retry_timedelta,
-                       get_sending_order)
-from .signals import email_queued
-from .utils import (create_attachments, get_email_template,
-                    get_language_from_code, get_or_create_recipient,
-                    get_recipients_objects, parse_emails, parse_priority,
-                    set_recipients)
+from sendmail.connections import connections
+from sendmail.logutils import setup_loghandlers
+from sendmail.models.emailaddress import Recipient
+from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
+from sendmail.models.log import Log
+from sendmail.settings import (get_available_backends, get_batch_size,
+                               get_default_language, get_email_address_model,
+                               get_log_level, get_max_retries,
+                               get_message_id_enabled, get_message_id_fqdn,
+                               get_retry_timedelta, get_sending_order)
+from sendmail.signals import email_queued
+from sendmail.utils import (create_attachments, get_email_template,
+                            get_language_from_code, get_or_create_recipient,
+                            get_recipients_objects, parse_emails,
+                            parse_priority, set_recipients)
 
 logger = setup_loghandlers('INFO')
 
@@ -265,7 +265,6 @@ def send_many(**kwargs):
             extra_attachments = []
 
             if template:
-
 
                 if email.language not in extra_attachments_cache:
                     extra_attachments = template.translated_contents.get(
