@@ -28,6 +28,7 @@ Installing nh3 is strongly encouraged for security reasons. Only with installed 
 ## Installation
 
 [![Build Status](https://github.com/jrief/django-sendmail/actions/workflows/test.yml/badge.svg)](https://github.com/jrief/django-sendmail/actions)
+[![Docs Status](https://readthedocs.org/projects/django-sendmail/badge/)](https://django-sendmail.readthedocs.io/en/latest/)
 [![PyPI](https://img.shields.io/pypi/pyversions/django-sendmail.svg)]()
 [![PyPI version](https://img.shields.io/pypi/v/django-sendmail.svg)](https://pypi.org/project/django-sendmail/)
 [![PyPI](https://img.shields.io/pypi/l/django-sendmail.svg)]()

@@ -17,7 +17,7 @@ get_message_preview.short_description = 'Message'
 def render_placeholder_content(content):
     """Render placeholders content to replace {% inline_image %} tags with actual images. """
     engine = get_template_engine()
-    template = engine.from_string(f"{{% load sendmail %}}{content}")
+    template = engine.from_string(content)
     context = {'media': True, 'dry_run': False}
     return template.render(context)
 

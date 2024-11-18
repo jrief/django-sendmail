@@ -28,7 +28,12 @@ class SendMailTemplates(BaseEngine):
     app_dirname = 'templates'
 
     def __init__(self, params):
-        params = params.copy()
+        self.options = self._initialize_options(params)
+        super().__init__(params)
+        self.engine = self._create_engine(self.options)
+
+    def _initialize_options(self, params):
+        #params = params.copy()
         options = params.pop('OPTIONS').copy()
         options.setdefault('autoescape', True)
         options.setdefault('debug', settings.DEBUG)
@@ -38,8 +43,12 @@ class SendMailTemplates(BaseEngine):
         )
         libraries = options.get('libraries', {})
         options['libraries'] = self.get_templatetag_libraries(libraries)
-        super().__init__(params)
-        self.engine = Engine(self.dirs, self.app_dirs, **options)
+        options['builtins'] = ['sendmail.template.tags.media_inline']
+
+        return options
+
+    def _create_engine(self, options):
+        return Engine(self.dirs, self.app_dirs, **options)
 
     def from_string(self, template_code):
         return Template(self.engine.from_string(template_code), self)

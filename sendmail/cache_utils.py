@@ -17,14 +17,10 @@ def get_placeholders(template, language=''):
     else:
         composite_name = '%s:%s:%s' % (template.name, language, template.template_file)
         placeholders = cache.get(composite_name, category='placeholders')
-        print(composite_name)
         if placeholders is None:
-            print('Placeholders from db')
             placeholders = template.contents.filter(language=language,
                                                     used_template_file=template.template_file)
             cache.set(composite_name, list(placeholders), category='placeholders')
-        else:
-            print('Placeholders from cache')
 
         return placeholders
 
@@ -43,9 +39,6 @@ def get_placeholder_names(template):
 
     if placeholders_names is None:
         placeholders_names = process_template(template.template_file)
-        print('PARSED')
         cache.set(composite_name, list(placeholders_names), category='names')
-    else:
-        print('CACHED')
 
     return set(placeholders_names)

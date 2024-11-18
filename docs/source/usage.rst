@@ -409,12 +409,21 @@ You may want to use embed images to your templates. This can be done using sendm
 
 ``<img src="{% inline_image 'images/logo.png' %}" alt="" width="100">``
 
-You can specify either alias or absolute path to your image. Alias are resolved in the following order:
+You can specify either alias or absolute path to your image. Alias are resolved:
 
-1. In MEDIA_ROOT
-2. In ``static`` (using ``django.contrib.staticfiles.finder``)
+1. If ``DEBUG`` mode is turned on searches in ``static`` folder. If not found searches in ``staticfiles``.
+If not found raises ``FileNotFound`` exception.
 
-If no file found ``FileNotFoundError`` exception will be raised
+
+2. If ``DEBUG`` is off searches only in ``staticfiles``. If not found src of your inline image will be empty.
+
+Media Images
+~~~~~~~~~~~~~~
+
+All images inserted in CKEditor fields will be saved in ``MEDIA_ROOT`` of your project.
+If you for any reason want to insert media images into your html templates:
+
+``<img src="{% inline_media_image 'images/logo.png' %}" alt="" width="100">``
 
 CKEDITOR Placeholders editor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

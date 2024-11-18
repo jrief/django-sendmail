@@ -188,7 +188,7 @@ TEMPLATES = [
 
 SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
-    'CELERY_ENABLED': True,
+    'CELERY_ENABLED': False,
     'MAX_RETRIES': 3,
     'BATCH_SIZE': 20,
     'BATCH_DELIVERY_TIMEOUT': 30,

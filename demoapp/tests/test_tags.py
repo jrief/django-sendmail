@@ -1,12 +1,12 @@
-import pathlib
-import re
+
 from unittest import mock
 
 import pytest
 from django.core.files.images import ImageFile
-from django.template import Context, Template
+from django.template import Context
 
-from sendmail.templatetags.sendmail import inline_image, placeholder, inline_media_image
+from sendmail.templatetags.sendmail import inline_image, placeholder
+from sendmail.template.tags.media_inline import inline_media_image
 
 
 @pytest.mark.django_db
