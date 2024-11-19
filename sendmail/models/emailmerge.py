@@ -187,7 +187,7 @@ class PlaceholderContent(models.Model):
         max_length=12,
         default='',
         blank=True,
-        choices=settings.LANGUAGES,
+        choices=[]
     )
     placeholder_name = models.CharField(
         verbose_name=_("Placeholder name"),
@@ -203,6 +203,9 @@ class PlaceholderContent(models.Model):
         # editable=False,  TODO: make it non-editable
         help_text="Template file used when creating this placeholder.",
     )
+
+    def get_language_display(self):
+        return dict(settings.LANGUAGES).get(self.language, self.language)
 
     class Meta:
         app_label = 'sendmail'

@@ -8,7 +8,7 @@ from sendmail.settings import get_cache_backend
 def check_cache_backend(app_configs, **kwargs):
     use_cache = getattr(settings, 'SENDMAIL_CACHE', True)
     if use_cache:
-        use_cache = getattr(settings, 'SENDMAIL_PLACEHOLDERS_CACHE', True)
+        use_cache = getattr(settings, 'SENDMAIL_PLACEHOLDERS_CACHE', False)
 
         if use_cache:
             cls = get_cache_backend().__class__.__name__
