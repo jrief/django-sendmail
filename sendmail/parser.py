@@ -1,6 +1,7 @@
 from django.template import loader
-from django.template.base import NodeList
-from django.template.loader_tags import IncludeNode
+from django.template.base import NodeList, VariableNode
+from django.template.loader_tags import IncludeNode, Variable
+import re
 
 
 def get_placeholders_names_from_nodes(nodelist):
@@ -31,7 +32,48 @@ def get_placeholders_names_from_nodes(nodelist):
     return placeholders_names
 
 
+def get_variables_names(nodelist):
+    variables_names = []
+
+    for node in nodelist:
+        if hasattr(node, 'nodelist'):
+            variables_names.extend(get_variables_names(node.nodelist))
+
+        if hasattr(node, 'nodelist_loop'):
+            variables_names.extend(get_variables_names(node.nodelist_loop))
+
+        if isinstance(node, NodeList):
+            variables_names.extend(get_variables_names(node))
+
+        elif isinstance(node, VariableNode):
+            variables_names.append(node.filter_expression.var.var)
+
+        elif isinstance(node, IncludeNode):
+            included_template = node.template.var
+            variables_names.extend(extract_variable_names(included_template))
+
+    return variables_names
+
+
 def process_template(template_name):
     template = loader.get_template(template_name, using='sendmail')
     nodelist = template.template.nodelist
     return get_placeholders_names_from_nodes(nodelist)
+
+
+def extract_variable_names(template_name):
+    template = loader.get_template(template_name, using='sendmail')
+    nodelist = template.template.nodelist
+    return get_variables_names(nodelist)
+
+def get_ckeditor_variables(template):
+    vars = []
+
+    pattern = r"#(.*?)#"
+
+    for content in template.contents.all():
+        vars.extend(re.findall(pattern, content.content))
+
+    return vars
+
+

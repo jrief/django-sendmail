@@ -17,11 +17,11 @@ from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
-from .admin_utils import get_language_name
+from sendmail.admin.admin_utils import get_language_name
 
-from ..mail import send
-from ..models import EmailMergeModel
-from ..models.emailmodel import STATUS
+from sendmail.mail import send
+from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.emailmodel import STATUS
 
 
 class SubjectField(TextInput):
