@@ -12,6 +12,7 @@ from django.utils.text import Truncator
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
+from tornado.test.options_test import Email
 
 from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel
@@ -157,6 +158,7 @@ class EmailMergeAdmin(admin.ModelAdmin):
 
     def send_email_view(self, request, obj):
         # obj = get_object_or_404(self.model, pk=object_id)
+        language = request.POST.get('email_language', None)
         admin_user = request.user
         admin_email = admin_user.email
 
@@ -165,7 +167,7 @@ class EmailMergeAdmin(admin.ModelAdmin):
             return
 
         try:
-            email = send(recipients=admin_email, template=obj, priority='now')
+            email = send(recipients=admin_email, template=obj, priority='now', language=language)
             if email.status == STATUS.sent:
                 messages.success(request, "Email sent successfully to {admin_email}".format(admin_email=admin_email))
             else:
@@ -179,9 +181,25 @@ class EmailMergeAdmin(admin.ModelAdmin):
         messages_list = messages.get_messages(request)
         extra_context['messages'] = messages_list
         email = request.user.email
+        if object_id:
+            obj = EmailMergeModel.objects.get(pk=object_id)
+            language_options = format_html(''.join([f'<option value="{code}">{code}</option>'
+                                                    for code in obj.get_available_languages()]))
+        else:
+            language_options = ''
+
         extra_context['send_email_button'] = format_html(
-            '<input type="submit" value="{0}" name="_send_email"></input>',
-            gettext(f"Send test email to {email}").format(email=email),
+            '''
+                    <form method="post" style="display: inline; margin: 0; padding: 0;" action="">
+                        <input type="submit" value="{button_text} in " name="_send_email" style="padding: 5px 10px; cursor: pointer; margin-right: -10px">
+                        <select name="email_language" style="
+                        padding: 5px 10px; background-color: var(--button-bg); cursor: pointer; margin-right: -10px; height: 2.1875rem">
+                            {language_options}
+                        </select>
+                    </form>
+                    ''',
+            language_options=language_options,
+            button_text=gettext(f"Send test email to {email}").format(email=email),
         )
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
@@ -195,7 +213,6 @@ class EmailMergeAdmin(admin.ModelAdmin):
                 ))
 
         return super().response_change(request, obj)
-
 
     def description_shortened(self, instance):
         return Truncator(instance.description.split('\n')[0]).chars(200)
