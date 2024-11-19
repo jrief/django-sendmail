@@ -18,6 +18,7 @@ from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel
 from sendmail.settings import (get_default_language, get_email_templates,
                                get_languages_list)
+from .admin_utils import get_language_name
 
 from ..mail import send
 from ..models import EmailMergeModel
@@ -183,7 +184,7 @@ class EmailMergeAdmin(admin.ModelAdmin):
         email = request.user.email
         if object_id:
             obj = EmailMergeModel.objects.get(pk=object_id)
-            language_options = format_html(''.join([f'<option value="{code}">{code}</option>'
+            language_options = format_html(''.join([f'<option value="{code}">{get_language_name(code)}</option>'
                                                     for code in obj.get_available_languages()]))
         else:
             language_options = ''

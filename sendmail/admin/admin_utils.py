@@ -37,3 +37,7 @@ def convert_media_urls_to_tags(content):
 
     html_str = html.tostring(tree, encoding='unicode', method='html')
     return mark_safe(html_str.replace('%20', ' '))
+
+
+def get_language_name(code):
+    return dict(settings.LANGUAGES).get(code, code)
