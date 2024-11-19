@@ -12,7 +12,6 @@ from django.utils.text import Truncator
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
-from tornado.test.options_test import Email
 
 from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.models.emailmerge import EmailMergeContentModel
