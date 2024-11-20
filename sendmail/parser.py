@@ -73,9 +73,9 @@ def get_ckeditor_variables(template):
     for content in template.contents.all():
         vars.extend(get_custom_vars(content.content))
 
-    return vars
+    return list(set(vars))
 
 
 def get_custom_vars(text):
     pattern = r"#(.*?)#"
-    return re.findall(pattern, text)
+    return list(set(re.findall(pattern, text)))

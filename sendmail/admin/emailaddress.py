@@ -35,4 +35,4 @@ class EmailAddressAdmin(admin.ModelAdmin):
 
 @admin.register(RecipientsList)
 class RecipientsAdmin(admin.ModelAdmin):
-    pass
+    filter_horizontal = ['recipients']

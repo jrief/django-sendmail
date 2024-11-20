@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.html import format_html
+from sendmail.models.emailmodel import STATUS
 
 from sendmail.models import Newsletter
 
@@ -70,16 +69,34 @@ class NewsletterForm(forms.ModelForm):
         }
 
 
+def requeue_failed(modeladmin, request, queryset):
+    for newsletter in queryset:
+        newsletter.emails.filter(status=STATUS.failed).update(status=STATUS.queued)
+
+
+requeue_failed.short_description = 'Requeue failed emails'
+
+
+def requeue_all(modeladmin, request, queryset):
+    for newsletter in queryset:
+        newsletter.emails.update(status=STATUS.queued)
+
+
+requeue_all.short_description = 'Requeue all emails'
+
+
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'to_recipients', 'total_emails', 'sent_emails', 'failed_emails', 'requeued_emails')
+    list_display = ('name', 'to_recipients', 'total_emails', 'queued_emails', 'sent_emails', 'failed_emails', 'requeued_emails')
+    filter_horizontal = ['attachments']
+    actions = [requeue_failed, requeue_all]
     form = NewsletterForm
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
         extra_context['send_newsletter_button'] = format_html(
             '''
-            <input type="submit" value="Send Many" name="_send_many"/>
+            <input type="submit" value="Send" name="_send_many" style="background-color: var(--message-success-bg)"/>
             '''
         )
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
@@ -87,11 +104,5 @@ class NewsletterAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         if "_send_many" in request.POST:
             obj.create()
-            # return redirect(
-            #     reverse(
-            #         'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
-            #         args=[obj.pk]
-            #     ))
 
         return super().response_change(request, obj)
-

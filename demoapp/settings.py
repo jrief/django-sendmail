@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
@@ -190,6 +191,7 @@ SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': False,
     'MAX_RETRIES': 3,
+    'RETRY_INTERVAL': timedelta(seconds=1),
     'BATCH_SIZE': 20,
     'BATCH_DELIVERY_TIMEOUT': 30,
     'MESSAGE_ID_ENABLED': True,

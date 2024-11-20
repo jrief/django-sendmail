@@ -92,6 +92,9 @@ class Newsletter(models.Model):
 
         vars = list(set(vars))
 
+        # Filter out recipient context, It is not expected to be filled by user
+        vars = filter(lambda x: not x.startswith('recipient'), vars)
+
         return {var: '' for var in vars}
 
     def create(self):
@@ -127,6 +130,10 @@ class Newsletter(models.Model):
     @property
     def requeued_emails(self):
         return self.emails.filter(status=STATUS.requeued).count()
+
+    @property
+    def queued_emails(self):
+        return self.emails.filter(status=STATUS.queued).count()
 
     def clean(self):
         if self.emailmerge and self.subject:
