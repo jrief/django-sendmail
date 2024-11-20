@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection as db_connection
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from sendmail.connections import connections
@@ -232,6 +232,7 @@ def send_many(**kwargs):
                  **kwargs)
             for recipient in recipients_objs]
     else:
+        kwargs.pop('language', None)
         emails = [
             send(recipients=[recipient.email],
                  context={**context, 'recipient': recipient.id},
@@ -252,7 +253,10 @@ def send_many(**kwargs):
         through_objs = []
 
         if attachments := kwargs.get('attachments'):
-            attachment_list.extend(create_attachments(attachments))
+            if isinstance(attachments, dict):
+                attachment_list.extend(create_attachments(attachments))
+            elif isinstance(attachments, QuerySet):
+                attachment_list.extend(list(attachments))
 
         if template := kwargs.get('template'):
             if not isinstance(template, EmailMergeModel):

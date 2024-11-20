@@ -1,13 +1,14 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from sendmail.models import EmailMergeModel
-from sendmail.parser import extract_variable_names, get_ckeditor_variables
+from sendmail.parser import extract_variable_names, get_ckeditor_variables, get_custom_vars
 from sendmail.validators import validate_email_with_name
 from django.utils.translation import gettext_lazy as _
 from sendmail.models.recipients_list import RecipientsList
 from sendmail.models.emailmodel import PRIORITY
 from sendmail.models.attachment import Attachment
-from sendmail.models.emailmodel import EmailModel
+from sendmail.models.emailmodel import EmailModel, STATUS
 from sendmail import mail
 
 
@@ -52,6 +53,10 @@ class Newsletter(models.Model):
         _('Expires'), blank=True, null=True, help_text=_("Email won't be sent after this timestamp")
     )
 
+    subject = models.CharField(_('Subject'), max_length=989, blank=True)
+    message = models.TextField(_('Message'), blank=True)
+    html_message = models.TextField(_('HTML Message'), blank=True)
+
     emailmerge = models.ForeignKey(
         EmailMergeModel,
         blank=True,
@@ -77,31 +82,67 @@ class Newsletter(models.Model):
         return self.name
 
     def construct_default_json(self):
-        vars = extract_variable_names(self.emailmerge.template_file)
-        vars.extend(get_ckeditor_variables(self.emailmerge))
+        if self.emailmerge:
+            vars = extract_variable_names(self.emailmerge.template_file)
+            vars.extend(get_ckeditor_variables(self.emailmerge))
+        else:
+            vars = get_custom_vars(self.subject)
+            vars.extend(get_custom_vars(self.message))
+            vars.extend(get_custom_vars(self.html_message))
 
         vars = list(set(vars))
 
         return {var: '' for var in vars}
 
     def create(self):
-        emails = mail.send_many(recipients=list(self.to_recipients.recipients.all()),
-                                sender=self.email_from,
-                                template=self.emailmerge,
-                                context=self.context,
-                                scheduled_time=self.scheduled_time,
-                                expires_at=self.expires_at,
-                                # language=self.language,
-                                priority=self.priority,
-                                )
-        return emails
+        kwargs = {
+            'recipients': list(self.to_recipients.recipients.all()),
+            'sender': self.email_from,
+            'priority': self.priority,
+            'template': self.emailmerge,
+            'context': self.context,
+            'html_message': self.html_message,
+            'subject': self.subject,
+            'message': self.message,
+            'language': self.language,
+            'scheduled_time': self.scheduled_time,
+            'expires_at': self.expires_at,
+            'attachments': self.attachments.all()
+        }
+        emails = mail.send_many(**kwargs)
+        self.emails.set(emails)
+
+    @property
+    def total_emails(self):
+        return self.emails.count()
+
+    @property
+    def sent_emails(self):
+        return self.emails.filter(status=STATUS.sent).count()
+
+    @property
+    def failed_emails(self):
+        return self.emails.filter(status=STATUS.failed).count()
+
+    @property
+    def requeued_emails(self):
+        return self.emails.filter(status=STATUS.requeued).count()
+
+    def clean(self):
+        if self.emailmerge and self.subject:
+            raise ValidationError("Subject and emailmerge are mutually exclusive")
+
+        if self.emailmerge and self.message:
+            raise ValidationError("Message and emailmerge are mutually exclusive")
+
+        if self.emailmerge and self.html_message:
+            raise ValidationError("HTML message and emailmerge are mutually exclusive")
+
+        super().clean()
 
     def save(self, *args, **kwargs):
-        if self.emailmerge and not self.context:
+        if not self.context:
             self.context = self.construct_default_json()
-
-        if self.pk:
-            print(self.create())
 
         super().save(*args, **kwargs)
 

@@ -3,13 +3,15 @@
 import django.db.models.deletion
 import sendmail.validators
 from django.db import migrations, models
+from sendmail.settings import get_email_address_setting
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('custom_user', '0002_alter_customemailaddress_email'),
         ('sendmail', '0014_alter_placeholdercontent_language'),
+        migrations.swappable_dependency(get_email_address_setting()),
+
     ]
 
     operations = [
@@ -18,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, unique=True, verbose_name='List Name')),
-                ('recipients', models.ManyToManyField(related_name='recipients_list', to='custom_user.customemailaddress', verbose_name='Recipients')),
+                ('recipients', models.ManyToManyField(related_name='recipients_list', to=get_email_address_setting(), verbose_name='Recipients')),
             ],
             options={
                 'verbose_name': 'Recipients List',

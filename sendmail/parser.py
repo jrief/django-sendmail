@@ -66,14 +66,16 @@ def extract_variable_names(template_name):
     nodelist = template.template.nodelist
     return get_variables_names(nodelist)
 
+
 def get_ckeditor_variables(template):
     vars = []
 
-    pattern = r"#(.*?)#"
-
     for content in template.contents.all():
-        vars.extend(re.findall(pattern, content.content))
+        vars.extend(get_custom_vars(content.content))
 
     return vars
 
 
+def get_custom_vars(text):
+    pattern = r"#(.*?)#"
+    return re.findall(pattern, text)
