@@ -63,6 +63,9 @@ class EmailMergeContentForm(forms.ModelForm):
         help_text=_('Render template in alternative language'),
     )
 
+    def has_changed(self):
+        return True
+
     class Meta:
         model = EmailMergeContentModel
         fields = ['subject', 'content', 'language', 'extra_attachments']

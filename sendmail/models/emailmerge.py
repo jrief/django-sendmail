@@ -132,7 +132,6 @@ class EmailMergeContentModel(models.Model):
         """
         On save of EmailMergeContent parses the template file and create a set of placeholders.
         """
-        self.full_clean()
         super().save(*args, **kwargs)
 
         cache_key = f'{self.emailmerge.name}:{self.language}:{self.emailmerge.template_file}'

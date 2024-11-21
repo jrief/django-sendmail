@@ -149,7 +149,7 @@ EMAIL_PORT = 1025
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'default@email.com'
 SENDMAIL_CACHE = True
-PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 10
+PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 0
 # EMAIL_HOST_USER = 'test'
 # EMAIL_HOST_PASSWORD = 'test'
 #print(EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
@@ -203,6 +203,7 @@ SENDMAIL = {
     'EMAIL_TEMPLATES': [
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
+        ('email/in.html', _('Incoming')),
     ],
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
