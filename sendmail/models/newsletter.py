@@ -1,5 +1,8 @@
+from functools import cached_property
+
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Count, Case, When, IntegerField
 
 from sendmail.models import EmailMergeModel
 from sendmail.parser import extract_variable_names, get_ckeditor_variables, get_custom_vars
@@ -115,25 +118,6 @@ class Newsletter(models.Model):
         emails = mail.send_many(**kwargs)
         self.emails.set(emails)
 
-    @property
-    def total_emails(self):
-        return self.emails.count()
-
-    @property
-    def sent_emails(self):
-        return self.emails.filter(status=STATUS.sent).count()
-
-    @property
-    def failed_emails(self):
-        return self.emails.filter(status=STATUS.failed).count()
-
-    @property
-    def requeued_emails(self):
-        return self.emails.filter(status=STATUS.requeued).count()
-
-    @property
-    def queued_emails(self):
-        return self.emails.filter(status=STATUS.queued).count()
 
     def clean(self):
         if self.emailmerge and self.subject:
