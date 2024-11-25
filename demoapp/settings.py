@@ -190,9 +190,9 @@ TEMPLATES = [
 SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': False,
-    'MAX_RETRIES': 3,
+    'MAX_RETRIES': 0,
     'RETRY_INTERVAL': timedelta(seconds=1),
-    'BATCH_SIZE': 20,
+    'BATCH_SIZE': 100,
     'BATCH_DELIVERY_TIMEOUT': 30,
     'MESSAGE_ID_ENABLED': True,
     'DEFAULT_PRIORITY': 'medium',
@@ -209,6 +209,7 @@ SENDMAIL = {
 WSGI_APPLICATION = "demoapp.wsgi.application"
 #EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
 EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

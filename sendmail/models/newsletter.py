@@ -88,6 +88,10 @@ class Newsletter(models.Model):
         blank=True,
     )
 
+    total_emails = models.PositiveSmallIntegerField(_('Total Emails'), default=0, editable=False)
+    sent_emails = models.PositiveSmallIntegerField(_('Sent Emails'), default=0, editable=False)
+    failed_emails = models.PositiveSmallIntegerField(_('Failed Emails'), default=0, editable=False)
+
     #emails = models.ManyToManyField(EmailModel, editable=False, verbose_name=_('Emails'), related_name='emails')
 
     def __str__(self):
@@ -109,6 +113,12 @@ class Newsletter(models.Model):
 
         return {var: '' for var in vars}
 
+    def check_status(self):
+        self.refresh_from_db()
+        if (self.sent_emails + self.failed_emails) == self.total_emails:
+            self.status = STATUS.completed
+            self.save()
+
     def create(self):
         self.status = STATUS.creation
         self.save()
@@ -129,6 +139,7 @@ class Newsletter(models.Model):
         }
         emails = mail.send_many(**kwargs)
 
+        self.total_emails = len(emails)
         self.status = STATUS.queued
         self.save()
 

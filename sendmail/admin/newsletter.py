@@ -1,9 +1,8 @@
 from django.contrib import admin
-from django.db.models import Count, Case, When, IntegerField
 from django.utils.html import format_html
 from sendmail.models.emailmodel import STATUS, EmailModel
+from sendmail.models.newsletter import Newsletter, STATUS as NewsletterStatus
 
-from sendmail.models import Newsletter
 
 from django import forms
 from django.utils.safestring import mark_safe
@@ -88,6 +87,11 @@ def recreate(modeladmin, request, queryset):
 
         newsletter.delete()
 
+        instance_data['sent_emails'] = 0
+        instance_data['failed_emails'] = 0
+        instance_data['total_emails'] = 0
+        instance_data['status'] = NewsletterStatus.draft
+
         new_instance = modeladmin.model.objects.create(**instance_data)
         new_instance.attachments.set(attachments)
         new_instance.save()
@@ -98,46 +102,46 @@ recreate.short_description = 'Recreate the newsletter'
 
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'to_recipients', 'sent_emails', 'failed_emails', 'requeued_emails', 'queued_emails')
+    list_display = ('name', 'to_recipients', 'status', 'total_emails', 'sent_emails', 'failed_emails',)
     filter_horizontal = ['attachments']
     actions = [requeue_failed, recreate]
     form = NewsletterForm
 
-    def get_queryset(self, request):
-        # Annotate the queryset with email status counts
-        qs = super().get_queryset(request).annotate(
-            total_emails=Count('emailmodel'),
-            sent_emails=Count(Case(When(emailmodel__status=STATUS.sent, then=1), output_field=IntegerField())),
-            failed_emails=Count(Case(When(emailmodel__status=STATUS.failed, then=1), output_field=IntegerField())),
-            requeued_emails=Count(Case(When(emailmodel__status=STATUS.requeued, then=1), output_field=IntegerField())),
-            queued_emails=Count(Case(When(emailmodel__status=STATUS.queued, then=1), output_field=IntegerField())),
-        )
-        return qs
+    # def get_queryset(self, request):
+    #     # Annotate the queryset with email status counts
+    #     qs = super().get_queryset(request).annotate(
+    #         total_emails=Count('emailmodel'),
+    #         sent_emails=Count(Case(When(emailmodel__status=STATUS.sent, then=1), output_field=IntegerField())),
+    #         failed_emails=Count(Case(When(emailmodel__status=STATUS.failed, then=1), output_field=IntegerField())),
+    #         requeued_emails=Count(Case(When(emailmodel__status=STATUS.requeued, then=1), output_field=IntegerField())),
+    #         queued_emails=Count(Case(When(emailmodel__status=STATUS.queued, then=1), output_field=IntegerField())),
+    #     )
+    #     return qs
 
-    def total_emails(self, obj):
-        return obj.total_emails
+    # def total_emails(self, obj):
+    #     return obj.total_emails
+    #
+    # total_emails.short_description = 'Total Emails'
 
-    total_emails.short_description = 'Total Emails'
+    # def sent_emails(self, obj):
+    #     return obj.sent_emails
+    #
+    # sent_emails.short_description = 'Sent Emails'
+    #
+    # def failed_emails(self, obj):
+    #     return obj.failed_emails
+    #
+    # failed_emails.short_description = 'Failed Emails'
 
-    def sent_emails(self, obj):
-        return obj.sent_emails
-
-    sent_emails.short_description = 'Sent Emails'
-
-    def failed_emails(self, obj):
-        return obj.failed_emails
-
-    failed_emails.short_description = 'Failed Emails'
-
-    def requeued_emails(self, obj):
-        return obj.requeued_emails
-
-    requeued_emails.short_description = 'Requeued Emails'
-
-    def queued_emails(self, obj):
-        return obj.queued_emails
-
-    queued_emails.short_description = 'Queued Emails'
+    # def requeued_emails(self, obj):
+    #     return obj.requeued_emails
+    #
+    # requeued_emails.short_description = 'Requeued Emails'
+    #
+    # def queued_emails(self, obj):
+    #     return obj.queued_emails
+    #
+    # queued_emails.short_description = 'Queued Emails'
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}

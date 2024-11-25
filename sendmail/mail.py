@@ -22,7 +22,7 @@ from sendmail.signals import email_queued
 from sendmail.utils import (create_attachments, get_email_template,
                             get_language_from_code, get_or_create_recipient,
                             get_recipients_objects, parse_emails,
-                            parse_priority, set_recipients)
+                            parse_priority, set_recipients, update_newsletter_counts)
 
 logger = setup_loghandlers('INFO')
 
@@ -354,8 +354,11 @@ def _send_bulk(emails, uses_multiprocessing=True, log_level=None):
             logger.exception('Failed to prepare email #%d' % email.id)
             failed_emails.append((email, e))
 
+    failed_list = set([el[0] for el in failed_emails])
+
     for email in emails:
-        send(email)
+        if email not in failed_list:
+            send(email)
 
     connections.close()
 
@@ -415,5 +418,7 @@ def _send_bulk(emails, uses_multiprocessing=True, log_level=None):
         num_failed,
         num_requeued,
     )
+
+    update_newsletter_counts(emails, sent_emails, failed_emails)
 
     return len(sent_emails), num_failed, num_requeued
