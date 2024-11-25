@@ -66,11 +66,9 @@ def test_construct_context(template_newsletter, basic_newsletter):
 
 @pytest.mark.django_db
 def test_template_send(template_newsletter):
-    template_newsletter.create()
+    created_emails = template_newsletter.create()
 
-    created_emails = template_newsletter.emails.all()
-
-    assert created_emails.count() == 5
+    assert len(created_emails) == 5
 
     assert all([email.status == STATUS.queued for email in created_emails])
 
@@ -107,11 +105,9 @@ def test_template_send(template_newsletter):
 
 @pytest.mark.django_db
 def test_basic_send(basic_newsletter):
-    basic_newsletter.create()
+    emails = basic_newsletter.create()
 
-    emails = basic_newsletter.emails.all()
-
-    assert emails.count() == 5
+    assert len(emails) == 5
 
     created_emails = list(emails)
 
@@ -128,7 +124,6 @@ def test_basic_send(basic_newsletter):
 
 @pytest.mark.django_db
 def test_clean(template_newsletter):
-
     template_newsletter.clean()
 
     template_newsletter.subject = 'Subj'
@@ -149,5 +144,3 @@ def test_clean(template_newsletter):
 
     with pytest.raises(ValidationError):
         template_newsletter.clean()
-
-

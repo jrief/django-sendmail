@@ -1,18 +1,18 @@
-from functools import cached_property
+from collections import namedtuple
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField
 
-from sendmail.models import EmailMergeModel
+from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.parser import extract_variable_names, get_ckeditor_variables, get_custom_vars
 from sendmail.validators import validate_email_with_name
 from django.utils.translation import gettext_lazy as _
 from sendmail.models.recipients_list import RecipientsList
-from sendmail.models.emailmodel import PRIORITY
 from sendmail.models.attachment import Attachment
-from sendmail.models.emailmodel import EmailModel, STATUS
 from sendmail import mail
+
+STATUS = namedtuple('STATUS', 'draft creation queued completed')._make(range(4))
+PRIORITY = namedtuple('PRIORITY', 'low medium high now')._make(range(4))
 
 
 class Newsletter(models.Model):
@@ -23,9 +23,18 @@ class Newsletter(models.Model):
         (PRIORITY.now, _('now')),
     ]
 
+    STATUS_CHOICES = [
+        (STATUS.draft, _('draft')),
+        (STATUS.creation, _('creation')),
+        (STATUS.queued, _('queued')),
+        (STATUS.completed, _('completed')),
+    ]
+
     name = models.CharField(_('Newsletter name'),
                             max_length=255,
                             unique=True)
+
+    status = models.PositiveSmallIntegerField(_('Status'), choices=STATUS_CHOICES, db_index=True, default=STATUS.draft)
 
     created = models.DateTimeField(auto_now_add=True,
                                    db_index=True)
@@ -79,7 +88,7 @@ class Newsletter(models.Model):
         blank=True,
     )
 
-    emails = models.ManyToManyField(EmailModel, editable=False, verbose_name=_('Emails'), related_name='emails')
+    #emails = models.ManyToManyField(EmailModel, editable=False, verbose_name=_('Emails'), related_name='emails')
 
     def __str__(self):
         return self.name
@@ -101,6 +110,8 @@ class Newsletter(models.Model):
         return {var: '' for var in vars}
 
     def create(self):
+        self.status = STATUS.creation
+        self.save()
         kwargs = {
             'recipients': list(self.to_recipients.recipients.all()),
             'sender': self.email_from,
@@ -113,11 +124,15 @@ class Newsletter(models.Model):
             'language': self.language,
             'scheduled_time': self.scheduled_time,
             'expires_at': self.expires_at,
-            'attachments': self.attachments.all()
+            'attachments': self.attachments.all(),
+            'newsletter': self,
         }
         emails = mail.send_many(**kwargs)
-        self.emails.set(emails)
 
+        self.status = STATUS.queued
+        self.save()
+
+        return emails
 
     def clean(self):
         if self.emailmerge and self.subject:

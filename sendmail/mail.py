@@ -44,6 +44,7 @@ def create(
         commit=True,
         backend='',
         language='',
+        newsletter=None,
 ):
     """
     Creates an email from supplied keyword arguments. If template is
@@ -54,6 +55,9 @@ def create(
         language = get_default_language()
     priority = parse_priority(priority)
     status = None if priority == PRIORITY.now else STATUS.queued
+
+    if newsletter and commit:
+        raise ValidationError("Newsletter parameter can only be set for send_many")
 
     if recipients is None:
         recipients = []
@@ -96,7 +100,8 @@ def create(
         context=context,
         template=template,
         backend_alias=backend,
-        language=language
+        language=language,
+        newsletter=newsletter,
     )
 
     if commit:
@@ -126,6 +131,7 @@ def send(
         bcc=None,
         language='',
         backend='',
+        newsletter=None,
 ):
     language = get_language_from_code(language)
 
@@ -193,6 +199,7 @@ def send(
         commit=commit,
         backend=backend,
         language=language,
+        newsletter=newsletter,
     )
 
     if attachments and commit:

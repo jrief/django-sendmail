@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count, Case, When, IntegerField
 from django.utils.html import format_html
-from sendmail.models.emailmodel import STATUS
+from sendmail.models.emailmodel import STATUS, EmailModel
 
 from sendmail.models import Newsletter
 
@@ -72,35 +72,45 @@ class NewsletterForm(forms.ModelForm):
 
 def requeue_failed(modeladmin, request, queryset):
     for newsletter in queryset:
-        newsletter.emails.filter(status=STATUS.failed).update(status=STATUS.queued)
+        EmailModel.objects.filter(newsletter=newsletter, status=STATUS.failed).update(status=STATUS.queued)
 
 
 requeue_failed.short_description = 'Requeue failed emails'
 
 
-def requeue_all(modeladmin, request, queryset):
-    for newsletter in queryset:
-        newsletter.emails.update(status=STATUS.queued)
+def recreate(modeladmin, request, queryset):
+    for newsletter in queryset.prefetch_related('attachments'):
+        instance_data = {}
+        attachments = newsletter.attachments.all()
+        for field in newsletter._meta.get_fields():
+            if not field.auto_created and not field.name == 'attachments':
+                instance_data[field.name] = getattr(newsletter, field.name)
+
+        newsletter.delete()
+
+        new_instance = modeladmin.model.objects.create(**instance_data)
+        new_instance.attachments.set(attachments)
+        new_instance.save()
 
 
-requeue_all.short_description = 'Requeue all emails'
+recreate.short_description = 'Recreate the newsletter'
 
 
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):
     list_display = ('name', 'to_recipients', 'sent_emails', 'failed_emails', 'requeued_emails', 'queued_emails')
     filter_horizontal = ['attachments']
-    actions = [requeue_failed, requeue_all]
+    actions = [requeue_failed, recreate]
     form = NewsletterForm
 
     def get_queryset(self, request):
         # Annotate the queryset with email status counts
         qs = super().get_queryset(request).annotate(
-            total_emails=Count('emails'),
-            sent_emails=Count(Case(When(emails__status=STATUS.sent, then=1), output_field=IntegerField())),
-            failed_emails=Count(Case(When(emails__status=STATUS.failed, then=1), output_field=IntegerField())),
-            requeued_emails=Count(Case(When(emails__status=STATUS.requeued, then=1), output_field=IntegerField())),
-            queued_emails=Count(Case(When(emails__status=STATUS.queued, then=1), output_field=IntegerField())),
+            total_emails=Count('emailmodel'),
+            sent_emails=Count(Case(When(emailmodel__status=STATUS.sent, then=1), output_field=IntegerField())),
+            failed_emails=Count(Case(When(emailmodel__status=STATUS.failed, then=1), output_field=IntegerField())),
+            requeued_emails=Count(Case(When(emailmodel__status=STATUS.requeued, then=1), output_field=IntegerField())),
+            queued_emails=Count(Case(When(emailmodel__status=STATUS.queued, then=1), output_field=IntegerField())),
         )
         return qs
 
