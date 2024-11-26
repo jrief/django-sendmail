@@ -6,6 +6,7 @@ from sendmail.models.recipients_list import RecipientsList
 from sendmail.models.newsletter import Newsletter
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import STATUS, EmailModel
+from sendmail.utils import set_recipients, update_newsletter_counts
 
 
 @pytest.fixture
@@ -144,3 +145,36 @@ def test_clean(template_newsletter):
 
     with pytest.raises(ValidationError):
         template_newsletter.clean()
+
+
+@pytest.mark.django_db
+def test_update_newsletter_counter(template_newsletter, basic_newsletter):
+    recipients = [EmailAddress.objects.create(email=f"{i}@exmaple.com") for i in range(10)]
+    news1 = template_newsletter
+    news2 = basic_newsletter
+    success_emails = [EmailModel.objects.create(from_email='test@ex.com',language='en', status=STATUS.sent) for _ in range(7)]
+    failed_emails = [EmailModel.objects.create(from_email='ex@test.com', language='en', status=STATUS.failed) for _ in range(7, 10)]
+    emails = [*success_emails, *failed_emails]
+    failed_emails = [(email, str(ValidationError)) for email in failed_emails]
+    for inx, (email, recipient) in enumerate(zip(emails, recipients)):
+        set_recipients(email, recipients)
+        if inx > 5:
+            email.newsletter = news1
+        else:
+            email.newsletter = news2
+        email.save()
+
+    assert update_newsletter_counts(emails, success_emails, failed_emails) == {1: {'failed': 3, 'sent': 1}, 2: {'failed': 0, 'sent': 6}}
+
+    news1.refresh_from_db()
+    news2.refresh_from_db()
+
+    assert news1.sent_emails == 1
+    assert news2.sent_emails == 6
+
+    assert news1.failed_emails == 3
+    assert news2.failed_emails == 0
+
+
+
+

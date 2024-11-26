@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.storage import default_storage
+from django.db import transaction
 from django.db.models import F
 from django.utils.encoding import force_str
 
@@ -303,28 +304,29 @@ def get_language_from_code(code, log=True, template=None) -> str:
     return code
 
 
-
 def update_newsletter_counts(emails, sent_emails, failed_emails):
     Newsletter = apps.get_model('sendmail', 'Newsletter')
     newsletter_set = set([email.newsletter.pk for email in emails if email.newsletter])
-    if newsletter_set:
-        updates = {news: {'sent': 0, 'failed': 0} for news in newsletter_set}
-        for email in sent_emails:
-            if email.newsletter and email.status:
-                updates[email.newsletter.pk]['sent'] += 1
+    updates = {news: {'sent': 0, 'failed': 0} for news in newsletter_set}
+    for email in sent_emails:
+        if email.newsletter:
+            updates[email.newsletter.pk]['sent'] += 1
 
-        for email, exc in failed_emails:
-            if email.newsletter and email.status == STATUS.failed:
-                updates[email.newsletter.pk]['failed'] += 1
+    for email, _ in failed_emails:
+        if email.newsletter:
+            updates[email.newsletter.pk]['failed'] += 1
 
-        newsletters = Newsletter.objects.filter(pk__in=newsletter_set)
+    newsletters = Newsletter.objects.filter(pk__in=newsletter_set)
 
-        for newsletter in newsletters:
-            sent_count = updates[newsletter.pk]['sent']
-            failed_count = updates[newsletter.pk]['failed']
+    for newsletter in newsletters:
+        sent_count = updates[newsletter.pk]['sent']
+        failed_count = updates[newsletter.pk]['failed']
 
+        with transaction.atomic():
             newsletter.sent_emails = F('sent_emails') + sent_count
             newsletter.failed_emails = F('failed_emails') + failed_count
 
             newsletter.save()
             newsletter.check_status()
+
+    return updates

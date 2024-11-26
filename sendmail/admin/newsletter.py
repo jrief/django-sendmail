@@ -3,6 +3,9 @@ from django.utils.html import format_html
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.models.newsletter import Newsletter, STATUS as NewsletterStatus
 
+from jsoneditor.forms import JSONEditor
+from django.db.models.fields.json import JSONField
+
 
 from django import forms
 from django.utils.safestring import mark_safe
@@ -60,13 +63,13 @@ class JSONTableWidget(forms.Widget):
         return json.dumps({k: v for k, v in zip(keys, values) if k})
 
 
-class NewsletterForm(forms.ModelForm):
-    class Meta:
-        model = Newsletter
-        fields = '__all__'
-        widgets = {
-            'context': JSONTableWidget(),  # Assign the custom widget
-        }
+# class NewsletterForm(forms.ModelForm):
+#     class Meta:
+#         model = Newsletter
+#         fields = '__all__'
+#         widgets = {
+#             'context': JSONEditor(),  # Assign the custom widget
+#         }
 
 
 def requeue_failed(modeladmin, request, queryset):
@@ -105,7 +108,10 @@ class NewsletterAdmin(admin.ModelAdmin):
     list_display = ('name', 'to_recipients', 'status', 'total_emails', 'sent_emails', 'failed_emails',)
     filter_horizontal = ['attachments']
     actions = [requeue_failed, recreate]
-    form = NewsletterForm
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditor},
+    }
+    # form = NewsletterForm
 
     # def get_queryset(self, request):
     #     # Annotate the queryset with email status counts

@@ -10,7 +10,6 @@ from django.core.files.storage import FileSystemStorage, default_storage
 
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress
-from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.settings import get_attachments_storage
 from sendmail.utils import (cleanup_expired_mails, create_attachments,

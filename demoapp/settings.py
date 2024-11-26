@@ -35,7 +35,11 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'sendmail',
     'demoapp',
+    'jsoneditor'
 ]
+
+# JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.1.1/jsoneditor.css'
+
 
 if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:
     INSTALLED_APPS.append('storages')
@@ -105,6 +109,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'workdir/newsletter.sqlite3',
     }
+    # 'default':{
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'new_post_office',
+    #     'USER': 'post_office',
+    #     'PASSWORD': 'post_office',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '5432',
+    # }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -204,6 +216,7 @@ SENDMAIL = {
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
         ('email/in.html', _('Incoming')),
+        ('email/uni.html', _('University')),
     ],
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
