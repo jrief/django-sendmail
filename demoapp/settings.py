@@ -220,6 +220,7 @@ SENDMAIL = {
         ('email/placeholders.html', _('Placeholders')),
         ('email/in.html', _('Incoming')),
         ('email/uni.html', _('University')),
+        ('email/contexed_uni.html', _('Contexed')),
     ],
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"

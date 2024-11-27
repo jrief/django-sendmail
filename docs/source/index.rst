@@ -19,6 +19,7 @@ sendmail provides a set of powerful features, such as:
 - Works with task queues like RQ and Celery.
 - Uses multiprocessing to send emails in parallel.
 - Support of different storages.
+- Newsletter feature to send emails directly from admin.
 
 
 .. toctree::

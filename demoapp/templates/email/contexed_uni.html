@@ -1,0 +1,108 @@
+{% extends 'sendmail/email.html' %}
+{% load sendmail %}
+
+{% block content %}
+    <div style="width:100%;height:100%;background-color:white;margin:0;padding:0;"><span style="background-color:white;">
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%;background-color:white;">
+<tbody><tr>
+<td align="center" valign="top" style="text-align:center;">
+<table width="300" align="center" border="0" cellspacing="0" cellpadding="0" style="width:300px;max-width:620px;">
+<tbody><tr>
+<td align="left" valign="top" style="text-align:justify;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="width:100%;">
+<tbody><tr>
+<td align="center" valign="top" style="text-align:center;"><img src="{% inline_image 'uni/uni_logo.png' %}" width="620" height="1" border="0" alt="1px transparent" style="max-width:100%;"></td>
+</tr>
+<tr>
+<td align="right" valign="top" style="padding:5px;"><font face="Arial" size="2" color="#1B599C" style="font-family: Arial, serif, EmojiFont;"><span style="font-size:14px;"><a href="{{ web_link }}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">zur
+Online-Version</a></span></font></td>
+</tr>
+<tr>
+<td align="left" valign="top" style="text-align:justify;padding:15px 25px 0 25px;">
+<font face="Arial" size="2" color="#1B599C" style="font-family: Arial, serif, EmojiFont;"><span style="font-size:14px;"><a href="https://www.uibk.ac.at" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><img src="{% inline_image 'uni/uni_logo.png' %}" width="157" height="40" border="0" alt="Universität Innsbruck" style="max-width:100%;"></a><br>
+
+<div style="margin:30px 0 4px 0;"><font size="5" color="#355C8E"><span style="font-size:30px;font-weight:normal;">{{ topic }}</span></font></div>
+<div style="margin:0 10px 10px 0;"><font size="2" color="#355C8E"><span style="font-size:18px;font-weight:normal;">{{ subtopic }}</span></font></div>
+</span></font></td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+<tr>
+<td align="center" valign="top" style="text-align:center;"><img src="http://www.uibk.ac.at/stylesheets/15/images/width-helper.png" height="1" border="0" alt="1px transparent" style="max-width:100%;"></td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%;background-color:#EFEFEF;">
+<tbody><tr>
+<td align="center" valign="top" style="text-align:center;">
+<table width="300" align="center" border="0" cellspacing="0" cellpadding="0" style="width:300px;background-color:#EFEFEF;max-width:620px;">
+<tbody>
+<tr>
+    <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width:100%;margin:0;padding:0;">
+<tbody>
+
+<tr>
+<td align="left" valign="top" style="text-align:justify;">
+    {% for new in news %}
+<table width="300" align="left" border="0" cellspacing="0" cellpadding="0" style="display:inline;width:300px;">
+<tbody><tr>
+<td><a href="http://www.uibk.ac.at/zid/intranet/newsletter/2024-10/vorwort.html" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><img src="{{ new.image }} {{ new.image }}" width="300" height="180" border="0" alt="Hello" style="max-width:100%;"></a></td>
+</tr>
+<tr>
+<td style="background-color:white;padding:25px;"><font size="2" color="black"><span style="font-size:14px;background-color:white;">
+<div style="display:block;margin:3px 0 10px 0;"><font face="Arial" size="2" color="#1B599C" style="font-family: Arial, serif, EmojiFont;"><span style="font-size:18px;font-weight:normal;">Vorwort</span></font></div>
+<div style="margin-top:14pt;margin-bottom:14pt;"><font face="Arial" size="2" color="black" style="font-family: Arial, serif, EmojiFont;"><span style="font-size:14px;">{{ new.text }}</span></font></div>
+<a href="{{ new.link }}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><img src="http://www.uibk.ac.at/stylesheets/15/images/button-beitrag-lesen-100x31px.png" width="100" height="31" border="0" alt="Beitrag lesen" style="max-width:100%;"></a></span></font></td>
+</tr>
+<tr>
+<td align="center" valign="top" style="text-align:center;"><img src="http://www.uibk.ac.at/stylesheets/15/images/schatten-beitrag-300x9px.png" width="300" height="9" border="0" alt="Schatten" style="max-width:100%;"></td>
+</tr>
+</tbody></table>
+    {% endfor %}
+</td>
+</tr>
+</tbody></table>
+    </td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%;background-color:#EFEFEF;">
+<tbody><tr>
+<td align="center" valign="top" style="text-align:center;">
+</td>
+</tr>
+</tbody></table>
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%;background-color:#EFEFEF;">
+<tbody><tr>
+</tr>
+</tbody></table>
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width:100%;background-color:#EFEFEF;">
+<tbody><tr>
+<td align="center" valign="top" style="text-align:center;">
+<table width="300" align="center" border="0" cellspacing="0" cellpadding="0" style="width:300px;background-color:#EFEFEF;max-width:620px;">
+<tbody><tr>
+<td align="left" valign="top" style="text-align:justify;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="width:100%;background-color:#EFEFEF;max-width:620px;">
+<tbody><tr>
+<td align="center" valign="top" style="text-align:center;"><img src="http://www.uibk.ac.at/stylesheets/15/images/width-helper.png" width="620" height="1" border="0" alt="1px transparent" style="max-width:100%;"></td>
+</tr>
+<tr>
+<td align="right" valign="top" style="padding:10px 5px;"><font face="Arial" size="2" color="#8D8D8C" style="font-family: Arial, serif, EmojiFont;"><span style="font-size:14px;"><a href="http://www.uibk.ac.at/impressum/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">Offenlegung
+nach §25 MedG</a></span></font></td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<div style="margin-top:14pt;margin-bottom:14pt;"><img src="http://www.uibk.ac.at/pwk/piwik.php?idsite=6" style="max-width:100%;"></div>
+</span></div>
+{% endblock %}

@@ -16,4 +16,6 @@ The creation of this fork was driven by a desire to introduce additional feature
 
 - Providing seamless integration with various storage backends.
 
-- These changes aim to extend the functionality of the original project while preserving its core strengths.
+- Introducing Newsletters to send emails directly from admin.
+
+These changes aim to extend the functionality of the original project while preserving its core strengths.

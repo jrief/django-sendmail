@@ -10,7 +10,6 @@ from sendmail.logutils import setup_loghandlers
 from sendmail.sanitizer import clean_html
 from sendmail.settings import get_email_address_setting, get_template_engine
 from sendmail.validators import validate_template_syntax
-from sendmail.parser import get_variables_names, extract_variable_names, get_ckeditor_variables
 
 logger = setup_loghandlers('INFO')
 

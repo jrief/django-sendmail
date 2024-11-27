@@ -11,9 +11,18 @@ def test_parse():
 
 
 def test_extract_vars():
-    assert sorted(extract_variable_names('test/parse_test.html')) == sorted([
-        'var1', 'var_block', 'var_false', 'var_inner', 'var_inner_true',
-        'var_loop', 'var_true', ])
+    assert (extract_variable_names('test/parse_test.html') ==
+            {'var1': '',
+             'var_true': '',
+             'var_false': '',
+             'list': [
+                 {
+                     'var_loop': ''
+                 }
+             ],
+             'var_inner': '',
+             'var_inner_true': '',
+             'var_block': ''})
 
 
 @pytest.mark.django_db

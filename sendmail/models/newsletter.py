@@ -118,18 +118,19 @@ class Newsletter(models.Model):
     def construct_default_json(self):
         if self.emailmerge:
             vars = extract_variable_names(self.emailmerge.template_file)
-            vars.extend(get_ckeditor_variables(self.emailmerge))
+            ckeditor_vars = get_ckeditor_variables(self.emailmerge)
+            vars = {**vars, **{var: '' for var in ckeditor_vars}}
         else:
             vars = get_custom_vars(self.subject)
             vars.extend(get_custom_vars(self.message))
             vars.extend(get_custom_vars(self.html_message))
-
-        vars = list(set(vars))
+            vars = list(set(vars))
+            vars = filter(lambda x: not x.startswith('recipient'), vars)
+            vars = {var: '' for var in vars}
 
         # Filter out recipient context, It is not expected to be filled by user
-        vars = filter(lambda x: not x.startswith('recipient'), vars)
 
-        return {var: '' for var in vars}
+        return vars
 
     def check_status(self):
         self.refresh_from_db()
