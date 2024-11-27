@@ -157,11 +157,7 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
-        extra_context['send_newsletter_button'] = format_html(
-            '''
-            <input type="submit" value="Send" name="_send_many" style="background-color: var(--message-success-bg)"/>
-            '''
-        )
+        extra_context['show_newsletter_send'] = True
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
     def response_change(self, request, obj):

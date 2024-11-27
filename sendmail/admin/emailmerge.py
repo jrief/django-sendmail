@@ -186,24 +186,14 @@ class EmailMergeAdmin(admin.ModelAdmin):
         email = request.user.email
         if object_id:
             obj = EmailMergeModel.objects.get(pk=object_id)
-            language_options = format_html(''.join([f'<option value="{code}">{get_language_name(code)}</option>'
-                                                    for code in obj.get_available_languages()]))
+            language_choices = [{'code': code, 'name': get_language_name(code)}
+                                for code in obj.get_available_languages()]
         else:
-            language_options = ''
+            language_choices = []
 
-        extra_context['send_email_button'] = format_html(
-            '''
-                    <form method="post" style="display: inline; margin: 0; padding: 0;" action="">
-                        <input type="submit" value="{button_text} in " name="_send_email" style="padding: 5px 10px; cursor: pointer; margin-right: -10px">
-                        <select name="email_language" style="
-                        padding: 5px 10px; background-color: var(--button-bg); cursor: pointer; margin-right: -10px; height: 2.1875rem">
-                            {language_options}
-                        </select>
-                    </form>
-                    ''',
-            language_options=language_options,
-            button_text=gettext(f"Send test email to {email}").format(email=email),
-        )
+        extra_context['show_send'] = True
+        extra_context['language_options'] = language_choices
+        extra_context['email'] = email
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
     def response_change(self, request, obj):
