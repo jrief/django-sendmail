@@ -117,6 +117,10 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     list_filter = ['status', 'result']
 
+    def has_change_permission(self, request, obj=None):
+        return obj and obj.status == NewsletterStatus.draft
+
+
     # form = NewsletterForm
 
     # def get_queryset(self, request):
@@ -157,7 +161,13 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
-        extra_context['show_newsletter_send'] = True
+        can_send = False
+        if object_id:
+            obj = Newsletter.objects.get(pk=object_id)
+            if obj.status == NewsletterStatus.draft:
+                can_send = True
+
+        extra_context['show_newsletter_send'] = can_send
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
     def response_change(self, request, obj):
