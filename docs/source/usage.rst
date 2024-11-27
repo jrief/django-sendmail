@@ -608,6 +608,31 @@ Management commands
      - Delete all locks.
 
 
+Newsletter
+---------------
+
+
+Alternatively to calling send you can enqueue emails directly from admin interface using Newsletters.
+
+For this you can create RecipientLists, which are just named lists of EmailAddress objects.
+
+As soon as your RecipientList is created you can create and send your Newsletter.
+For this simply:
+
+- Open your admin interface and select template if you want to use one.
+Note, that template is mutually exclusive with subject, message and HTML message.
+
+- Click "Save and Continue". Your context will be populated with variables found in template and placeholders.
+
+- Fill in values for your context keys. Note, you wont see recipient context keys, because those are filled automatically for each recipient.
+
+- You can specify other optional parameters which will be passed to each created email.
+
+- When you are ready just click Send and your emails will be created and can be tracked on model overview admin page.
+
+- If your emails failed or you want to completely resend a Newsletter you can use one of the admin actions.
+
+
 
 
 

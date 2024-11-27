@@ -56,7 +56,7 @@ You should see something like this:
       . sendmail.tasks.cleanup_mail
       . sendmail.tasks.send_queued_mail
 
-In case of a temporary delivery failure, we might want retrying to send those emails by a periodic task.
+``send-queued-mail`` tasks is triggered when email is created. We might want to process queue automatically to sent scheduled emails or retry failed ones.
 This can be scheduled with a simple `Celery beat configuration <https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html#entries>`_,
 for instance through
 
@@ -68,6 +68,12 @@ for instance through
         'schedule': 600.0,
         },
     }
+
+Now Beat can be started as:
+
+.. code-block::
+
+    python -m celery -A your_project beat -l info
 
 The email queue now will be processed every 10 minutes.
 If you are using `Django Celery Beat <https://django-celery-beat.readthedocs.io/en/latest/>`_, then use the Django-Admin backend and add a periodic tasks for ``sendmail.tasks.send_queued_mail``.

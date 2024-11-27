@@ -8,9 +8,11 @@
 </head>
 <body>
     {% placeholder 'inner' %}
+    {{ var_inner }}
 
     {% if True %}
         {% placeholder 'inner_true' %}
+        {{ var_inner_true }}
     {% endif %}
 </body>
 </html>

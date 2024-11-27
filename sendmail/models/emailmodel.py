@@ -70,6 +70,7 @@ class EmailModel(models.Model):
     language = models.CharField(max_length=12)
     context = models.JSONField(_('Context'), blank=True, null=True)
     backend_alias = models.CharField(_('Backend alias'), blank=True, default='', max_length=64)
+    newsletter = models.ForeignKey('sendmail.Newsletter', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         app_label = 'sendmail'

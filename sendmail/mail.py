@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection as db_connection
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from sendmail.connections import connections
@@ -22,7 +22,7 @@ from sendmail.signals import email_queued
 from sendmail.utils import (create_attachments, get_email_template,
                             get_language_from_code, get_or_create_recipient,
                             get_recipients_objects, parse_emails,
-                            parse_priority, set_recipients)
+                            parse_priority, set_recipients, update_newsletter_counts)
 
 logger = setup_loghandlers('INFO')
 
@@ -44,6 +44,7 @@ def create(
         commit=True,
         backend='',
         language='',
+        newsletter=None,
 ):
     """
     Creates an email from supplied keyword arguments. If template is
@@ -54,6 +55,9 @@ def create(
         language = get_default_language()
     priority = parse_priority(priority)
     status = None if priority == PRIORITY.now else STATUS.queued
+
+    if newsletter and commit:
+        raise ValidationError("Newsletter parameter can only be set for send_many")
 
     if recipients is None:
         recipients = []
@@ -96,7 +100,8 @@ def create(
         context=context,
         template=template,
         backend_alias=backend,
-        language=language
+        language=language,
+        newsletter=newsletter,
     )
 
     if commit:
@@ -126,6 +131,7 @@ def send(
         bcc=None,
         language='',
         backend='',
+        newsletter=None,
 ):
     language = get_language_from_code(language)
 
@@ -193,6 +199,7 @@ def send(
         commit=commit,
         backend=backend,
         language=language,
+        newsletter=newsletter,
     )
 
     if attachments and commit:
@@ -232,6 +239,7 @@ def send_many(**kwargs):
                  **kwargs)
             for recipient in recipients_objs]
     else:
+        kwargs.pop('language', None)
         emails = [
             send(recipients=[recipient.email],
                  context={**context, 'recipient': recipient.id},
@@ -252,7 +260,10 @@ def send_many(**kwargs):
         through_objs = []
 
         if attachments := kwargs.get('attachments'):
-            attachment_list.extend(create_attachments(attachments))
+            if isinstance(attachments, dict):
+                attachment_list.extend(create_attachments(attachments))
+            elif isinstance(attachments, QuerySet):
+                attachment_list.extend(list(attachments))
 
         if template := kwargs.get('template'):
             if not isinstance(template, EmailMergeModel):
@@ -343,8 +354,11 @@ def _send_bulk(emails, uses_multiprocessing=True, log_level=None):
             logger.exception('Failed to prepare email #%d' % email.id)
             failed_emails.append((email, e))
 
+    failed_list = set([el[0] for el in failed_emails])
+
     for email in emails:
-        send(email)
+        if email not in failed_list:
+            send(email)
 
     connections.close()
 
@@ -404,5 +418,7 @@ def _send_bulk(emails, uses_multiprocessing=True, log_level=None):
         num_failed,
         num_requeued,
     )
+
+    update_newsletter_counts(emails, sent_emails, failed_emails)
 
     return len(sent_emails), num_failed, num_requeued

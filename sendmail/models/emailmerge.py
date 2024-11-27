@@ -10,6 +10,7 @@ from sendmail.logutils import setup_loghandlers
 from sendmail.sanitizer import clean_html
 from sendmail.settings import get_email_address_setting, get_template_engine
 from sendmail.validators import validate_template_syntax
+from sendmail.parser import get_variables_names, extract_variable_names, get_ckeditor_variables
 
 logger = setup_loghandlers('INFO')
 
@@ -131,7 +132,6 @@ class EmailMergeContentModel(models.Model):
         """
         On save of EmailMergeContent parses the template file and create a set of placeholders.
         """
-        self.full_clean()
         super().save(*args, **kwargs)
 
         cache_key = f'{self.emailmerge.name}:{self.language}:{self.emailmerge.template_file}'
@@ -200,7 +200,6 @@ class PlaceholderContent(models.Model):
     used_template_file = models.CharField(
         verbose_name="Template File",
         max_length=255,
-        # editable=False,  TODO: make it non-editable
         help_text="Template file used when creating this placeholder.",
     )
 

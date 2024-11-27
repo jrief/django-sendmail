@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
@@ -34,7 +35,11 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'sendmail',
     'demoapp',
+    'jsoneditor'
 ]
+
+# JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.1.1/jsoneditor.css'
+
 
 if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:
     INSTALLED_APPS.append('storages')
@@ -102,8 +107,16 @@ LANGUAGES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'workdir/db.sqlite3',
+        'NAME': BASE_DIR / 'workdir/newsletter.sqlite3',
     }
+    # 'default':{
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'new_post_office',
+    #     'USER': 'post_office',
+    #     'PASSWORD': 'post_office',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '5432',
+    # }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -143,12 +156,15 @@ EMAIL_BACKEND = 'sendmail.EmailBackend'
 # EMAIL_HOST_USER = 'postmaster@sandboxf099cc52e4d94225bf3ad0e9f2bcabd2.mailgun.org'
 # EMAIL_HOST_PASSWORD = '722eddd8ef922dbcd381d68f6b28c4f0-7a3af442-a4d621a6'
 
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 1025
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'default@email.com'
+# If no env variables provided -> Use mailpit defaults
+EMAIL_HOST = os.getenv('EMAIL_HOST', '127.0.0.1')
+EMAIL_PORT = os.getenv('EMAIL_PORT', 1025)
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', '') in ['1', 'True', 'true']
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'default@email.com')
 SENDMAIL_CACHE = True
-PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 10
+PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 0
 # EMAIL_HOST_USER = 'test'
 # EMAIL_HOST_PASSWORD = 'test'
 #print(EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
@@ -189,8 +205,9 @@ TEMPLATES = [
 SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': False,
-    'MAX_RETRIES': 3,
-    'BATCH_SIZE': 20,
+    'MAX_RETRIES': 0,
+    'RETRY_INTERVAL': timedelta(seconds=1),
+    'BATCH_SIZE': 100,
     'BATCH_DELIVERY_TIMEOUT': 30,
     'MESSAGE_ID_ENABLED': True,
     'DEFAULT_PRIORITY': 'medium',
@@ -201,11 +218,14 @@ SENDMAIL = {
     'EMAIL_TEMPLATES': [
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
+        ('email/in.html', _('Incoming')),
+        ('email/uni.html', _('University')),
     ],
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
 #EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
 EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

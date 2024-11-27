@@ -9,19 +9,25 @@
 <body>
     {% placeholder 'place1' %}
 
+    {{ var1 }}
+
     {% if 1 == 1 %}
         {% placeholder 'place_true' %}
+        {{ var_true }}
         {% else %}
         {% placeholder 'place_false' %}
+        {{ var_false }}
     {% endif %}
 
     {% for i in list %}
+        {{ var_loop }}
         {% placeholder 'place_loop' %}
     {% endfor %}
 
     {% include 'test/ini.html' %}
 
     {% block nodes %}
+        {{ var_block }}
         {% placeholder 'place_block' %}
     {% endblock %}
 </body>

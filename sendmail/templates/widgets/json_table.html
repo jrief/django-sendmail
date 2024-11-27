@@ -1,0 +1,22 @@
+{% load static %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, value in widget.value.items %}
+        <tr>
+            <td><input type="text" name="{{ widget.name }}_key[]" value="{{ key }}" class="form-control" /></td>
+            <td><input type="text" name="{{ widget.name }}_value[]" value="{{ value }}" class="form-control" /></td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td><input type="text" name="{{ widget.name }}_key[]" class="form-control" /></td>
+            <td><input type="text" name="{{ widget.name }}_value[]" class="form-control" /></td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="{{ widget.name }}" value="{{ widget.value|safe }}" />
