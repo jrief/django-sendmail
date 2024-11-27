@@ -3,10 +3,11 @@ from django.core.exceptions import ValidationError
 
 from sendmail.models import PlaceholderContent
 from sendmail.models.recipients_list import RecipientsList
-from sendmail.models.newsletter import Newsletter
+from sendmail.models.newsletter import Newsletter, RESULT, STATUS as Newsletter_STATUS
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.utils import set_recipients, update_newsletter_counts
+from sendmail.mail import _send_bulk
 
 
 @pytest.fixture
@@ -150,8 +151,13 @@ def test_clean(template_newsletter):
 @pytest.mark.django_db
 def test_update_newsletter_counter(template_newsletter, basic_newsletter):
     recipients = [EmailAddress.objects.create(email=f"{i}@exmaple.com") for i in range(10)]
+
     news1 = template_newsletter
+    assert news1.status == Newsletter_STATUS.draft
+
     news2 = basic_newsletter
+    assert news2.status == Newsletter_STATUS.draft
+
     success_emails = [EmailModel.objects.create(from_email='test@ex.com',language='en', status=STATUS.sent) for _ in range(7)]
     failed_emails = [EmailModel.objects.create(from_email='ex@test.com', language='en', status=STATUS.failed) for _ in range(7, 10)]
     emails = [*success_emails, *failed_emails]
@@ -174,6 +180,67 @@ def test_update_newsletter_counter(template_newsletter, basic_newsletter):
 
     assert news1.failed_emails == 3
     assert news2.failed_emails == 0
+
+
+@pytest.mark.django_db
+def test_success_status(basic_newsletter):
+    assert basic_newsletter.status == Newsletter_STATUS.draft
+
+    emails = basic_newsletter.create()
+
+    assert basic_newsletter.status == Newsletter_STATUS.queued
+
+    _send_bulk(emails, False)
+
+    basic_newsletter.refresh_from_db()
+
+    assert basic_newsletter.status == Newsletter_STATUS.completed
+
+    assert basic_newsletter.result == RESULT.success
+
+@pytest.mark.django_db
+def test_failed_status(basic_newsletter):
+    assert basic_newsletter.status == Newsletter_STATUS.draft
+
+    emails = basic_newsletter.create()
+
+    for email in emails:
+        email.backend_alias = 'error'
+        email.save()
+
+    assert basic_newsletter.status == Newsletter_STATUS.queued
+
+    _send_bulk(emails, False)
+
+    basic_newsletter.refresh_from_db()
+
+    assert basic_newsletter.status == Newsletter_STATUS.completed
+
+    assert basic_newsletter.result == RESULT.failed
+
+@pytest.mark.django_db
+def test_partial_status(basic_newsletter):
+    assert basic_newsletter.status == Newsletter_STATUS.draft
+
+    emails = basic_newsletter.create()
+
+    for email in emails:
+        if email in emails[:1]:
+            email.backend_alias = 'error'
+        email.save()
+
+    assert basic_newsletter.status == Newsletter_STATUS.queued
+
+    _send_bulk(emails, False)
+
+    basic_newsletter.refresh_from_db()
+
+    assert basic_newsletter.status == Newsletter_STATUS.completed
+
+    assert basic_newsletter.sent_emails == 4
+    assert basic_newsletter.failed_emails == 1
+
+    assert basic_newsletter.result == RESULT.partial
 
 
 

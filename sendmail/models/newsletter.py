@@ -13,6 +13,7 @@ from sendmail import mail
 
 STATUS = namedtuple('STATUS', 'draft creation queued completed')._make(range(4))
 PRIORITY = namedtuple('PRIORITY', 'low medium high now')._make(range(4))
+RESULT = namedtuple('RESULT', 'failed success partial')._make(range(3))
 
 
 class Newsletter(models.Model):
@@ -30,11 +31,28 @@ class Newsletter(models.Model):
         (STATUS.completed, _('completed')),
     ]
 
+    RESULT_CHOICES = [
+        (RESULT.failed, _('all failed')),
+        (RESULT.success, _('all successful')),
+        (RESULT.partial, _('partially successful')),
+    ]
+
     name = models.CharField(_('Newsletter name'),
                             max_length=255,
                             unique=True)
 
-    status = models.PositiveSmallIntegerField(_('Status'), choices=STATUS_CHOICES, db_index=True, default=STATUS.draft)
+    status = models.PositiveSmallIntegerField(_('Status'),
+                                              choices=STATUS_CHOICES,
+                                              db_index=True,
+                                              default=STATUS.draft,
+                                              editable=False)
+
+    result = models.PositiveSmallIntegerField(_('Result'),
+                                              choices=RESULT_CHOICES,
+                                              db_index=True,
+                                              null=True,
+                                              blank=True,
+                                              editable=False)
 
     created = models.DateTimeField(auto_now_add=True,
                                    db_index=True)
@@ -117,6 +135,14 @@ class Newsletter(models.Model):
         self.refresh_from_db()
         if (self.sent_emails + self.failed_emails) == self.total_emails:
             self.status = STATUS.completed
+
+            if self.sent_emails == self.total_emails:
+                self.result = RESULT.success
+            elif self.failed_emails == self.total_emails:
+                self.result = RESULT.failed
+            else:
+                self.result = RESULT.partial
+
             self.save()
 
     def create(self):

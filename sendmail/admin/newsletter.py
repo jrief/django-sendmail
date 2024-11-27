@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from sendmail.models.emailmodel import STATUS, EmailModel
-from sendmail.models.newsletter import Newsletter, STATUS as NewsletterStatus
+from sendmail.models.newsletter import Newsletter, STATUS as NewsletterStatus, RESULT
 
 from jsoneditor.forms import JSONEditor
 from django.db.models.fields.json import JSONField
-
 
 from django import forms
 from django.utils.safestring import mark_safe
@@ -73,8 +72,10 @@ class JSONTableWidget(forms.Widget):
 
 
 def requeue_failed(modeladmin, request, queryset):
+    queryset = queryset.filter(status=NewsletterStatus.completed, result__in=[RESULT.failed, RESULT.partial])
     for newsletter in queryset:
         EmailModel.objects.filter(newsletter=newsletter, status=STATUS.failed).update(status=STATUS.queued)
+    queryset.update(failed_emails=0, status=NewsletterStatus.queued, result=None)
 
 
 requeue_failed.short_description = 'Requeue failed emails'
@@ -94,6 +95,7 @@ def recreate(modeladmin, request, queryset):
         instance_data['failed_emails'] = 0
         instance_data['total_emails'] = 0
         instance_data['status'] = NewsletterStatus.draft
+        instance_data['result'] = None
 
         new_instance = modeladmin.model.objects.create(**instance_data)
         new_instance.attachments.set(attachments)
@@ -105,12 +107,16 @@ recreate.short_description = 'Recreate the newsletter'
 
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'to_recipients', 'status', 'total_emails', 'sent_emails', 'failed_emails',)
+    list_display = (
+        'name', 'to_recipients', 'status', 'result', 'total_emails', 'queued_emails', 'sent_emails', 'failed_emails',)
     filter_horizontal = ['attachments']
     actions = [requeue_failed, recreate]
     formfield_overrides = {
         JSONField: {'widget': JSONEditor},
     }
+
+    list_filter = ['status', 'result']
+
     # form = NewsletterForm
 
     # def get_queryset(self, request):
@@ -144,10 +150,10 @@ class NewsletterAdmin(admin.ModelAdmin):
     #
     # requeued_emails.short_description = 'Requeued Emails'
     #
-    # def queued_emails(self, obj):
-    #     return obj.queued_emails
-    #
-    # queued_emails.short_description = 'Queued Emails'
+    def queued_emails(self, obj):
+        return EmailModel.objects.filter(newsletter=obj, status=STATUS.queued).count()
+
+    queued_emails.short_description = 'Queued Emails'
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}

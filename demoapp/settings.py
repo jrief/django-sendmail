@@ -156,10 +156,13 @@ EMAIL_BACKEND = 'sendmail.EmailBackend'
 # EMAIL_HOST_USER = 'postmaster@sandboxf099cc52e4d94225bf3ad0e9f2bcabd2.mailgun.org'
 # EMAIL_HOST_PASSWORD = '722eddd8ef922dbcd381d68f6b28c4f0-7a3af442-a4d621a6'
 
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 1025
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'default@email.com'
+# If no env variables provided -> Use mailpit defaults
+EMAIL_HOST = os.getenv('EMAIL_HOST', '127.0.0.1')
+EMAIL_PORT = os.getenv('EMAIL_PORT', 1025)
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', '') in ['1', 'True', 'true']
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'default@email.com')
 SENDMAIL_CACHE = True
 PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 0
 # EMAIL_HOST_USER = 'test'
