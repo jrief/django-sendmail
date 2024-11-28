@@ -32,10 +32,17 @@ def get_variables_structure(nodelist):
         # Handle for-loop nodes.
         elif isinstance(node, ForNode):
             iterable_name = node.sequence.var.var
+            is_recipient_context = False
+
+            if '.' in iterable_name:
+                prefix = iterable_name.split('.')[0]
+                iterable_name = iterable_name.split('.')[1]
+                is_recipient_context = prefix == 'recipient'
+
             loop_vars = get_variables_structure(node.nodelist_loop)
 
             # Initialize a list if the iterable isn't already in the dictionary.
-            if iterable_name not in variables:
+            if iterable_name not in variables and not is_recipient_context:
                 variables[iterable_name] = []
 
             # Append the loop variables as a dictionary inside the list.
@@ -76,31 +83,6 @@ def get_placeholders_names_from_nodes(nodelist):
     return placeholders_names
 
 
-# def get_variables_names(nodelist):
-#     variables_names = []
-#
-#     for node in nodelist:
-#         if hasattr(node, 'nodelist'):
-#             variables_names.extend(get_variables_names(node.nodelist))
-#
-#         if hasattr(node, 'nodelist_loop'):
-#             variables_names.extend(get_variables_names(node.nodelist_loop))
-#
-#         if isinstance(node, NodeList):
-#             variables_names.extend(get_variables_names(node))
-#
-#         elif isinstance(node, VariableNode):
-#             variables_names.append(node.filter_expression.var.var)
-#
-#         elif isinstance(node, IncludeNode):
-#             included_template = node.template.var
-#             variables_names.extend(extract_variable_names(included_template))
-#
-#         if isinstance(node, ForNode):
-#             if hasattr(node.sequence, 'var'):
-#                 variables_names.append(node.sequence.var.var)
-#
-#     return variables_names
 
 
 def process_template(template_name):
@@ -121,7 +103,9 @@ def get_ckeditor_variables(template):
     for content in template.contents.all():
         vars.extend(get_custom_vars(content.content))
 
-    return list(set(vars))
+    vars = list(set(vars))
+
+    return filter(lambda x: not x.startswith('recipient'), vars)
 
 
 def get_custom_vars(text):

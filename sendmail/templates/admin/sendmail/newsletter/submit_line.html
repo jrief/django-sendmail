@@ -7,7 +7,7 @@
 {% if show_save_and_add_another %}<input type="submit" value="{% translate 'Save and add another' %}" name="_addanother">{% endif %}
 {% if show_save_and_continue %}<input type="submit" value="{% if can_change %}{% translate 'Save and continue editing' %}{% else %}{% translate 'Save and view' %}{% endif %}" name="_continue">{% endif %}
 {% if show_newsletter_send %}
-    <input type="submit" value="Send" name="_send_many" style="background-color: var(--message-success-bg)"/>
+    <input type="submit" value="Send" name="_send_many" style="background-color: #34D058"/>
 {% endif %}
 {% if show_close %}
     {% url opts|admin_urlname:'changelist' as changelist_url %}

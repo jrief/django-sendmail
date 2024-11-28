@@ -619,10 +619,13 @@ For this you can create RecipientLists, which are just named lists of EmailAddre
 As soon as your RecipientList is created you can create and send your Newsletter.
 For this simply:
 
-- Open your admin interface and select template if you want to use one.
-Note, that template is mutually exclusive with subject, message and HTML message.
+- Open your admin interface and select template if you want to use one. Note, that template is mutually exclusive with subject, message and HTML message.
 
 - Click "Save and Continue". Your context will be populated with variables found in template and placeholders.
+
+.. note::
+
+    User variable (``{{var}}``) in template wont be correctly found if its name contains ``.`` and it is outside ``{% for %}`` tag.
 
 - Fill in values for your context keys. Note, you wont see recipient context keys, because those are filled automatically for each recipient.
 

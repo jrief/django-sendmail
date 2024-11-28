@@ -91,8 +91,9 @@ class Newsletter(models.Model):
         EmailMergeModel,
         blank=True,
         null=True,
-        verbose_name=_('EmailMergeModel'),
-        on_delete=models.SET_NULL
+        verbose_name=_('EmailMerge'),
+        on_delete=models.SET_NULL,
+        help_text=_('Changing this erases existing context')
     )
 
     context = models.JSONField(_('Context'),
@@ -185,6 +186,10 @@ class Newsletter(models.Model):
         super().clean()
 
     def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Newsletter.objects.get(pk=self.pk)
+            if old_instance.emailmerge != self.emailmerge:
+                self.context = None
         if not self.context:
             self.context = self.construct_default_json()
 
