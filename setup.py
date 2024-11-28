@@ -21,6 +21,9 @@ setup(
     include_package_data=True,
     package_data={'': ['README.md']},
     install_requires=['Django>=4', 'django-ckeditor>=6', 'lxml>=5', 'nh3'],
+    extras_require={
+        'jsoneditor': ['django-jsoneditor>=0.2.0']
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',

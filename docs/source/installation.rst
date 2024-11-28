@@ -3,6 +3,11 @@ Installation
 
 ``pip install django-sendmail``
 
+To enable JSON editing functionality for Newsletter in the admin interface, install with ``django-jsoneditor``
+optional dependency.
+
+``pip install django-sendmail[jsoneditor]``
+
 Add ``sendmail`` and ``ckeditor`` to your installed apps in ``settings.py``:
 
 .. code-block::
@@ -12,6 +17,7 @@ Add ``sendmail`` and ``ckeditor`` to your installed apps in ``settings.py``:
     'ckeditor',
     'ckeditor_uploader',
     'sendmail',
+    'jsoneditor' # if installed
     ]
 
 To your ``settings.py`` also add email server configurations:

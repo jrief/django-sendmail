@@ -38,6 +38,13 @@ Installing nh3 is strongly encouraged for security reasons. Only with installed 
 pip install django-sendmail
 ```
 
+To enable JSON editing functionality for Newsletter in the admin interface, install with `django-jsoneditor`
+optional dependency.
+
+```sh
+pip install django-sendmail[jsoneditor]
+```
+
 Add sendmail and ckeditor to your installed app in settings.py:
 
 ```python
@@ -46,7 +53,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'sendmail',
-]
+    'jsoneditor' # if installed
+    ]
 ```
 
 To your settings.py also add email server configurations:
