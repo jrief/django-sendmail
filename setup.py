@@ -11,7 +11,7 @@ setup(
     version=VERSION,
     author='Mykhailo Poienko, Jacob Rief',
     author_email='22IMC10258@fh-krems.ac.at',
-    packages=find_packages(exclude=['demoapp', 'demoapp.tests']),
+    packages=find_packages(exclude=['demoapp', 'demoapp.tests', 'demoapp.custom_user', 'demoapp.custom_user.migrations']),
     url='https://github.com/jrief/django-sendmail',
     license='MIT',
     description='A Django app to monitor and send mail asynchronously, complete with template support.',
