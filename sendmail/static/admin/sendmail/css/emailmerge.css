@@ -1,0 +1,12 @@
+.submit-row select[name="email_language"] {
+	height: 2.1875rem;
+	line-height: 0.9375rem;
+	padding: 0 5px 0 0;
+	color: var(--button-fg);
+	background-color: var(--button-bg);
+	margin-left: -1.5rem;
+	border: none;
+}
+.submit-row select[name="email_language"]:focus-visible {
+	outline: none;
+}
