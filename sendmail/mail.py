@@ -271,7 +271,7 @@ def send_many(**kwargs):
 
         extra_attachments_cache = {}
 
-        for email, emailaddress in zip(emails, recipients_objs):
+        for email in emails:
 
             extra_attachments = []
 
@@ -279,13 +279,12 @@ def send_many(**kwargs):
 
                 if email.language not in extra_attachments_cache:
                     extra_attachments = template.translated_contents.get(
-                        language=email.language).extra_attachments.all()
+                        language=email.language).extra_attachments.exclude(id__in=[attach.id for attach in attachment_list])
                     extra_attachments_cache[email.language] = extra_attachments
                 else:
                     extra_attachments = extra_attachments_cache[email.language]
 
             for attach in [*attachment_list, *extra_attachments]:
-                print([*attachment_list, *extra_attachments])
                 through_objs.append(email.attachments.through(emailmodel_id=email.id, attachment_id=attach.id))
 
         emails[0].attachments.through.objects.bulk_create(through_objs)

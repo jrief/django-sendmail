@@ -86,6 +86,7 @@ class Newsletter(models.Model):
     subject = models.CharField(_('Subject'), max_length=989, blank=True)
     message = models.TextField(_('Message'), blank=True)
     html_message = models.TextField(_('HTML Message'), blank=True)
+    headers = models.JSONField(_('Headers'), blank=True, null=True)
 
     emailmerge = models.ForeignKey(
         EmailMergeModel,
@@ -163,6 +164,7 @@ class Newsletter(models.Model):
             'scheduled_time': self.scheduled_time,
             'expires_at': self.expires_at,
             'attachments': self.attachments.all(),
+            'headers': dict(self.headers or {}),
             'newsletter': self,
         }
         emails = mail.send_many(**kwargs)

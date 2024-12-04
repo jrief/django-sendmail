@@ -6,3 +6,6 @@ from sendmail.models.base import AbstractEmailAddress
 
 class CustomEmailAddress(AbstractEmailAddress, SwappableMetaMixin):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Custom User'
