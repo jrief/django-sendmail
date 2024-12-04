@@ -78,7 +78,7 @@ You can use relative path from your ``templates`` folder or absolute file path.
     mail.send(
         'recipient@example.com', # List of email addresses or list of EmailAddress also accepted
         'from@example.com',
-        template='your-template-here', # Could be an EmailTemplate instance or name
+        emailmerge='your-template-here', # Could be an EmailTemplate instance or name
         context={'generator': 'sendmail',
         'username': 'michaelpoi',}, # Context is used to fill both {{ var }} in html and #var# in ckeditor.
         language='en' # If not specified settings.LANGUAGE_CODE is used

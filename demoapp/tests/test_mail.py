@@ -72,7 +72,7 @@ def test_create_email(template):
 
     email_model = create(sender=sender,
                          recipients=recipients,
-                         template=template,
+                         emailmerge=template,
                          priority='medium',
                          commit=True,
                          language='en')
@@ -92,7 +92,7 @@ def test_create_email(template):
     context = {'recipient': new_recipient}
     email_model = create(sender=sender,
                          recipients=recipients,
-                         template=template,
+                         emailmerge=template,
                          priority='medium',
                          commit=True,
                          context=context,
@@ -105,7 +105,7 @@ def test_create_email(template):
     email_model = create(sender=sender,
                          cc=cc,
                          bcc=bcc,
-                         template=template,
+                         emailmerge=template,
                          priority='medium',
                          commit=True,
                          context=context,
@@ -124,7 +124,7 @@ def test_send_email(template, recipient):
     context = {'recipient': recipient}
     email_model = send(sender=sender,
                        recipients=recipients,
-                       template=template,
+                       emailmerge=template,
                        priority='medium',
                        commit=True,
                        context=context,
@@ -134,7 +134,7 @@ def test_send_email(template, recipient):
 
     email = send(sender=sender,
                  recipients=recipients,
-                 template=template,
+                 emailmerge=template,
                  priority='medium',
                  commit=True,
                  context=context,
@@ -146,7 +146,7 @@ def test_send_email(template, recipient):
         nv_recipients = [*recipients, 'not_valid']
         send(sender=sender,
              recipients=nv_recipients,
-             template=template,
+             emailmerge=template,
              priority='medium',
              commit=True,
              context=context,
@@ -156,7 +156,7 @@ def test_send_email(template, recipient):
         nv_cc = [*cc, 'not_valid']
         send(sender=sender,
              recipients=recipients,
-             template=template,
+             emailmerge=template,
              priority='medium',
              commit=True,
              context=context,
@@ -167,7 +167,7 @@ def test_send_email(template, recipient):
         nv_bcc = [*bcc, 'not_valid']
         send(sender=sender,
              recipients=recipients,
-             template=template,
+             emailmerge=template,
              priority='medium',
              commit=True,
              context=context,
@@ -177,7 +177,7 @@ def test_send_email(template, recipient):
 
     mail = send(
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -189,7 +189,7 @@ def test_send_email(template, recipient):
     with pytest.raises(ValueError):
         send(
             recipients=recipients,
-            template=template,
+            emailmerge=template,
             priority='now',
             commit=False,
             context=context,
@@ -198,7 +198,7 @@ def test_send_email(template, recipient):
 
     with pytest.raises(ValueError):
         send(recipients=recipients,
-             template=template,
+             emailmerge=template,
              subject='subject',
              priority='medium',
              commit=True,
@@ -207,7 +207,7 @@ def test_send_email(template, recipient):
 
     with pytest.raises(ValueError):
         send(recipients=recipients,
-             template=template,
+             emailmerge=template,
              message='message',
              priority='medium',
              commit=True,
@@ -216,7 +216,7 @@ def test_send_email(template, recipient):
 
     with pytest.raises(ValueError):
         send(recipients=recipients,
-             template=template,
+             emailmerge=template,
              html_message='<h1>Hi</hi>',
              priority='medium',
              commit=True,
@@ -225,7 +225,7 @@ def test_send_email(template, recipient):
 
     mail = send(
         recipients=recipients,
-        template='test_template',
+        emailmerge='test_template',
         priority='medium',
         commit=True,
         context=context,
@@ -238,7 +238,7 @@ def test_send_email(template, recipient):
 
     mail = send(
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -249,7 +249,7 @@ def test_send_email(template, recipient):
 
     mail = send(
         recipients=recipients,
-        template='test_template',
+        emailmerge='test_template',
         priority='medium',
         commit=True,
         context=context,
@@ -261,7 +261,7 @@ def test_send_email(template, recipient):
     with pytest.raises(ValueError):
         send(
             recipients=recipients,
-            template='test_template',
+            emailmerge='test_template',
             priority='medium',
             commit=True,
             context=context,
@@ -271,7 +271,7 @@ def test_send_email(template, recipient):
 
     mail = send(
         recipients=recipients,
-        template='test_template',
+        emailmerge='test_template',
         priority='medium',
         commit=True,
         context=context,
@@ -286,7 +286,7 @@ def test_send_email(template, recipient):
         tmp.seek(0)
         mail = send(
             recipients=recipients,
-            template='test_template',
+            emailmerge='test_template',
             priority='medium',
             commit=True,
             context=context,
@@ -300,7 +300,7 @@ def test_send_email(template, recipient):
 
     mail = send(
         recipients=recipients,
-        template='test_template',
+        emailmerge='test_template',
         priority='now',
         commit=True,
         context=context,
@@ -316,15 +316,15 @@ def test_send_many(template):
     recipients = ['mrec1@gmail.com', 'mrec2@gmail.com']
     sender = 'from@gmail.com'
     with pytest.raises(ValueError):
-        send_many(sender=sender, template=template)
+        send_many(sender=sender, emailmerge=template)
 
     with pytest.raises(ValidationError):
-        send_many(sender=sender, recipients=['nv', 'valid@email.com'], template=template)
+        send_many(sender=sender, recipients=['nv', 'valid@email.com'], emailmerge=template)
 
     with CaptureQueriesContext(connection) as ctx:
         emails = send_many(
             sender=sender,
-            template=template,
+            emailmerge=template,
             recipients=recipients,
             context={'test': 'val'}
         )
@@ -338,7 +338,7 @@ def test_send_many(template):
     with pytest.raises(ValueError):
         emails = send_many(
             sender=sender,
-            template=template,
+            emailmerge=template,
             recipients=recipients,
             context={'test': 'val'},
             cc=['test@gmail.com']
@@ -373,7 +373,7 @@ def test_send_many(template):
                 tmp2.seek(0)
                 emails = send_many(
                     sender=sender,
-                    template=template,
+                    emailmerge=template,
                     recipients=new_recipients,
                     context={'test': 'val'},
                     attachments={'test.txt': tmp, 'new.txt': tmp2},
@@ -423,7 +423,7 @@ def test_internalization(caplog, template):
     with caplog.at_level(logging.WARNING):
         emails = send_many(
             recipients=[en_recipient, de_recipient, ua_recipient, nullable_recipient],
-            template=template)
+            emailmerge=template)
 
         assert 'Language "ua" is not found in LANGUAGES configuration' in caplog.text
 
@@ -438,7 +438,7 @@ def test_internalization(caplog, template):
     with caplog.at_level(logging.WARNING):
         emails = send_many(
             recipients=[en_recipient, de_recipient, ua_recipient, nullable_recipient],
-            template=template,
+            emailmerge=template,
             language='en')
 
         assert 'Language "ua" is not found in LANGUAGES configuration.' not in caplog.text
@@ -490,7 +490,7 @@ def test_send_bulk(template):
     email = send(
         sender=sender,
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -505,7 +505,7 @@ def test_send_bulk(template):
 def test_errors(settings, template):
     email_model = send(
         recipients=['test@gmail.com'],
-        template=template,
+        emailmerge=template,
         priority='now',
         commit=True,
         backend='error', )
@@ -517,7 +517,7 @@ def test_errors(settings, template):
     email = send(
         sender=sender,
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -555,7 +555,7 @@ def test_extra_recipients(template):
     email = send(
         sender=sender,
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -608,7 +608,7 @@ def test_extra_attachments(template_with_extra_attachments):
     email = send(
         sender=sender,
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -629,7 +629,7 @@ def test_extra_attachments(template_with_extra_attachments):
     email = send(
         sender=sender,
         recipients=recipients,
-        template=template,
+        emailmerge=template,
         priority='medium',
         commit=True,
         context=context,
@@ -667,7 +667,7 @@ def test_many_extra_attachments(settings, template_with_extra_attachments):
 
     emails = send_many(
         recipients=[john, marry],
-        template='test_template',
+        emailmerge='test_template',
         attachments={'defau.txt': ContentFile(b'Some data...')}
     )
 
@@ -690,5 +690,5 @@ def test_unavailable_language(template):
     test1 = EmailAddress.objects.get(email='test1@exmaple.com')
     test1.preferred_language = 'de'
     test1.save()
-    emails = send_many(recipients=['test1@exmaple.com', 'test2@exmaple.com'], template='test_template')
+    emails = send_many(recipients=['test1@exmaple.com', 'test2@exmaple.com'], emailmerge='test_template')
     assert emails[0].language == emails[1].language == 'en'

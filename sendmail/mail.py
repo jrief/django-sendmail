@@ -39,7 +39,7 @@ def create(
         scheduled_time=None,
         expires_at=None,
         headers=None,
-        template=None,
+        emailmerge=None,
         priority=None,
         commit=True,
         backend='',
@@ -72,8 +72,8 @@ def create(
     cc_addresses = get_recipients_objects(cc)
     bcc_addresses = get_recipients_objects(bcc)
 
-    if commit and template:
-        bcc_addresses.extend(list(template.extra_recipients.all()))
+    if commit and emailmerge:
+        bcc_addresses.extend(list(emailmerge.extra_recipients.all()))
 
     if not (recipient := context.get('recipient', None)):  # If recipient is not set use the first one from the list
         context['recipient'] = get_or_create_recipient(recipients[0]).id
@@ -81,8 +81,8 @@ def create(
         if isinstance(recipient, get_email_address_model()):
             context['recipient'] = recipient.id
 
-    if template:
-        translated_content = template.translated_contents.get(language=language)
+    if emailmerge:
+        translated_content = emailmerge.translated_contents.get(language=language)
         subject = translated_content.subject
         message = translated_content.content
 
@@ -98,7 +98,7 @@ def create(
         priority=priority,
         status=status,
         context=context,
-        template=template,
+        template=emailmerge,
         backend_alias=backend,
         language=language,
         newsletter=newsletter,
@@ -115,7 +115,7 @@ def create(
 def send(
         recipients=None,
         sender=None,
-        template=None,
+        emailmerge=None,
         context=None,
         subject='',
         message='',
@@ -162,7 +162,7 @@ def send(
         if priority == PRIORITY.now:
             raise ValueError("send_many() can't be used with priority = 'now'")
 
-    if template:
+    if emailmerge:
         if subject:
             raise ValueError('You can\'t specify both "template" and "subject" arguments')
         if message:
@@ -171,13 +171,13 @@ def send(
             raise ValueError('You can\'t specify both "template" and "html_message" arguments')
 
         # template can be an EmailMerge instance or name
-        if not isinstance(template, EmailMergeModel):
-            template = get_email_template(template)
+        if not isinstance(emailmerge, EmailMergeModel):
+            emailmerge = get_email_template(emailmerge)
 
         # validate that content with this language exists
-        language = get_language_from_code(language, template=template)
+        language = get_language_from_code(language, template=emailmerge)
 
-        translated_content = template.translated_contents.get(language=language)
+        translated_content = emailmerge.translated_contents.get(language=language)
 
     if backend and backend not in get_available_backends().keys():
         raise ValueError('%s is not a valid backend alias' % backend)
@@ -194,7 +194,7 @@ def send(
         scheduled_time,
         expires_at,
         headers,
-        template,
+        emailmerge,
         priority,
         commit=commit,
         backend=backend,
@@ -206,7 +206,7 @@ def send(
         attachments = create_attachments(attachments)
         email.attachments.add(*attachments)
 
-    if template and commit:
+    if emailmerge and commit:
         extra_attachments = translated_content.extra_attachments.all()
         email.attachments.add(*extra_attachments)
 
@@ -265,7 +265,7 @@ def send_many(**kwargs):
             elif isinstance(attachments, QuerySet):
                 attachment_list.extend(list(attachments))
 
-        if template := kwargs.get('template'):
+        if template := kwargs.get('emailmerge'):
             if not isinstance(template, EmailMergeModel):
                 template = get_email_template(template)
 

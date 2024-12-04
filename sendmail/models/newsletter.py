@@ -155,7 +155,7 @@ class Newsletter(models.Model):
             'recipients': list(self.to_recipients.recipients.all()),
             'sender': self.email_from,
             'priority': self.priority,
-            'template': self.emailmerge,
+            'emailmerge': self.emailmerge,
             'context': self.context,
             'html_message': self.html_message,
             'subject': self.subject,

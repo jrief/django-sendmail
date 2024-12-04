@@ -158,8 +158,6 @@ class EmailMergeContentModel(models.Model):
             )
         PlaceholderContent.objects.bulk_create(placeholder_objs)
 
-        return self
-
     class Meta:
         constraints = [
             models.UniqueConstraint(

@@ -1,15 +1,12 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.html import format_html
 from django.utils.text import Truncator
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
 
@@ -115,7 +112,6 @@ class EmailMergeContentInline(admin.StackedInline):
     filter_horizontal = ('extra_attachments',)
     extra = 0
 
-    #template = 'admin/sendmail/emailmergemodel/stacked.html'
 
     def get_min_num(self, request, obj=None, **kwargs):
         if obj and not obj.translated_contents.filter(language=get_default_language()):
@@ -164,7 +160,6 @@ class EmailMergeAdmin(admin.ModelAdmin):
         js = ['admin/sendmail/js/emailmerge.js']
 
     def send_email_view(self, request, obj):
-        # obj = get_object_or_404(self.model, pk=object_id)
         language = request.POST.get('email_language', None)
         admin_user = request.user
         admin_email = admin_user.email
@@ -174,7 +169,7 @@ class EmailMergeAdmin(admin.ModelAdmin):
             return
 
         try:
-            email = send(recipients=admin_email, template=obj, priority='now', language=language)
+            email = send(recipients=admin_email, emailmerge=obj, priority='now', language=language)
             if email.status == STATUS.sent:
                 messages.success(request, "Email sent successfully to {admin_email}".format(admin_email=admin_email))
             else:

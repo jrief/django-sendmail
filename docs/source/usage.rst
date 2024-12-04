@@ -35,7 +35,7 @@ It is used to send **one** email to a list of recipients. It takes these argumen
       - str (context vars allowed)
       - No
       - HTML content of Email, if ``template`` is not specified
-    * - template
+    * - emailmerge
       - str | EmailMerge
       - No
       - EmailMerge instance or name
@@ -113,7 +113,7 @@ Passing ``now`` as the priority allows to bypass the queue and deliver the email
     mail.send(
         'recipient@example.com', # List of email addresses or list of EmailAddress also accepted
         'from@example.com',
-        template='your-template-here', # Could be an EmailTemplate instance or name
+        emailmerge='your-template-here', # Could be an EmailTemplate instance or name
         context={'generator': 'sendmail',
         'username': 'michaelpoi',}, # Context is used to fill both {{ var }} in html and #var# in ckeditor.
         language='en', # If not specified settings.LANGUAGE_CODE is used,
@@ -497,7 +497,7 @@ Extra attachments are also translated to this language.
     en_recipient = EmailAddress.objects.create(email='en@gmail.com', first_name='John', preferred_language='en')
     de_recipient = EmailAddress.objects.create(email='de@gmail.com', first_name='Ali', preferred_language='de')
 
-    send_many(recipients=[en_recipient, de_recipient], template='your-template', language='en')
+    send_many(recipients=[en_recipient, de_recipient], emailmerge='your-template', language='en')
 
 In this case de_recipient also gets English copy of an email. To use preferred language you can do something like this:
 
@@ -509,7 +509,7 @@ In this case de_recipient also gets English copy of an email. To use preferred l
     en_recipient = EmailAddress.objects.create(email='en@gmail.com', first_name='John', preferred_language='en')
     de_recipient = EmailAddress.objects.create(email='de@gmail.com', first_name='Ali', preferred_language='de')
 
-    send_many(recipients=[en_recipient, de_recipient], template='your-template')
+    send_many(recipients=[en_recipient, de_recipient], emailmerge='your-template')
 
 Now de_recipient gets German letter and en_recipient English copy.
 

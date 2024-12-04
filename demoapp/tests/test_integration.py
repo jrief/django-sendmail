@@ -112,7 +112,7 @@ def test_send_many(settings, email_testing, template):
     )
     emails = send_many(
         recipients=[john, gudrun, ben],
-        template=template,
+        emailmerge=template,
         context={'test_var': 'test_value'},
         backend='smtp',
     )
@@ -151,7 +151,7 @@ def test_send_many(settings, email_testing, template):
 
     emails = send_many(
         recipients=[john, gudrun, ben],
-        template=template,
+        emailmerge=template,
         context={'test_var': 'test_value'},
         backend='smtp',
     )
@@ -186,7 +186,7 @@ def test_simulate_mp(email_testing, template):
             recipient.preferred_language = 'de'
         recipient.save()
 
-    emails = send_many(recipients=recipients, template=template, context={'test_var': 'test_value'}, backend='smtp')
+    emails = send_many(recipients=recipients, emailmerge=template, context={'test_var': 'test_value'}, backend='smtp')
     pool = Pool(processes=3)
 
     email_lists = split_emails(emails)
