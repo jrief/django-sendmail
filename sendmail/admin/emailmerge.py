@@ -159,6 +159,10 @@ class EmailMergeAdmin(admin.ModelAdmin):
     formfield_overrides = {models.CharField: {'widget': SubjectField}}
     filter_horizontal = ['extra_recipients']
 
+    class Media:
+        css = {'all': ['admin/sendmail/css/emailmerge.css']}
+        js = ['admin/sendmail/js/emailmerge.js']
+
     def send_email_view(self, request, obj):
         # obj = get_object_or_404(self.model, pk=object_id)
         language = request.POST.get('email_language', None)
