@@ -6,6 +6,14 @@
 	background-color: var(--button-bg);
 	margin-left: -1.5rem;
 	border: none;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+.submit-row input[name="_send_email"]:hover + select[name="email_language"] {
+	background-color: var(--button-hover-bg);
+}
+.submit-row select[name="email_language"]:hover {
+	background-color: var(--button-hover-bg);
 }
 .submit-row select[name="email_language"]:focus-visible {
 	outline: none;

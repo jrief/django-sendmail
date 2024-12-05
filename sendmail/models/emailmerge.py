@@ -57,7 +57,8 @@ class EmailMergeModel(models.Model):
         Function to render an email template. Takes an EmailAddress object and a dictionary of context variables.
         """
         if not language:
-            raise
+            raise ValueError("Language is required to render email template.")
+
         if not context_dict:
             context_dict = {}
 
