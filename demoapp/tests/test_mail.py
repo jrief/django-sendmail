@@ -11,7 +11,7 @@ from django.db.utils import InterfaceError
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
-from sendmail.mail import (_send_bulk, create, get_queued, send, send_many,
+from sendmail.mail import (_send_bulk, create_email, get_queued, send, send_many,
                            split_into_batches)
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress, Recipient
@@ -36,14 +36,14 @@ def test_create_email(template):
     recipients = ['rec1@gmail.com', 'rec2@gmail.com']
     sender = 'sender@gmail.com'
 
-    email_model = create(sender=sender,
-                         recipients=recipients,
-                         subject='subject',
-                         message='message',
-                         html_message='html_message',
-                         priority='medium',
-                         commit=True,
-                         language='en', )
+    email_model = create_email(sender=sender,
+                               recipients=recipients,
+                               subject='subject',
+                               message='message',
+                               html_message='html_message',
+                               priority='medium',
+                               commit=True,
+                               language='en', )
 
     assert EmailModel.objects.count() == 1
     email = EmailModel.objects.first()
@@ -59,23 +59,23 @@ def test_create_email(template):
 
     assert EmailAddress.objects.get(pk=recipient_id).email == recipients[0]
 
-    create(sender=sender,
-           recipients=recipients,
-           subject='subject',
-           message='message',
-           html_message='html_message',
-           priority='medium',
-           commit=False,
-           language='en')
+    create_email(sender=sender,
+                 recipients=recipients,
+                 subject='subject',
+                 message='message',
+                 html_message='html_message',
+                 priority='medium',
+                 commit=False,
+                 language='en')
 
     assert EmailModel.objects.count() == 1
 
-    email_model = create(sender=sender,
-                         recipients=recipients,
-                         emailmerge=template,
-                         priority='medium',
-                         commit=True,
-                         language='en')
+    email_model = create_email(sender=sender,
+                               recipients=recipients,
+                               emailmerge=template,
+                               priority='medium',
+                               commit=True,
+                               language='en')
 
     assert EmailModel.objects.count() == 2
     email = EmailModel.objects.last()
@@ -90,26 +90,26 @@ def test_create_email(template):
                                                 preferred_language='en')
 
     context = {'recipient': new_recipient}
-    email_model = create(sender=sender,
-                         recipients=recipients,
-                         emailmerge=template,
-                         priority='medium',
-                         commit=True,
-                         context=context,
-                         language='en')
+    email_model = create_email(sender=sender,
+                               recipients=recipients,
+                               emailmerge=template,
+                               priority='medium',
+                               commit=True,
+                               context=context,
+                               language='en')
 
     assert email_model.context['recipient'] == new_recipient.id
 
     cc = ['cc1@gmail.com', 'cc2@gmail.com']
     bcc = ['bcc1@gmail.com', 'bcc2@gmail.com']
-    email_model = create(sender=sender,
-                         cc=cc,
-                         bcc=bcc,
-                         emailmerge=template,
-                         priority='medium',
-                         commit=True,
-                         context=context,
-                         language='en')
+    email_model = create_email(sender=sender,
+                               cc=cc,
+                               bcc=bcc,
+                               emailmerge=template,
+                               priority='medium',
+                               commit=True,
+                               context=context,
+                               language='en')
     em = EmailModel.objects.get(pk=email_model.id)
     assert em.recipients.count() == 4
     assert list(em.recipients.values_list('email', flat=True)).sort() == [*cc, *bcc].sort()

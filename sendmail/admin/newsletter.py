@@ -1,13 +1,9 @@
 from django.contrib import admin
-from django.utils.html import format_html
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.models.newsletter import Newsletter, STATUS as NewsletterStatus, RESULT
 
 from django.db.models.fields.json import JSONField
 
-from django import forms
-from django.utils.safestring import mark_safe
-import json
 
 try:
     from jsoneditor.forms import JSONEditor

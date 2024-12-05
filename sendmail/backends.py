@@ -19,7 +19,7 @@ class EmailBackend(BaseEmailBackend):
         Queue one or more EmailMessage objects and returns the number of
         email messages sent.
         """
-        from .mail import create
+        from .mail import create_email
         from .models.emailmodel import STATUS, EmailModel
         from .signals import email_queued
         from .utils import create_attachments
@@ -55,7 +55,7 @@ class EmailBackend(BaseEmailBackend):
                 else:
                     attachment_files[attachment[0]] = ContentFile(attachment[1])
 
-            email = create(
+            email = create_email(
                 sender=from_email,
                 recipients=email_message.to,
                 cc=email_message.cc,

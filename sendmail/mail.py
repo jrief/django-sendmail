@@ -27,7 +27,7 @@ from sendmail.utils import (create_attachments, get_email_template,
 logger = setup_loghandlers('INFO')
 
 
-def create(
+def create_email(
         sender,
         recipients=None,
         cc=None,
@@ -47,7 +47,7 @@ def create(
         newsletter=None,
 ):
     """
-    Creates an email from supplied keyword arguments. If template is
+    Creates an email from supplied keyword arguments. If emailmerge is
     specified, email subject and content will be rendered during delivery.
     """
 
@@ -182,7 +182,7 @@ def send(
     if backend and backend not in get_available_backends().keys():
         raise ValueError('%s is not a valid backend alias' % backend)
 
-    email = create(
+    email = create_email(
         sender,
         recipients,
         cc,
