@@ -17,7 +17,7 @@ from sendmail.settings import get_default_language, get_default_priority, get_em
 from sendmail.signals import email_queued
 from sendmail.validators import validate_email_with_name
 
-logger = setup_loghandlers('WARN')
+logger = setup_loghandlers('INFO')
 
 
 def send_mail(
@@ -66,9 +66,9 @@ def send_mail(
     return emails
 
 
-def get_email_template(name):
+def get_emailmerge(name):
     """
-    Function that returns an email template instance, from cache or DB.
+    Function that returns an EmailMerge instance, from cache or DB.
     """
     use_cache = getattr(settings, 'SENDMAIL_CACHE', True)
     if use_cache:
@@ -144,6 +144,22 @@ def create_attachments(attachment_files):
 
 
 def parse_priority(priority):
+    """
+    Parses and validates the given priority, returning its enum representation
+    or a default value if none is provided. This function handles string
+    representations of priorities and maps them to corresponding enum values.
+
+    Parameters:
+        priority (Optional[Union[str, Enum]]): The priority value to parse, which can be a string or an enum or None.
+
+    Returns:
+        Enum: The corresponding enum representation of the priority or a default
+        enum value if input is None.
+
+    Raises:
+        ValueError: If the priority given as a string does not match any valid
+        enum value.
+    """
     if priority is None:
         priority = get_default_priority()
     # If priority is given as a string, returns the enum representation
@@ -183,6 +199,22 @@ def get_or_create_recipient(email: str):
 
 
 def get_recipients_objects(emails):
+    """
+    Processes a list of emails or EmailAddress instances, deduplicating and
+    filtering them, and returns a list of EmailAddress objects that are not
+    blocked. The function identifies existing email addresses in the database
+    and distinguishes between those that need to be created and those that
+    already exist. Blocked emails are logged and excluded from the results.
+
+    Args:
+        emails (list[Union[str, EmailAddress]]): A list of email strings or
+            EmailAddress instances.
+
+    Returns:
+        list[EmailAddress]: A list of EmailAddress objects representing
+            non-blocked emails, including newly created ones if they did not
+            exist in the database.
+    """
     EmailAddress = get_email_address_model()
     unique_emails = []
     seen = set()
@@ -233,6 +265,21 @@ def set_recipients(email: EmailModel,
                    to_addresses,
                    cc_addresses=None,
                    bcc_addresses=None, ):
+
+    """
+    Set recipients for an email by creating 'Recipient' objects for each address and bulk creating
+    them in the database. Handles 'to', 'cc', and 'bcc' recipient types.
+
+    Parameters:
+        email (EmailModel): The email for which recipients are being set.
+        to_addresses (list): List of email addresses to be added as 'to' recipients.
+        cc_addresses (list, optional): List of email addresses to be added as 'cc' recipients.
+        bcc_addresses (list, optional): List of email addresses to be added as 'bcc' recipients.
+
+    Returns:
+        list: A list of created 'Recipient' objects associated with the email.
+    """
+
     to_recipients = [Recipient(email=email,
                                address=addr,
                                send_type='to')

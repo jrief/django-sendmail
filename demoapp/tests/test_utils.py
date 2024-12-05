@@ -13,7 +13,7 @@ from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.settings import get_attachments_storage
 from sendmail.utils import (cleanup_expired_mails, create_attachments,
-                            get_email_template, get_language_from_code,
+                            get_emailmerge, get_language_from_code,
                             get_recipients_objects, parse_emails,
                             parse_priority, send_mail, set_recipients,
                             split_emails)
@@ -143,9 +143,9 @@ def test_split_emails():
 
 @pytest.mark.django_db
 def test_get_template(settings, template):
-    assert get_email_template('test_template') == template
+    assert get_emailmerge('test_template') == template
     settings.POST_OFFICE_TEMPLATE_CACHE = False
-    assert get_email_template('test_template') == template
+    assert get_emailmerge('test_template') == template
 
 
 @pytest.mark.django_db

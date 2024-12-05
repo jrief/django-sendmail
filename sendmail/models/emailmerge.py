@@ -54,7 +54,24 @@ class EmailMergeModel(models.Model):
 
     def render_email_template(self, language='', recipient=None, context_dict=None):
         """
-        Function to render an email template. Takes an EmailAddress object and a dictionary of context variables.
+        Renders an email template based on the specified language, recipient,
+        and context. The rendering involves a two-pass processing of the template
+        to replace placeholders with their actual values and ensure the content
+        is cleaned and appropriately formatted before being returned. This method
+        requires specifying a language and can optionally take a recipient and
+        context dictionary to personalize the email content.
+
+        Parameters:
+            language (str): Specifies the language for rendering the email template.
+            recipient: The recipient of the email, which can be used for personalized content.
+            context_dict: Optional dictionary containing additional context for rendering.
+
+        Returns:
+            str: The final rendered email content with placeholders replaced by actual
+            values.
+
+        Raises:
+            ValueError: If the language parameter is not specified.
         """
         if not language:
             raise ValueError("Language is required to render email template.")

@@ -1,4 +1,5 @@
 from email.utils import make_msgid
+from datetime import date, datetime
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -9,7 +10,7 @@ from django.utils import timezone
 
 from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
-from sendmail.models.emailaddress import Recipient
+from sendmail.models.emailaddress import Recipient, EmailAddress
 from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.models.log import Log
@@ -17,7 +18,7 @@ from sendmail.settings import (get_available_backends, get_batch_size, get_defau
                                get_log_level, get_max_retries, get_message_id_enabled, get_message_id_fqdn,
                                get_retry_timedelta, get_sending_order)
 from sendmail.signals import email_queued
-from sendmail.utils import (create_attachments, get_email_template, get_language_from_code, get_or_create_recipient,
+from sendmail.utils import (create_attachments, get_emailmerge, get_language_from_code, get_or_create_recipient,
                             get_recipients_objects, parse_emails, parse_priority, set_recipients,
                             update_newsletter_counts)
 
@@ -25,23 +26,23 @@ logger = setup_loghandlers('INFO')
 
 
 def create_email(
-        sender,
-        recipients=None,
-        cc=None,
-        bcc=None,
-        subject='',
-        message='',
-        html_message='',
-        context=None,
-        scheduled_time=None,
-        expires_at=None,
-        headers=None,
-        emailmerge=None,
-        priority=None,
-        commit=True,
-        backend='',
-        language='',
-        newsletter=None,
+    sender,
+    recipients=None,
+    cc=None,
+    bcc=None,
+    subject='',
+    message='',
+    html_message='',
+    context=None,
+    scheduled_time=None,
+    expires_at=None,
+    headers=None,
+    emailmerge=None,
+    priority=None,
+    commit=True,
+    backend='',
+    language='',
+    newsletter=None,
 ):
     """
     Creates an email from supplied keyword arguments. If emailmerge is
@@ -110,26 +111,51 @@ def create_email(
 
 
 def send(
-        recipients=None,
-        sender=None,
-        emailmerge=None,
-        context=None,
-        subject='',
-        message='',
-        html_message='',
-        scheduled_time=None,
-        expires_at=None,
-        headers=None,
-        priority=None,
-        attachments=None,
-        log_level=None,
-        commit=True,
-        cc=None,
-        bcc=None,
-        language='',
-        backend='',
-        newsletter=None,
-):
+    recipients:str|list[str|EmailAddress]=None,
+    sender:str=None,
+    emailmerge:str|EmailMergeModel=None,
+    context:dict=None,
+    subject:str='',
+    message:str='',
+    html_message:str='',
+    scheduled_time:datetime|date=None,
+    expires_at:datetime|date=None,
+    headers:dict=None,
+    priority:str=None,
+    attachments:dict=None,
+    log_level:int=None,
+    commit:bool=True,
+    cc:list[str|EmailAddress]=None,
+    bcc:list[str|EmailAddress]=None,
+    language:str='',
+    backend:str='',
+    newsletter=None,
+) -> EmailModel:
+    """
+    Send an email using the specified parameters.
+
+    :param recipients: List of recipient email addresses. As a string, list of string or list of EmailAddress instances.(Required)
+    :param sender: Email address of the sender. (Defaults to settings.DEFAULT_FROM_EMAIL)
+    :param emailmerge: An EmailMergeModel instance or name for template-based email content.
+    :param context: A dictionary of additional context data for the email.
+    :param subject: The subject of the email. If no emailmerge specified.
+    :param message: The plain text message of the email. If no emailmerge specified.
+    :param html_message: The HTML message of the email. If no emailmerge specified.
+    :param scheduled_time: When the email should be sent.
+    :param expires_at: If specified, mails that are not yet sent won’t be delivered after this date.
+    :param headers: Additional headers for the email.
+    :param priority: high, medium, low or now (send immediately).
+    :param attachments: Dictionary of attachments to include in the email.
+    :param log_level: Level of logging for attempted sends.
+    :param commit: If False, the email is not saved in the database.
+    :param cc: Carbon copy addresses to be included in the email.
+    :param bcc: Blind carbon copy addresses to be included in the email.
+    :param language: Language (code) in which you want to send email. Defaults to settings.LANGUAGE_CODE.
+    :param backend: Backend alias used to send the email.
+    :param newsletter: Newsletter instance if you want to assosiacte email with it.
+    :return: An instance of the created EmailModel.
+    :raises ValueError|ValidationError: If invalid arguments or parameters are provided.
+    """
     language = get_language_from_code(language)
 
     try:
@@ -147,7 +173,10 @@ def send(
     except ValidationError as e:
         raise ValidationError('bcc: %s' % e.message)
 
-    if sender is None:
+    if backend and backend not in get_available_backends().keys():
+        raise ValueError('%s is not a valid backend alias' % backend)
+
+    if not sender:
         sender = settings.DEFAULT_FROM_EMAIL
 
     priority = parse_priority(priority)
@@ -169,15 +198,12 @@ def send(
 
         # template can be an EmailMerge instance or name
         if not isinstance(emailmerge, EmailMergeModel):
-            emailmerge = get_email_template(emailmerge)
+            emailmerge = get_emailmerge(emailmerge)
 
         # validate that content with this language exists
         language = get_language_from_code(language, template=emailmerge)
 
         translated_content = emailmerge.translated_contents.get(language=language)
-
-    if backend and backend not in get_available_backends().keys():
-        raise ValueError('%s is not a valid backend alias' % backend)
 
     email = create_email(
         sender,
@@ -219,6 +245,20 @@ def send_many(**kwargs):
     """
     This function allows to send multiple emails separately. Using it is beneficial if you need a user data as a
     context, and you want to serve every recipient separately.
+
+    The expected keyword arguments (kwargs) for this function are:
+    - recipients: Required. A list or string of email addresses to send emails to.
+    - context: Optional. A dictionary of additional context data for the email.
+    - language: Optional. Specifies the language for the email content. Default uses the recipient's preferred language.
+    - attachments: Optional. Can be a dictionary or a QuerySet, represents file attachments for the email.
+    - emailmerge: Optional. An EmailMergeModel instance or name for template-based email content.
+    Additionally, this function accepts the same arguments as the `send` function. These are inherited and used
+    for each email created, meaning the user can specify arguments such as `subject`, `message`,
+    `html_message`, `scheduled_time`, `expires_at`, `headers`, `priority`, and more, which will
+    be applied consistently across each individual email sent.
+
+    - cc: Can't be used with send_many(), causes a ValueError if present.
+    - bcc: Can't be used with send_many(), causes a ValueError if present.
     """
     if not (recipients := parse_emails(kwargs.pop('recipients', None))):
         raise ValueError('You must specify recipients')
@@ -264,7 +304,7 @@ def send_many(**kwargs):
 
         if template := kwargs.get('emailmerge'):
             if not isinstance(template, EmailMergeModel):
-                template = get_email_template(template)
+                template = get_emailmerge(template)
 
         extra_attachments_cache = {}
 
@@ -276,7 +316,9 @@ def send_many(**kwargs):
 
                 if email.language not in extra_attachments_cache:
                     extra_attachments = template.translated_contents.get(
-                        language=email.language).extra_attachments.exclude(id__in=[attach.id for attach in attachment_list])
+                        language=email.language).extra_attachments.exclude(
+                        id__in=[attach.id for attach in attachment_list])
+
                     extra_attachments_cache[email.language] = extra_attachments
                 else:
                     extra_attachments = extra_attachments_cache[email.language]

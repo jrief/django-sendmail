@@ -8,6 +8,26 @@ from django.template.loader_tags import IncludeNode
 
 
 def get_variables_structure(nodelist):
+    """
+    Analyzes a list of nodes and constructs a dictionary representing the
+    structure of variables referenced within those nodes. This function
+    processes different types of nodes, such as variable nodes, for-loop
+    nodes, and include nodes, to collect variable names and their
+    corresponding contexts within the process. Variable nodes are added to
+    the dictionary directly, while for-loop nodes add nested structures in
+    the form of lists. The function also handles nested nodelists
+    recursively.
+
+    Parameters:
+    nodelist : list
+        A list of nodes to be analyzed for variable structure.
+
+    Returns:
+    dict
+        A dictionary with variable names as keys and their corresponding
+        contexts as values. The values could be empty strings for standalone
+        variables, or lists of dictionaries for variables involved in loops.
+    """
     variables = {}
 
     for node in nodelist:
@@ -56,6 +76,19 @@ def get_variables_structure(nodelist):
 
 
 def get_placeholders_names_from_nodes(nodelist):
+    """
+    Recursively extracts placeholder names from a given list of nodes. This function
+    traverses and processes nodes to collect all placeholder names present in the node
+    list and any nested nodes. It handles various possible node attributes and types,
+    such as `nodelist`, `nodelist_loop`, `NodeList`, token attributes with placeholders,
+    and the `IncludeNode`.
+
+    Args:
+        nodelist: A list of nodes to be processed.
+
+    Returns:
+        A list of extracted placeholder names found within the nodes.
+    """
     placeholders_names = []
 
     for node in nodelist:
@@ -86,18 +119,62 @@ def get_placeholders_names_from_nodes(nodelist):
 
 
 def process_template(template_name):
+    """
+    Process a template to extract placeholder names.
+
+    This function loads a template using the provided template name
+    and extracts the placeholder names from its node list. It's useful
+    for analyzing template content to identify which placeholders are
+    being used, which can aid in dynamically populating templates
+    before they are rendered.
+
+    Args:
+        template_name: The name of the template to process. It's used
+                       to load and identify the specific template.
+
+    Returns:
+        A list of placeholder names extracted from the nodes of the
+        specified template.
+    """
     template = loader.get_template(template_name, using='sendmail')
     nodelist = template.template.nodelist
     return get_placeholders_names_from_nodes(nodelist)
 
 
 def extract_variable_names(template_name):
+    """
+    Extract variable names from a given template.
+
+    This function loads a specified template using the Django template loader
+    with a given name and retrieves its nodelist. It then extracts the
+    variable structure from the nodelist using the `get_variables_structure`
+    function.
+
+    Args:
+        template_name (str): The name of the template from which to extract
+        variable names.
+
+    Returns:
+        The structure of variables extracted from the template's nodelist.
+    """
     template = loader.get_template(template_name, using='sendmail')
     nodelist = template.template.nodelist
     return get_variables_structure(nodelist)
 
 
 def get_ckeditor_variables(template):
+    """
+    Extracts unique custom variables from the contents of a given
+    template, excluding those that start with 'recipient'.
+
+    Args:
+        template: The template object that contains contents from which
+                  custom variables are to be extracted.
+
+    Returns:
+        A filtered list of unique custom variables not starting with
+        'recipient'.
+    """
     vars = []
 
     for content in template.contents.all():
@@ -109,5 +186,17 @@ def get_ckeditor_variables(template):
 
 
 def get_custom_vars(text):
+    """
+    Extracts and returns a list of unique custom variables from the given text. A custom
+    variable is defined as any substring enclosed within hash `#` characters. This function
+    utilizes regular expressions to find all occurrences of such patterns and returns them
+    as a list of unique elements.
+
+    Args:
+        text (str): The input text from which to extract custom variables.
+
+    Returns:
+        list: A list containing unique custom variables found within the input text.
+    """
     pattern = r"#(.*?)#"
     return list(set(re.findall(pattern, text)))

@@ -117,6 +117,22 @@ class Newsletter(models.Model):
         return self.name
 
     def construct_default_json(self):
+        """
+        Constructs a default JSON-like dictionary containing template variables.
+
+        The method generates a dictionary of variables, with the variable names
+        as keys and empty strings as values. It differentiates between scenarios
+        where an email merge template is used and where custom text variables
+        need to be extracted. In the case of an email merge, it combines variables
+        from the template file and additional variables from the CKEditor. When an
+        email merge isn't used, the method extracts custom variables from various
+        text sources such as 'subject', 'message', and 'html_message', filtering
+        out variables that start with 'recipient'.
+
+        Returns:
+            dict: A dictionary with variable names as keys and empty strings as values.
+
+        """
         if self.emailmerge:
             template_vars = extract_variable_names(self.emailmerge.template_file)
             ckeditor_vars = get_ckeditor_variables(self.emailmerge)
@@ -131,6 +147,18 @@ class Newsletter(models.Model):
             return {var: '' for var in text_vars}
 
     def check_status(self):
+        """
+        Updates the status and result of an email-sending operation based on the number
+        of sent and failed emails compared to the total emails.
+
+        The method checks the current state of sent and failed emails and updates the
+        operation's completion status and result accordingly, ensuring the database
+        record reflects the operation's actual progress and outcomes.
+
+        Raises:
+            Errors related to database refresh or save operations could be raised.
+
+        """
         self.refresh_from_db()
         if (self.sent_emails + self.failed_emails) == self.total_emails:
             self.status = STATUS.completed
@@ -145,6 +173,16 @@ class Newsletter(models.Model):
             self.save()
 
     def create(self):
+        """
+        Creates and queues a batch of emails for sending based on the current
+        newsletter configuration. Updates the status of the newsletter and
+        saves changes to the database. Constructs an email with specified
+        parameters and uses the mail module to send the emails to all recipients.
+        The total number of emails sent is stored for record keeping.
+
+        Returns:
+            list: A list of EmailModel objects representing the emails that were queued for sending.
+        """
         self.status = STATUS.creation
         self.save()
         kwargs = {
