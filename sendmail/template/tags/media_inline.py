@@ -21,7 +21,7 @@ def inline_media_image(context, file):
 
     assert hasattr(
         context.template, '_attached_images'
-    ), "You must use template engine 'sendmail' when rendering images using templatetag 'inline_image'."
+    ), "You must use template engine 'sendmail' when rendering images using templatetag 'media_inline_image'."
     if isinstance(file, ImageFile):
         fileobj = file
     else:

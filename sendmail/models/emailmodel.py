@@ -135,8 +135,6 @@ class EmailModel(models.Model):
         Returns a django ``EmailMessage`` or ``EmailMultiAlternatives`` object,
         depending on whether html_message is empty.
         """
-        # if get_override_recipients():
-        #     self.to = get_override_recipients()
 
         # Replace recipient id with EmailAddress object
         if self.context:
