@@ -1,11 +1,11 @@
-import json
-from collections import defaultdict
+
+import re
 
 from django.template import loader
 from django.template.base import NodeList, VariableNode
 from django.template.defaulttags import ForNode
-from django.template.loader_tags import IncludeNode, Variable
-import re
+from django.template.loader_tags import IncludeNode
+
 
 def get_variables_structure(nodelist):
     variables = {}

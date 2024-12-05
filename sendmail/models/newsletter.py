@@ -2,14 +2,14 @@ from collections import namedtuple
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
+from sendmail import mail
+from sendmail.models.attachment import Attachment
 from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.recipients_list import RecipientsList
 from sendmail.parser import extract_variable_names, get_ckeditor_variables, get_custom_vars
 from sendmail.validators import validate_email_with_name
-from django.utils.translation import gettext_lazy as _
-from sendmail.models.recipients_list import RecipientsList
-from sendmail.models.attachment import Attachment
-from sendmail import mail
 
 STATUS = namedtuple('STATUS', 'draft creation queued completed')._make(range(4))
 PRIORITY = namedtuple('PRIORITY', 'low medium high now')._make(range(4))
@@ -112,27 +112,23 @@ class Newsletter(models.Model):
     sent_emails = models.PositiveSmallIntegerField(_('Sent Emails'), default=0, editable=False)
     failed_emails = models.PositiveSmallIntegerField(_('Failed Emails'), default=0, editable=False)
 
-    #emails = models.ManyToManyField(EmailModel, editable=False, verbose_name=_('Emails'), related_name='emails')
 
     def __str__(self):
         return self.name
 
     def construct_default_json(self):
         if self.emailmerge:
-            vars = extract_variable_names(self.emailmerge.template_file)
+            template_vars = extract_variable_names(self.emailmerge.template_file)
             ckeditor_vars = get_ckeditor_variables(self.emailmerge)
-            vars = {**vars, **{var: '' for var in ckeditor_vars}}
+            vars_dict = {**template_vars, **{var: '' for var in ckeditor_vars}}
+            return vars_dict
         else:
-            vars = get_custom_vars(self.subject)
-            vars.extend(get_custom_vars(self.message))
-            vars.extend(get_custom_vars(self.html_message))
-            vars = list(set(vars))
-            vars = filter(lambda x: not x.startswith('recipient'), vars)
-            vars = {var: '' for var in vars}
-
-        # Filter out recipient context, It is not expected to be filled by user
-
-        return vars
+            text_vars = get_custom_vars(self.subject)
+            text_vars.extend(get_custom_vars(self.message))
+            text_vars.extend(get_custom_vars(self.html_message))
+            text_vars = list(set(text_vars))
+            text_vars = filter(lambda x: not x.startswith('recipient'), text_vars)
+            return {var: '' for var in text_vars}
 
     def check_status(self):
         self.refresh_from_db()

@@ -12,9 +12,7 @@ from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
 from sendmail.models.emailaddress import Recipient
 from sendmail.sanitizer import clean_html
-from sendmail.settings import (get_email_address_model,
-                               get_email_address_setting, get_log_level,
-                               get_template_engine)
+from sendmail.settings import get_email_address_model, get_email_address_setting, get_log_level, get_template_engine
 from sendmail.validators import validate_email_with_name
 
 logger = setup_loghandlers('INFO')

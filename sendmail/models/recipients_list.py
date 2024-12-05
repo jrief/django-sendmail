@@ -1,9 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from sendmail.models.emailaddress import Recipient
 from sendmail.settings import get_email_address_setting
-from sendmail.models.emailmerge import EmailMergeModel
 
 
 class RecipientsList(models.Model):

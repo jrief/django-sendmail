@@ -76,7 +76,7 @@ class EmailMergeModel(models.Model):
         context_data = {**context_data, 'dry_run': True}
 
         # Replaces placeholders with actual values
-        django_template_second_pass = engine.from_string("{% load sendmail %}" + first_pass_content)
+        django_template_second_pass = engine.from_string(f"{{% load sendmail %}}{first_pass_content}")
         final_content = django_template_second_pass.render(context_data)
 
         final_content = f"{{% load sendmail %}}\n {final_content}"

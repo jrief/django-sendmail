@@ -2,8 +2,7 @@ import re
 
 from django.contrib import admin, messages
 from django.core.mail import SafeMIMEText
-from django.http import (HttpResponse, HttpResponseNotFound,
-                         HttpResponseRedirect)
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.urls import re_path, reverse
 from django.utils.html import format_html
 from django.utils.text import Truncator
@@ -123,9 +122,9 @@ class EmailAdmin(admin.ModelAdmin):
     render_plaintext_body.short_description = _('Mail Body')
 
     def render_html_body(self, instance):
-        pattern = re.compile('cid:([0-9a-f]{32})')
+        re.compile('cid:([0-9a-f]{32})')
         url = reverse('admin:sendmail_email_image', kwargs={'pk': instance.id, 'content_id': 32 * '0'})
-        url = url.replace(32 * '0', r'\1')
+        url.replace(32 * '0', r'\1')
         for message in instance.email_message().message().walk():
             if isinstance(message, SafeMIMEText) and message.get_content_type() == 'text/html':
                 payload = message.get_payload(decode=True).decode('utf-8')

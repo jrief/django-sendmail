@@ -4,8 +4,7 @@ from django.contrib import admin
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import HiddenInput
 
-from sendmail.admin.admin_utils import (convert_media_urls_to_tags,
-                                        render_placeholder_content)
+from sendmail.admin.admin_utils import convert_media_urls_to_tags, render_placeholder_content
 from sendmail.models.emailmerge import PlaceholderContent
 from sendmail.settings import get_default_language
 

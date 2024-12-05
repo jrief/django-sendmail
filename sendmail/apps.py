@@ -11,7 +11,7 @@ class PostOfficeConfig(AppConfig):
     }
 
     def ready(self):
-        import sendmail.checks
+        import sendmail.checks  # noqa: F401
         from sendmail import tasks
         from sendmail.settings import get_celery_enabled
         from sendmail.signals import email_queued

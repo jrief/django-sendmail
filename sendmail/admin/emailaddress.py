@@ -1,9 +1,8 @@
 from django.contrib import admin
 
 from sendmail.models.emailaddress import Recipient
-from sendmail.settings import get_email_address_model
 from sendmail.models.recipients_list import RecipientsList
-from sendmail import mail
+from sendmail.settings import get_email_address_model
 
 
 class RecipientInline(admin.TabularInline):
@@ -25,11 +24,7 @@ class EmailAddressAdmin(admin.ModelAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     list_display = ('email', 'first_name', 'last_name', 'gender', 'is_blocked')
 
-# def send_many_action(modeladmin, request, queryset):
-#     letter = queryset.first()
-#     mail.send_many(
-#         recipients=letter.
-#     )
+
 
 
 

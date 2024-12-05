@@ -1,9 +1,10 @@
 from django.contrib import admin
-from sendmail.models.emailmodel import STATUS, EmailModel
-from sendmail.models.newsletter import Newsletter, STATUS as NewsletterStatus, RESULT
-
 from django.db.models.fields.json import JSONField
 
+from sendmail.models.emailmodel import STATUS, EmailModel
+from sendmail.models.newsletter import RESULT
+from sendmail.models.newsletter import STATUS as NewsletterStatus
+from sendmail.models.newsletter import Newsletter
 
 try:
     from jsoneditor.forms import JSONEditor

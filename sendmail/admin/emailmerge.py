@@ -10,15 +10,12 @@ from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
 
-from sendmail.admin.placeholder import PlaceholderContentInline
-from sendmail.models.emailmerge import EmailMergeContentModel
-from sendmail.settings import (get_default_language, get_email_templates,
-                               get_languages_list)
 from sendmail.admin.admin_utils import get_language_name
-
+from sendmail.admin.placeholder import PlaceholderContentInline
 from sendmail.mail import send
-from sendmail.models.emailmerge import EmailMergeModel
+from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
 from sendmail.models.emailmodel import STATUS
+from sendmail.settings import get_default_language, get_email_templates, get_languages_list
 
 
 class SubjectField(TextInput):

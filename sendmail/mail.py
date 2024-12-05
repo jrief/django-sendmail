@@ -13,16 +13,13 @@ from sendmail.models.emailaddress import Recipient
 from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.models.log import Log
-from sendmail.settings import (get_available_backends, get_batch_size,
-                               get_default_language, get_email_address_model,
-                               get_log_level, get_max_retries,
-                               get_message_id_enabled, get_message_id_fqdn,
+from sendmail.settings import (get_available_backends, get_batch_size, get_default_language, get_email_address_model,
+                               get_log_level, get_max_retries, get_message_id_enabled, get_message_id_fqdn,
                                get_retry_timedelta, get_sending_order)
 from sendmail.signals import email_queued
-from sendmail.utils import (create_attachments, get_email_template,
-                            get_language_from_code, get_or_create_recipient,
-                            get_recipients_objects, parse_emails,
-                            parse_priority, set_recipients, update_newsletter_counts)
+from sendmail.utils import (create_attachments, get_email_template, get_language_from_code, get_or_create_recipient,
+                            get_recipients_objects, parse_emails, parse_priority, set_recipients,
+                            update_newsletter_counts)
 
 logger = setup_loghandlers('INFO')
 
