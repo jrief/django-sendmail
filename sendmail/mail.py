@@ -221,7 +221,7 @@ def send(
 def send_many(**kwargs):
     """
     This function allows to send multiple emails separately. Using it is beneficial if you need a user data as a
-    context and you want to serve every recipient separately.
+    context, and you want to serve every recipient separately.
     """
     if not (recipients := parse_emails(kwargs.pop('recipients', None))):
         raise ValueError('You must specify recipients')
