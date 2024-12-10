@@ -1,3 +1,4 @@
+import time
 from email.utils import make_msgid
 from datetime import date, datetime
 
@@ -328,15 +329,20 @@ def send_many(**kwargs):
 
         emails[0].attachments.through.objects.bulk_create(through_objs)
 
-        for batch in split_into_batches(emails):
-            email_queued.send(sender=EmailModel, emails=batch)
+        def send_signal_after_commit():
+            for batch in split_into_batches(emails):
+                email_queued.send(sender=EmailModel, emails=batch)
+
+        transaction.on_commit(send_signal_after_commit)
 
         return emails
 
 
 def split_into_batches(emails):
     n = get_batch_size()
-    return [emails[i:i + n] for i in range(0, len(emails), n)]
+    if emails:
+        return [emails[i:i + n] for i in range(0, len(emails), n)]
+    return []
 
 
 def get_queued():
@@ -351,6 +357,7 @@ def get_queued():
     return (
         EmailModel.objects.filter(query, status__in=[STATUS.queued, STATUS.requeued])
         .select_related('template')
+        .select_related('newsletter')
         .order_by(*get_sending_order())
         .prefetch_related('attachments')[: get_batch_size()]
     )

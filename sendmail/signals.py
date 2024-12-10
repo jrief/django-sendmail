@@ -2,8 +2,8 @@ from django.dispatch import Signal
 
 email_queued = Signal()
 """
-This signal is triggered whenever Post Office pushes one or more emails into its queue.
-The Emails objects added to the queue are passed as list to the callback handler. 
+This signal is triggered whenever Sendmail pushes one or more emails into its queue.
+The Emails objects added to the queue are passed as list to the callback handler.
 It can be connected to any handler function using this signature:
 
 Example:

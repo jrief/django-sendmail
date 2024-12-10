@@ -34,8 +34,9 @@ else:
         """
         To be called by the Celery task manager.
         """
-
         while True:
+            if not get_queued().exists():
+                break
             queued_emails = get_queued().select_for_update(of=('self',), skip_locked=True)
             with transaction.atomic():
                 try:
@@ -43,8 +44,6 @@ else:
                 except Exception as e:
                     raise e
 
-                if not get_queued().select_for_update(of=('self',), skip_locked=True).exists():
-                    break
             db_connection.close()
 
 

@@ -1,4 +1,3 @@
-
 import re
 
 from django.template import loader
@@ -116,8 +115,6 @@ def get_placeholders_names_from_nodes(nodelist):
     return placeholders_names
 
 
-
-
 def process_template(template_name):
     """
     Process a template to extract placeholder names.
@@ -133,7 +130,7 @@ def process_template(template_name):
                        to load and identify the specific template.
 
     Returns:
-        A list of placeholder names extracted from the nodes of the
+        list[str]: A list of placeholder names extracted from the nodes of the
         specified template.
     """
     template = loader.get_template(template_name, using='sendmail')
@@ -155,7 +152,7 @@ def extract_variable_names(template_name):
         variable names.
 
     Returns:
-        The structure of variables extracted from the template's nodelist.
+        dict:The structure of variables extracted from the template's nodelist.
     """
     template = loader.get_template(template_name, using='sendmail')
     nodelist = template.template.nodelist
@@ -168,11 +165,11 @@ def get_ckeditor_variables(template):
     template, excluding those that start with 'recipient'.
 
     Args:
-        template: The template object that contains contents from which
+        template: The EmailMerge object that contains contents from which
                   custom variables are to be extracted.
 
     Returns:
-        A filtered list of unique custom variables not starting with
+        list[str]: A filtered list of unique custom variables not starting with
         'recipient'.
     """
     vars = []
@@ -196,7 +193,7 @@ def get_custom_vars(text):
         text (str): The input text from which to extract custom variables.
 
     Returns:
-        list: A list containing unique custom variables found within the input text.
+        list[str]: A list containing unique custom variables found within the input text.
     """
     pattern = r"#(.*?)#"
     return list(set(re.findall(pattern, text)))

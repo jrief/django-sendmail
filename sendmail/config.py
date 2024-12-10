@@ -14,7 +14,6 @@ class Settings:
         config.setdefault('LOG_LEVEL', 'medium')
         config.setdefault('SENDING_ORDER', ['-priority'])
         config.setdefault('TEMPLATE_ENGINE', 'django')
-        config.setdefault('OVERRIDE_RECIPIENTS', None)
         config.setdefault('MAX_RETRIES', 0)
         config.setdefault('RETRY_INTERVAL', timedelta(minutes=15))
         config.setdefault('MESSAGE_ID_ENABLED', True)

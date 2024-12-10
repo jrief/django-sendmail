@@ -105,18 +105,18 @@ LANGUAGES = [
 ]
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'workdir/newsletter.sqlite3',
-    }
-    # 'default':{
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'new_post_office',
-    #     'USER': 'post_office',
-    #     'PASSWORD': 'post_office',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '5432',
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'workdir/newsletter.sqlite3',
     # }
+    'default':{
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'new_post_office',
+        'USER': 'post_office',
+        'PASSWORD': 'post_office',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
 }
 
 if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
@@ -214,10 +214,9 @@ TEMPLATES = [
 
 SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
-    'CELERY_ENABLED': False,
+    'CELERY_ENABLED': True,
     'MAX_RETRIES': 0,
-    'RETRY_INTERVAL': timedelta(seconds=1),
-    'BATCH_SIZE': 100,
+    'BATCH_SIZE': 200,
     'BATCH_DELIVERY_TIMEOUT': 30,
     'MESSAGE_ID_ENABLED': True,
     'DEFAULT_PRIORITY': 'medium',

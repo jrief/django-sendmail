@@ -17,11 +17,13 @@ RESULT = namedtuple('RESULT', 'failed success partial')._make(range(3))
 
 
 class Newsletter(models.Model):
+    """
+    Model that holds newsletter information.
+    """
     PRIORITY_CHOICES = [
         (PRIORITY.low, _('low')),
         (PRIORITY.medium, _('medium')),
         (PRIORITY.high, _('high')),
-        (PRIORITY.now, _('now')),
     ]
 
     STATUS_CHOICES = [
@@ -154,10 +156,6 @@ class Newsletter(models.Model):
         The method checks the current state of sent and failed emails and updates the
         operation's completion status and result accordingly, ensuring the database
         record reflects the operation's actual progress and outcomes.
-
-        Raises:
-            Errors related to database refresh or save operations could be raised.
-
         """
         self.refresh_from_db()
         if (self.sent_emails + self.failed_emails) == self.total_emails:
@@ -225,8 +223,11 @@ class Newsletter(models.Model):
         if self.pk:
             old_instance = Newsletter.objects.get(pk=self.pk)
             if old_instance.emailmerge != self.emailmerge:
+                # If you change emailmerge all the context should be erased
                 self.context = None
+
         if not self.context:
+            # If no context, create and save a default schema
             self.context = self.construct_default_json()
 
         super().save(*args, **kwargs)
