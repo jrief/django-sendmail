@@ -59,6 +59,12 @@ class EmailModel(models.Model):
     expires_at = models.DateTimeField(
         _('Expires'), blank=True, null=True, help_text=_("Email won't be sent after this timestamp")
     )
+    opened_at = models.DateTimeField(
+        _('Opened'), blank=True, null=True, help_text=_("Email opening time")
+    )
+    clicked_at = models.DateTimeField(
+        _('Clicked'), blank=True, null=True, help_text=_("Email first click time")
+    )
     message_id = models.CharField('Message-ID', null=True, max_length=255, editable=False)
     number_of_retries = models.PositiveIntegerField(null=True, blank=True)
     headers = models.JSONField(_('Headers'), blank=True, null=True)
@@ -142,6 +148,9 @@ class EmailModel(models.Model):
             context['recipient'] = get_email_address_model().objects.get(id=self.context['recipient'])
         else:
             context = {}
+
+        if self.newsletter:
+            context.update({'email_id': self.id})
 
         subject = render_message(self.subject, context)
         plaintext_message = render_message(self.message, context)

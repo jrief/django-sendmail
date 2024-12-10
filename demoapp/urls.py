@@ -8,6 +8,7 @@ from demoapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('sendmail/', include('sendmail.urls')),
 ]
 
 if settings.DEBUG:

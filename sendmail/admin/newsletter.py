@@ -5,6 +5,7 @@ from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.models.newsletter import RESULT
 from sendmail.models.newsletter import STATUS as NewsletterStatus
 from sendmail.models.newsletter import Newsletter
+from sendmail.settings import get_tracking_enabled
 
 try:
     from jsoneditor.forms import JSONEditor
@@ -58,43 +59,38 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     list_filter = ['status', 'result']
 
+    def get_list_display(self, request):
+        list_display = (
+            'name', 'to_recipients', 'status', 'result', 'total_emails', 'queued_emails', 'sent_emails',
+            'failed_emails',)
+
+        if get_tracking_enabled():
+            list_display += ('opened', 'open_rate', 'clicked', 'click_rate',)
+
+        return list_display
+
+    def opened(self, obj):
+        return EmailModel.objects.filter(opened_at__isnull=False, newsletter=obj).count()
+
+    def clicked(self, obj):
+        return EmailModel.objects.filter(clicked_at__isnull=False, newsletter=obj).count()
+
+    def click_rate(self, obj):
+        if not obj.sent_emails:
+            return 0
+
+        return self.clicked(obj) / obj.sent_emails
+
+    def open_rate(self, obj):
+        if not obj.sent_emails:
+            return 0
+
+        return self.opened(obj) / obj.sent_emails
+
     def has_change_permission(self, request, obj=None):
         return obj and obj.status == NewsletterStatus.draft
 
 
-    # form = NewsletterForm
-
-    # def get_queryset(self, request):
-    #     # Annotate the queryset with email status counts
-    #     qs = super().get_queryset(request).annotate(
-    #         total_emails=Count('emailmodel'),
-    #         sent_emails=Count(Case(When(emailmodel__status=STATUS.sent, then=1), output_field=IntegerField())),
-    #         failed_emails=Count(Case(When(emailmodel__status=STATUS.failed, then=1), output_field=IntegerField())),
-    #         requeued_emails=Count(Case(When(emailmodel__status=STATUS.requeued, then=1), output_field=IntegerField())),
-    #         queued_emails=Count(Case(When(emailmodel__status=STATUS.queued, then=1), output_field=IntegerField())),
-    #     )
-    #     return qs
-
-    # def total_emails(self, obj):
-    #     return obj.total_emails
-    #
-    # total_emails.short_description = 'Total Emails'
-
-    # def sent_emails(self, obj):
-    #     return obj.sent_emails
-    #
-    # sent_emails.short_description = 'Sent Emails'
-    #
-    # def failed_emails(self, obj):
-    #     return obj.failed_emails
-    #
-    # failed_emails.short_description = 'Failed Emails'
-
-    # def requeued_emails(self, obj):
-    #     return obj.requeued_emails
-    #
-    # requeued_emails.short_description = 'Requeued Emails'
-    #
     def queued_emails(self, obj):
         return EmailModel.objects.filter(newsletter=obj, status=STATUS.queued).count()
 
