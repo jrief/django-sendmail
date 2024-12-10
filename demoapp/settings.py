@@ -105,17 +105,9 @@ LANGUAGES = [
 ]
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'workdir/newsletter.sqlite3',
-    # }
-    'default':{
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'new_post_office',
-        'USER': 'post_office',
-        'PASSWORD': 'post_office',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'workdir/newsletter.sqlite3',
     }
 }
 
