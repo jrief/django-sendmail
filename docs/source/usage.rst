@@ -682,6 +682,9 @@ Now you can use templatetags for tracking:
 
     In the ``EmaiModel``, the fields ``opened_at`` and ``clicked_at`` record the timestamps
     of the first instances when the user opens or interacts with the email, respectively.
+
+If you want to extend the standard behavior, you can connect to ``email_opened`` and ``email_clicked`` signals.
+Signals are triggered **every time** email is opened or clicked.
     
 
 

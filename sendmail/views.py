@@ -4,17 +4,18 @@ from django.conf import settings
 from django.contrib.messages.storage import default_storage
 from django.contrib.staticfiles.finders import find
 from django.core.files.images import ImageFile
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, FileResponse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, FileResponse
 from django.shortcuts import get_object_or_404
 from sendmail.models.emailmodel import EmailModel
 from django.core.files.storage import default_storage
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils import timezone
+from sendmail.signals import email_opened, email_clicked
 
 
 def track(request, img, pk):
     email = get_object_or_404(EmailModel, pk=pk)
-    print(f'Email with id {email.id} was opened')
+    email_opened.send(sender=EmailModel, email=email)
 
     if isinstance(img, ImageFile):
         fileobj = img.open('rb')
@@ -48,6 +49,7 @@ def track(request, img, pk):
 
 def click(request, pk):
     email = get_object_or_404(EmailModel, pk=pk)
+    email_clicked.send(sender=EmailModel, email=email)
     if not (target_uri := request.GET.get('target_uri')):
         return HttpResponseBadRequest("Missing 'target_uri' parameter")
 
