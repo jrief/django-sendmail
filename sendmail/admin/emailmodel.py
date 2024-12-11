@@ -13,6 +13,7 @@ from sendmail.admin.emailaddress import RecipientInline
 from sendmail.admin.log import LogInline
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.sanitizer import clean_html
+from sendmail.settings import get_tracking_enabled
 
 
 def requeue(modeladmin, request, queryset):
@@ -26,19 +27,28 @@ requeue.short_description = 'Requeue selected emails'
 
 @admin.register(EmailModel)
 class EmailAdmin(admin.ModelAdmin):
-    list_display = [
-        'truncated_message_id',
-        #'to_display',
-        'shortened_subject',
-        'status',
-        'last_updated',
-        'scheduled_time',
-        'use_template',
-    ]
-    search_fields = ['to', 'subject']
+
+
+    def get_list_display(self, request):
+        list_display = [
+            'truncated_message_id',
+            # 'to_display',
+            'shortened_subject',
+            'status',
+            'last_updated',
+            'scheduled_time',
+            'use_template',
+            'newsletter',
+        ]
+        if get_tracking_enabled():
+            list_display.extend(['opened_at', 'clicked_at'])
+
+        return list_display
+
+    search_fields = ['message_id', 'subject']
     readonly_fields = ['message_id', 'language', 'render_subject', 'render_plaintext_body', 'render_html_body']
     inlines = [RecipientInline, AttachmentInline, LogInline, ]
-    list_filter = ['status', 'template__name']
+    list_filter = ['status', 'template__name', 'newsletter']
     actions = [requeue]
 
     def get_urls(self):

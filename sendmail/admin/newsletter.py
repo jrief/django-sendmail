@@ -5,6 +5,7 @@ from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.models.newsletter import RESULT
 from sendmail.models.newsletter import STATUS as NewsletterStatus
 from sendmail.models.newsletter import Newsletter
+from sendmail.settings import get_tracking_enabled
 
 try:
     from jsoneditor.forms import JSONEditor
@@ -24,23 +25,7 @@ requeue_failed.short_description = 'Requeue failed emails'
 
 def recreate(modeladmin, request, queryset):
     for newsletter in queryset.prefetch_related('attachments'):
-        instance_data = {}
-        attachments = newsletter.attachments.all()
-        for field in newsletter._meta.get_fields():
-            if not field.auto_created and not field.name == 'attachments':
-                instance_data[field.name] = getattr(newsletter, field.name)
-
-        newsletter.delete()
-
-        instance_data['sent_emails'] = 0
-        instance_data['failed_emails'] = 0
-        instance_data['total_emails'] = 0
-        instance_data['status'] = NewsletterStatus.draft
-        instance_data['result'] = None
-
-        new_instance = modeladmin.model.objects.create(**instance_data)
-        new_instance.attachments.set(attachments)
-        new_instance.save()
+        modeladmin.recreate(newsletter)
 
 
 recreate.short_description = 'Recreate the newsletter'
@@ -58,43 +43,59 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     list_filter = ['status', 'result']
 
+    def get_list_display(self, request):
+        list_display = (
+            'name', 'to_recipients', 'status', 'result', 'total_emails', 'queued_emails', 'sent_emails',
+            'failed_emails',)
+
+        if get_tracking_enabled():
+            list_display += ('opened', 'open_rate', 'clicked', 'click_rate',)
+
+        return list_display
+
+    def opened(self, obj):
+        return EmailModel.objects.filter(opened_at__isnull=False, newsletter=obj).count()
+
+    def clicked(self, obj):
+        return EmailModel.objects.filter(clicked_at__isnull=False, newsletter=obj).count()
+
+    def click_rate(self, obj):
+        if not obj.sent_emails:
+            return 0
+
+        return self.clicked(obj) / obj.sent_emails
+
+    def open_rate(self, obj):
+        if not obj.sent_emails:
+            return 0
+
+        return self.opened(obj) / obj.sent_emails
+
+    def recreate(self, obj):
+        instance_data = {}
+        attachments = obj.attachments.all()
+        for field in obj._meta.get_fields():
+            if not field.auto_created and not field.name == 'attachments':
+                instance_data[field.name] = getattr(obj, field.name)
+
+        obj.delete()
+
+        instance_data['sent_emails'] = 0
+        instance_data['failed_emails'] = 0
+        instance_data['total_emails'] = 0
+        instance_data['status'] = NewsletterStatus.draft
+        instance_data['result'] = None
+
+        new_instance = Newsletter.objects.create(**instance_data)
+        new_instance.attachments.set(attachments)
+        new_instance.save()
+
+        return new_instance
+
     def has_change_permission(self, request, obj=None):
         return obj and obj.status == NewsletterStatus.draft
 
 
-    # form = NewsletterForm
-
-    # def get_queryset(self, request):
-    #     # Annotate the queryset with email status counts
-    #     qs = super().get_queryset(request).annotate(
-    #         total_emails=Count('emailmodel'),
-    #         sent_emails=Count(Case(When(emailmodel__status=STATUS.sent, then=1), output_field=IntegerField())),
-    #         failed_emails=Count(Case(When(emailmodel__status=STATUS.failed, then=1), output_field=IntegerField())),
-    #         requeued_emails=Count(Case(When(emailmodel__status=STATUS.requeued, then=1), output_field=IntegerField())),
-    #         queued_emails=Count(Case(When(emailmodel__status=STATUS.queued, then=1), output_field=IntegerField())),
-    #     )
-    #     return qs
-
-    # def total_emails(self, obj):
-    #     return obj.total_emails
-    #
-    # total_emails.short_description = 'Total Emails'
-
-    # def sent_emails(self, obj):
-    #     return obj.sent_emails
-    #
-    # sent_emails.short_description = 'Sent Emails'
-    #
-    # def failed_emails(self, obj):
-    #     return obj.failed_emails
-    #
-    # failed_emails.short_description = 'Failed Emails'
-
-    # def requeued_emails(self, obj):
-    #     return obj.requeued_emails
-    #
-    # requeued_emails.short_description = 'Requeued Emails'
-    #
     def queued_emails(self, obj):
         return EmailModel.objects.filter(newsletter=obj, status=STATUS.queued).count()
 

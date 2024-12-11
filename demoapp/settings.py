@@ -205,6 +205,8 @@ TEMPLATES = [
 ]
 
 SENDMAIL = {
+    'TRACKING_ENABLED': True,
+    'TRACKING_DOMAIN': os.getenv('SENDMAIL_TRACKING_DOMAIN', 'http://127.0.0.1:8000'),
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': True,
     'MAX_RETRIES': 0,
@@ -222,6 +224,7 @@ SENDMAIL = {
         ('email/in.html', _('Incoming')),
         ('email/uni.html', _('University')),
         ('email/contexed_uni.html', _('Contexed')),
+        ('email/tracker.html', _('Tracker')),
     ],
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"

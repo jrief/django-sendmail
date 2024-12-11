@@ -4,10 +4,14 @@ from pathlib import Path
 
 from django import template
 from django.conf import settings
+from urllib.parse import quote
 from django.contrib.staticfiles.finders import find
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.images import ImageFile
+from django.urls import reverse
 from django.utils.html import SafeString
+
+from sendmail.settings import get_tracking_enabled, get_tracking_domain
 
 register = template.Library()
 
@@ -49,3 +53,31 @@ def inline_image(context, file):
 @register.simple_tag
 def placeholder(name: str) -> str:
     return f"{{{{{name}}}}}"
+
+if get_tracking_enabled():
+
+    def build_url(path):
+        return "{}{}".format(get_tracking_domain(), path)
+
+    @register.simple_tag(takes_context=True)
+    def tracker_link(context, target_img) -> str:
+        if not (email_id := context.get('email_id')):
+            return ''
+
+
+        url = reverse('sendmail:track', args=[email_id, target_img])
+
+        return build_url(url)
+
+    @register.simple_tag(takes_context=True)
+    def click_link(context, target_uri):
+
+        if not (email_id := context.get('email_id')):
+            return ''
+
+        url = reverse('sendmail:click', args=[email_id])
+        return f"{build_url(url)}?target_uri={quote(target_uri)}"
+
+
+
+
