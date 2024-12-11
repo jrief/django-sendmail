@@ -60,7 +60,7 @@ if get_tracking_enabled():
         return "{}{}".format(get_tracking_domain(), path)
 
     @register.simple_tag(takes_context=True)
-    def tracker(context, target_img) -> str:
+    def tracker_link(context, target_img) -> str:
         if not (email_id := context.get('email_id')):
             return ''
 

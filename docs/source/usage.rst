@@ -635,6 +635,55 @@ For this simply:
 
 - If your emails failed or you want to completely resend a Newsletter you can use one of the admin actions.
 
+Email Tracking
+^^^^^^^^^^^^^^^
+
+Emails generated with Newsletter feature can be tracked to measure recipients engagement.
+Currently sendmail can track:
+
+- When email was opened.
+
+- When interaction button was clicked.
+
+Tracking is disabled by default. To make it work add to your ``settings.py``:
+
+.. code-block:: python
+
+    
+    SENDMAIL = {
+        'TRACKING_ENABLED': True,
+        'TRACKING_DOMAIN': 'https://www.example.com',
+        ...
+    }
+    
+Now you can use templatetags for tracking:
+
+- ``{% tracker_link <target_img> %}`` should be used as a ``src`` for any image on a HTML template:
+
+    .. code-block:: html
+        
+        <img src="{% tracker_link 'images/logo.jpg'%}" alt="No image"/>
+        
+    You can provide a link to any image in media or staticfiles that will be loaded, updating ``EmailModel`` ``opened_at``.
+    
+    .. note::
+        
+       Most email clients prompt the user to confirm before loading images from external sources. So this metric can be not reliable enough.
+
+- ``{% click_link <target_url> %}`` can be used in ``href`` of ``button`` or ``a`` you want to measure interactions with.
+
+    .. code-block:: html
+
+        <td> <a href="{% click_link 'https://www.google.com' %}" target="_blank">Call To Action</a> </td>
+
+    After clicking a button ``EmailModel`` ``clicked_at`` will be updated and user will be redirected to ``target_url``.
+
+.. note::
+
+    In the ``EmaiModel``, the fields ``opened_at`` and ``clicked_at`` record the timestamps
+    of the first instances when the user opens or interacts with the email, respectively.
+    
+
 
 
 
