@@ -25,23 +25,7 @@ requeue_failed.short_description = 'Requeue failed emails'
 
 def recreate(modeladmin, request, queryset):
     for newsletter in queryset.prefetch_related('attachments'):
-        instance_data = {}
-        attachments = newsletter.attachments.all()
-        for field in newsletter._meta.get_fields():
-            if not field.auto_created and not field.name == 'attachments':
-                instance_data[field.name] = getattr(newsletter, field.name)
-
-        newsletter.delete()
-
-        instance_data['sent_emails'] = 0
-        instance_data['failed_emails'] = 0
-        instance_data['total_emails'] = 0
-        instance_data['status'] = NewsletterStatus.draft
-        instance_data['result'] = None
-
-        new_instance = modeladmin.model.objects.create(**instance_data)
-        new_instance.attachments.set(attachments)
-        new_instance.save()
+        modeladmin.recreate(newsletter)
 
 
 recreate.short_description = 'Recreate the newsletter'
@@ -86,6 +70,27 @@ class NewsletterAdmin(admin.ModelAdmin):
             return 0
 
         return self.opened(obj) / obj.sent_emails
+
+    def recreate(self, obj):
+        instance_data = {}
+        attachments = obj.attachments.all()
+        for field in obj._meta.get_fields():
+            if not field.auto_created and not field.name == 'attachments':
+                instance_data[field.name] = getattr(obj, field.name)
+
+        obj.delete()
+
+        instance_data['sent_emails'] = 0
+        instance_data['failed_emails'] = 0
+        instance_data['total_emails'] = 0
+        instance_data['status'] = NewsletterStatus.draft
+        instance_data['result'] = None
+
+        new_instance = Newsletter.objects.create(**instance_data)
+        new_instance.attachments.set(attachments)
+        new_instance.save()
+
+        return new_instance
 
     def has_change_permission(self, request, obj=None):
         return obj and obj.status == NewsletterStatus.draft

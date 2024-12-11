@@ -206,6 +206,7 @@ TEMPLATES = [
 
 SENDMAIL = {
     'TRACKING_ENABLED': True,
+    'TRACKING_DOMAIN': os.getenv('SENDMAIL_TRACKING_DOMAIN', 'http://127.0.0.1:8000'),
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': True,
     'MAX_RETRIES': 0,

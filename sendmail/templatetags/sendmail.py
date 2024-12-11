@@ -9,11 +9,7 @@ from django.contrib.staticfiles.finders import find
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.images import ImageFile
 from django.urls import reverse
-from django.utils.html import SafeString, format_html
-from django.contrib.sites.shortcuts import get_current_site
-import socket
-
-from django.utils.safestring import mark_safe
+from django.utils.html import SafeString
 
 from sendmail.settings import get_tracking_enabled, get_tracking_domain
 
@@ -59,18 +55,19 @@ def placeholder(name: str) -> str:
     return f"{{{{{name}}}}}"
 
 if get_tracking_enabled():
+
+    def build_url(path):
+        return "{}{}".format(get_tracking_domain(), path)
+
     @register.simple_tag(takes_context=True)
-    def tracker(context) -> str:
+    def tracker(context, target_img) -> str:
         if not (email_id := context.get('email_id')):
             return ''
 
-        print(context)
 
-        url = reverse('sendmail:track', args=[email_id])
+        url = reverse('sendmail:track', args=[email_id, target_img])
 
-        url = get_tracking_domain() + url
-
-        return format_html('<img src="{}" alt="" style="display:none;width:1px;height:1px;" />', url)
+        return build_url(url)
 
     @register.simple_tag(takes_context=True)
     def click_link(context, target_uri):
@@ -79,9 +76,8 @@ if get_tracking_enabled():
             return ''
 
         url = reverse('sendmail:click', args=[email_id])
-        url = f"{get_tracking_domain()}{url}?target_uri={quote(target_uri)}"
+        return f"{build_url(url)}?target_uri={quote(target_uri)}"
 
-        return url
 
 
 
