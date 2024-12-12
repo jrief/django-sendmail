@@ -11,8 +11,7 @@ from django.db.utils import InterfaceError
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
-from sendmail.mail import (_send_bulk, create_email, get_queued, send, send_many,
-                           split_into_batches)
+from sendmail.mail import _send_bulk, create_email, get_queued, send, send_many, split_into_batches
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress, Recipient
 from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent

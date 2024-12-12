@@ -1,4 +1,5 @@
 from django.urls import path
+
 from sendmail import views
 
 app_name = "sendmail"

@@ -1,13 +1,15 @@
 import pytest
 from django.core.exceptions import ValidationError
 
+from sendmail.mail import _send_bulk
 from sendmail.models import PlaceholderContent
-from sendmail.models.recipients_list import RecipientsList
-from sendmail.models.newsletter import Newsletter, RESULT, STATUS as Newsletter_STATUS
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import STATUS, EmailModel
+from sendmail.models.newsletter import RESULT
+from sendmail.models.newsletter import STATUS as Newsletter_STATUS
+from sendmail.models.newsletter import Newsletter
+from sendmail.models.recipients_list import RecipientsList
 from sendmail.utils import set_recipients, update_newsletter_counts
-from sendmail.mail import _send_bulk
 
 
 @pytest.fixture

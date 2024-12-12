@@ -1,17 +1,17 @@
 import uuid
 from email.mime.image import MIMEImage
-from pathlib import Path
+from urllib.parse import quote
 
 from django import template
 from django.conf import settings
-from urllib.parse import quote
-from django.contrib.staticfiles.finders import find
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.images import ImageFile
+from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils.html import SafeString
 
-from sendmail.settings import get_tracking_enabled, get_tracking_domain
+from sendmail.settings import get_tracking_domain, get_tracking_enabled
+from sendmail.utils import get_path_from_static
 
 register = template.Library()
 
@@ -28,12 +28,7 @@ def inline_image(context, file):
         fileobj = file.open('rb')
     else:
         if settings.DEBUG:
-            path = find(file)
-            fullpath = Path(path) if path else None
-            if not fullpath:
-                raise FileNotFoundError(f"No such file in static: {file}")
-            if not fullpath.is_file():
-                raise IsADirectoryError(f"File {file} is not a file")
+            fullpath = get_path_from_static(file)
             fileobj = fullpath.open('rb')
         else:
             if staticfiles_storage.exists(file):
@@ -64,6 +59,11 @@ if get_tracking_enabled():
         if not (email_id := context.get('email_id')):
             return ''
 
+        if not default_storage.exists(target_img):
+            if settings.DEBUG:
+                get_path_from_static(target_img)
+            elif not staticfiles_storage.exists(target_img):
+                return ''
 
         url = reverse('sendmail:track', args=[email_id, target_img])
 

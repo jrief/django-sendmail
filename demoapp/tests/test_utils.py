@@ -12,13 +12,10 @@ from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.settings import get_attachments_storage
-from sendmail.utils import (cleanup_expired_mails, create_attachments,
-                            get_emailmerge, get_language_from_code,
-                            get_recipients_objects, parse_emails,
-                            parse_priority, send_mail, set_recipients,
+from sendmail.utils import (cleanup_expired_mails, create_attachments, get_emailmerge, get_language_from_code,
+                            get_recipients_objects, parse_emails, parse_priority, send_mail, set_recipients,
                             split_emails)
-from sendmail.validators import (validate_email_with_name,
-                                 validate_template_syntax)
+from sendmail.validators import validate_email_with_name, validate_template_syntax
 
 
 @pytest.mark.django_db

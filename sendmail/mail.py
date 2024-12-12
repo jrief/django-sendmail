@@ -1,6 +1,6 @@
-import time
-from email.utils import make_msgid
+
 from datetime import date, datetime
+from email.utils import make_msgid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from sendmail.connections import connections
 from sendmail.logutils import setup_loghandlers
-from sendmail.models.emailaddress import Recipient, EmailAddress
+from sendmail.models.emailaddress import EmailAddress, Recipient
 from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
 from sendmail.models.log import Log

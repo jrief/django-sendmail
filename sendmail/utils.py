@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from django.apps import apps
 from django.conf import settings
+from django.contrib.staticfiles.finders import find
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -376,3 +379,36 @@ def update_newsletter_counts(emails, sent_emails, failed_emails):
             newsletter.check_status()
 
     return updates
+
+def get_path_from_static(filename):
+    """
+        Retrieve the full path of a file from the static directory.
+
+        This function searches for a file in a predefined static directory and
+        returns its full path as a Path object. If the file is not found, or if
+        the file is a directory instead of a file, appropriate exceptions are
+        raised.
+
+        Parameters:
+        filename: str
+            The name of the file to locate in the static directory.
+
+        Returns:
+        Path
+            The full path object of the requested file.
+
+        Raises:
+        FileNotFoundError
+            If the file does not exist in the static directory.
+        IsADirectoryError
+            If the located path is a directory and not a file.
+    """
+    path = find(filename)
+    fullpath = Path(path) if path else None
+    if not fullpath:
+        raise FileNotFoundError(f"No such file in static: {filename}")
+    if not fullpath.is_file():
+        raise IsADirectoryError(f"File {filename} is not a file")
+
+    return fullpath
+

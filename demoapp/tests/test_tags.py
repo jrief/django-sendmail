@@ -5,8 +5,8 @@ import pytest
 from django.core.files.images import ImageFile
 from django.template import Context
 
-from sendmail.templatetags.sendmail import inline_image, placeholder
 from sendmail.template.tags.media_inline import inline_media_image
+from sendmail.templatetags.sendmail import inline_image, placeholder
 
 
 @pytest.mark.django_db
@@ -121,5 +121,38 @@ def test_staticfiles(settings, collectstatic):
     assert len(template._attached_images) == 1
 
     assert inline_image(context, 'invalid') == ''
+
+
+def test_track_link(settings):
+    from sendmail.templatetags.sendmail import tracker_link
+
+    media_link = 'images/logo.jpg'
+
+    assert tracker_link(target_img=media_link, context={}) == ''
+
+    assert tracker_link(target_img=media_link, context={'email_id': 5}) == 'https://example.com/sendmail/track/5/images/logo.jpg'
+    # settings.MEDIA_ROOT = settings.BASE_DIR
+    settings.DEBUG = True
+    staticfiles_link = 'images/logo.jpg'
+
+    assert tracker_link(target_img=staticfiles_link, context={'email_id': 5}) == 'https://example.com/sendmail/track/5/images/logo.jpg'
+
+    with pytest.raises(FileNotFoundError):
+            tracker_link(target_img='invalid.png', context={'email_id': 5, 'target_uri': 'https://google.com'})
+
+    settings.DEBUG = False
+    assert tracker_link(target_img='invalid.png', context={'email_id': 5, 'target_uri': 'https://google.com'}) == ''
+
+def test_click_link():
+    from sendmail.templatetags.sendmail import click_link
+    from urllib.parse import quote
+
+    target_uri = 'https://google.com'
+    quoted = quote(target_uri)
+
+    assert click_link(target_uri=target_uri, context={}) == ''
+
+    assert click_link(target_uri=target_uri, context={'email_id': 5}) == f'https://example.com/sendmail/click/5/?target_uri={quoted}'
+
 
 

@@ -126,6 +126,8 @@ SENDMAIL = {
         'smtp': 'django.core.mail.backends.smtp.EmailBackend',
         'slow_backend': 'demoapp.tests.backends.SlowTestBackend',
     },
+    'TRACKING_ENABLED': True,
+    'TRACKING_DOMAIN': 'https://example.com',
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': False,
     'MAX_RETRIES': 2,

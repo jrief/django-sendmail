@@ -1,8 +1,7 @@
 import pytest
 
 from sendmail.models.emailaddress import EmailAddress
-from sendmail.models.emailmerge import (EmailMergeContentModel,
-                                        EmailMergeModel, PlaceholderContent)
+from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel, PlaceholderContent
 
 
 @pytest.fixture

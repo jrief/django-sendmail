@@ -1,7 +1,7 @@
 import pytest
 
 from sendmail.models import PlaceholderContent
-from sendmail.parser import process_template, extract_variable_names, get_ckeditor_variables
+from sendmail.parser import extract_variable_names, get_ckeditor_variables, process_template
 
 
 def test_parse():
