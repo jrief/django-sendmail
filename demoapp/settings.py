@@ -114,11 +114,11 @@ DATABASES = {
 if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'new_post_office',
-        'USER': 'post_office',
-        'PASSWORD': 'post_office',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME', 'new_post_office'),
+        'USER': os.getenv('DB_USER', 'post_office'),
+        'PASSWORD': os.getenv('DB_PASSWORD','post_office'),
+        'HOST': os.getenv('DB_HOST','127.0.0.1'),
+        'PORT': os.getenv("DB_PORT", '5432'),
     }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

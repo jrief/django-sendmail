@@ -1,0 +1,86 @@
+version: '3.9'
+
+services:
+  sendmail:
+    container_name: sendmail
+    restart: always
+    build:
+      context: .
+      dockerfile: ./deploy/sendmail/Dockerfile
+
+    environment:
+        - USE_POSTGRES=True
+        - DB_NAME=sendmail
+        - DB_USER=sendmail
+        - DB_PASSWORD=sendmail
+        - DB_HOST=db
+        - DB_PORT=5432
+        - EMAIL_HOST=mailpit
+        - CELERY_BROKER_URL=redis://redis:6379/0
+        - TRACKING_DOMAIN=0.0.0.0
+
+    volumes:
+      - static:/app/staticfiles
+      - media:/app/workdir/media
+    ports:
+      - "8000:8080"
+    depends_on:
+        -   db
+
+  db:
+      container_name: postgres
+      image: postgres:13
+      restart: always
+      volumes:
+          - postgres_data:/var/lib/posgresql/data
+      environment:
+          - POSTGRES_DB=sendmail
+          - POSTGRES_USER=sendmail
+          - POSTGRES_PASSWORD=sendmail
+      ports:
+          -   "5435:5432"
+
+  redis:
+      container_name: redis
+      image: redis:alpine
+      restart: always
+      ports:
+          - "6379:6379"  # Exposing Redis default port
+
+
+  celery:
+      container_name: celery
+      build:
+          context: .
+          dockerfile: ./deploy/sendmail/Dockerfile
+      command: python -m celery -A demoapp worker -l info --concurrency=5
+      volumes:
+          - static:/app/staticfiles
+          - media:/app/workdir/media
+      depends_on:
+          -  redis
+          -  sendmail
+      environment:
+          - USE_POSTGRES=True
+          - DB_NAME=sendmail
+          - DB_USER=sendmail
+          - DB_PASSWORD=sendmail
+          - DB_HOST=db
+          - DB_PORT=5432
+          - CELERY_BROKER_URL=redis://redis:6379/0  # Use Redis as the broker
+          - EMAIL_HOST=mailpit
+
+  mailpit:
+      container_name: mailpit
+      image: axllent/mailpit:latest
+      restart: always
+      ports:
+          - "1025:1025"  # Expose Mailpit SMTP port
+          - "8025:8025"  # Expose Mailpit Web UI port for email viewing
+
+
+
+volumes:
+  static:
+  media:
+  postgres_data:
