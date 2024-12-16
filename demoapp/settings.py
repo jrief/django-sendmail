@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'sendmail',
     'demoapp',
-    'jsoneditor'
+    'jsoneditor',
 ]
 
 # JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.1.1/jsoneditor.css'
