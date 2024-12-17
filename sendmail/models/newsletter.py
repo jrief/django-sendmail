@@ -85,17 +85,15 @@ class Newsletter(models.Model):
         _('Expires'), blank=True, null=True, help_text=_("Email won't be sent after this timestamp")
     )
 
-    subject = models.CharField(_('Subject'), max_length=989, blank=True)
-    message = models.TextField(_('Message'), blank=True)
-    html_message = models.TextField(_('HTML Message'), blank=True)
+    # subject = models.CharField(_('Subject'), max_length=989, blank=True)
+    # message = models.TextField(_('Message'), blank=True)
+    # html_message = models.TextField(_('HTML Message'), blank=True)
     headers = models.JSONField(_('Headers'), blank=True, null=True)
 
     emailmerge = models.ForeignKey(
         EmailMergeModel,
-        blank=True,
-        null=True,
         verbose_name=_('EmailMerge'),
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         help_text=_('Changing this erases existing context')
     )
 
@@ -135,18 +133,10 @@ class Newsletter(models.Model):
             dict: A dictionary with variable names as keys and empty strings as values.
 
         """
-        if self.emailmerge:
-            template_vars = extract_variable_names(self.emailmerge.template_file)
-            ckeditor_vars = get_ckeditor_variables(self.emailmerge)
-            vars_dict = {**template_vars, **{var: '' for var in ckeditor_vars}}
-            return vars_dict
-        else:
-            text_vars = get_custom_vars(self.subject)
-            text_vars.extend(get_custom_vars(self.message))
-            text_vars.extend(get_custom_vars(self.html_message))
-            text_vars = list(set(text_vars))
-            text_vars = filter(lambda x: not x.startswith('recipient'), text_vars)
-            return {var: '' for var in text_vars}
+        template_vars = extract_variable_names(self.emailmerge.template_file)
+        ckeditor_vars = get_ckeditor_variables(self.emailmerge)
+        vars_dict = {**template_vars, **{var: '' for var in ckeditor_vars}}
+        return vars_dict
 
     def check_status(self):
         """
@@ -189,9 +179,6 @@ class Newsletter(models.Model):
             'priority': self.priority,
             'emailmerge': self.emailmerge,
             'context': self.context,
-            'html_message': self.html_message,
-            'subject': self.subject,
-            'message': self.message,
             'language': self.language,
             'scheduled_time': self.scheduled_time,
             'expires_at': self.expires_at,
@@ -207,17 +194,6 @@ class Newsletter(models.Model):
 
         return emails
 
-    def clean(self):
-        if self.emailmerge and self.subject:
-            raise ValidationError("Subject and emailmerge are mutually exclusive")
-
-        if self.emailmerge and self.message:
-            raise ValidationError("Message and emailmerge are mutually exclusive")
-
-        if self.emailmerge and self.html_message:
-            raise ValidationError("HTML message and emailmerge are mutually exclusive")
-
-        super().clean()
 
     def save(self, *args, **kwargs):
         if self.pk:

@@ -40,17 +40,21 @@ def template_newsletter(recipient_list, template):
 
     return news
 
-
 @pytest.fixture
-def basic_newsletter(recipient_list):
-    news = Newsletter.objects.create(name='basic',
-                                     to_recipients=recipient_list,
-                                     subject=f"#subj# to #recipient.first_name#",
-                                     html_message='''
-                                     <h1>Dear #salute# #recipient.last_name# </h1>
-                                     ''')
+def duplicate_newsletter(recipient_list, template):
+    placeholder1 = PlaceholderContent.objects.get(placeholder_name='test1', language='en')
+    placeholder2 = PlaceholderContent.objects.get(placeholder_name='test2', language='en')
+
+    placeholder1.content = 'This is a #var1#'
+    placeholder1.save()
+
+    placeholder2.content = 'This is a #var2# and #var1# and #new.var1#'
+    placeholder2.save()
+    news = Newsletter.objects.create(name='duplicate', to_recipients=recipient_list, emailmerge=template)
 
     return news
+
+
 
 
 @pytest.mark.django_db
@@ -62,10 +66,9 @@ def test_newsletter_creation(template_newsletter):
 
 
 @pytest.mark.django_db
-def test_construct_context(template_newsletter, basic_newsletter):
+def test_construct_context(template_newsletter):
     assert template_newsletter.context == {'var2': '', 'test_var': '', 'var1': '', 'new.var1': ''}
 
-    assert basic_newsletter.context == {'subj': '', 'salute': ''}
 
 
 @pytest.mark.django_db
@@ -107,57 +110,15 @@ def test_template_send(template_newsletter):
     assert created_emails[1].recipients.first() == EmailAddress.objects.get(pk=2)
 
 
-@pytest.mark.django_db
-def test_basic_send(basic_newsletter):
-    emails = basic_newsletter.create()
-
-    assert len(emails) == 5
-
-    created_emails = list(emails)
-
-    assert created_emails[0].subject == '#subj# to #recipient.first_name#'
-
-    assert created_emails[0].context == {
-        'recipient': 1,
-        'salute': '',
-        'subj': '',
-    }
-
-    assert created_emails[0].recipients.first() == EmailAddress.objects.get(pk=1)
-
 
 @pytest.mark.django_db
-def test_clean(template_newsletter):
-    template_newsletter.clean()
-
-    template_newsletter.subject = 'Subj'
-
-    with pytest.raises(ValidationError):
-        template_newsletter.clean()
-
-    template_newsletter.subject = None
-
-    template_newsletter.message = 'Message'
-
-    with pytest.raises(ValidationError):
-        template_newsletter.clean()
-
-    template_newsletter.message = None
-
-    template_newsletter.html_message = 'HTML'
-
-    with pytest.raises(ValidationError):
-        template_newsletter.clean()
-
-
-@pytest.mark.django_db
-def test_update_newsletter_counter(template_newsletter, basic_newsletter):
+def test_update_newsletter_counter(template_newsletter, duplicate_newsletter):
     recipients = [EmailAddress.objects.create(email=f"{i}@exmaple.com") for i in range(10)]
 
     news1 = template_newsletter
     assert news1.status == Newsletter_STATUS.draft
 
-    news2 = basic_newsletter
+    news2 = duplicate_newsletter
     assert news2.status == Newsletter_STATUS.draft
 
     success_emails = [EmailModel.objects.create(from_email='test@ex.com',language='en', status=STATUS.sent) for _ in range(7)]
@@ -185,64 +146,64 @@ def test_update_newsletter_counter(template_newsletter, basic_newsletter):
 
 
 @pytest.mark.django_db
-def test_success_status(basic_newsletter):
-    assert basic_newsletter.status == Newsletter_STATUS.draft
+def test_success_status(template_newsletter):
+    assert template_newsletter.status == Newsletter_STATUS.draft
 
-    emails = basic_newsletter.create()
+    emails = template_newsletter.create()
 
-    assert basic_newsletter.status == Newsletter_STATUS.queued
+    assert template_newsletter.status == Newsletter_STATUS.queued
 
     _send_bulk(emails, False)
 
-    basic_newsletter.refresh_from_db()
+    template_newsletter.refresh_from_db()
 
-    assert basic_newsletter.status == Newsletter_STATUS.completed
+    assert template_newsletter.status == Newsletter_STATUS.completed
 
-    assert basic_newsletter.result == RESULT.success
+    assert template_newsletter.result == RESULT.success
 
 @pytest.mark.django_db
-def test_failed_status(basic_newsletter):
-    assert basic_newsletter.status == Newsletter_STATUS.draft
+def test_failed_status(template_newsletter):
+    assert template_newsletter.status == Newsletter_STATUS.draft
 
-    emails = basic_newsletter.create()
+    emails = template_newsletter.create()
 
     for email in emails:
         email.backend_alias = 'error'
         email.save()
 
-    assert basic_newsletter.status == Newsletter_STATUS.queued
+    assert template_newsletter.status == Newsletter_STATUS.queued
 
     _send_bulk(emails, False)
 
-    basic_newsletter.refresh_from_db()
+    template_newsletter.refresh_from_db()
 
-    assert basic_newsletter.status == Newsletter_STATUS.completed
+    assert template_newsletter.status == Newsletter_STATUS.completed
 
-    assert basic_newsletter.result == RESULT.failed
+    assert template_newsletter.result == RESULT.failed
 
 @pytest.mark.django_db
-def test_partial_status(basic_newsletter):
-    assert basic_newsletter.status == Newsletter_STATUS.draft
+def test_partial_status(template_newsletter):
+    assert template_newsletter.status == Newsletter_STATUS.draft
 
-    emails = basic_newsletter.create()
+    emails = template_newsletter.create()
 
     for email in emails:
         if email in emails[:1]:
             email.backend_alias = 'error'
         email.save()
 
-    assert basic_newsletter.status == Newsletter_STATUS.queued
+    assert template_newsletter.status == Newsletter_STATUS.queued
 
     _send_bulk(emails, False)
 
-    basic_newsletter.refresh_from_db()
+    template_newsletter.refresh_from_db()
 
-    assert basic_newsletter.status == Newsletter_STATUS.completed
+    assert template_newsletter.status == Newsletter_STATUS.completed
 
-    assert basic_newsletter.sent_emails == 4
-    assert basic_newsletter.failed_emails == 1
+    assert template_newsletter.sent_emails == 4
+    assert template_newsletter.failed_emails == 1
 
-    assert basic_newsletter.result == RESULT.partial
+    assert template_newsletter.result == RESULT.partial
 
 
 

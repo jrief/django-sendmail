@@ -226,7 +226,7 @@ SENDMAIL = {
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
 #EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
-EMAIL_ADDRESS_MODEL = 'sendmail.CustomEmailAddress'
+EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
 # Database
