@@ -79,24 +79,19 @@ class EmailMergeModel(models.Model):
         if not context_dict:
             context_dict = {}
 
-        engine = get_template_engine()
-        context = {'recipient': recipient, 'dry_run': True, **context_dict} \
-            if recipient else {'dry_run': True, **context_dict}
+        # Get placeholders from cache or db
+        placeholders = get_placeholders(self, language=language)
+        placeholders_dict = {placeholder.placeholder_name: clean_html(placeholder.content) for placeholder in placeholders}
+
+        # Create a context
+        context = {'recipient': recipient, 'dry_run': True, **context_dict, **placeholders_dict} \
+            if recipient else {'dry_run': True, **context_dict, **placeholders_dict}
 
         django_template_first_pass = loader.get_template(self.template_file, using='sendmail')
 
-        # Replace all {% placeholder <name> %} to {{ name }}
-        first_pass_content = django_template_first_pass.render(context)
+        rendered = django_template_first_pass.render(context)
 
-        placeholders = get_placeholders(self, language=language)
-        context_data = {placeholder.placeholder_name: clean_html(placeholder.content) for placeholder in placeholders}
-        context_data = {**context_data, 'dry_run': True}
-
-        # Replaces placeholders with actual values
-        django_template_second_pass = engine.from_string(f"{{% load sendmail %}}{first_pass_content}")
-        final_content = django_template_second_pass.render(context_data)
-
-        final_content = f"{{% load sendmail %}}\n {final_content}"
+        final_content = f"{{% load sendmail %}}\n {rendered}"
 
         return final_content
 

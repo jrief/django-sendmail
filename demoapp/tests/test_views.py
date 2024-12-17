@@ -28,7 +28,7 @@ def test_track(settings, simple_email, client, collectstatic):
     assert simple_email.opened_at is None
 
     # Test static with DEBUG
-    response = client.get(f'/sendmail/track/{simple_email.id}/images/logo.jpg')
+    response = client.get(f'/sendmail/track/{simple_email.id}/images/static_logo.jpg')
     assert response.status_code == 200
     simple_email.refresh_from_db()
     assert isinstance(simple_email.opened_at, datetime.datetime)
@@ -47,14 +47,14 @@ def test_track(settings, simple_email, client, collectstatic):
     settings.MEDIA_ROOT = (settings.BASE_DIR / 'demoapp' / 'tests' / 'assets')
 
     # Test media
-    response = client.get(f'/sendmail/track/{simple_email.id}/logo.png')
+    response = client.get(f'/sendmail/track/{simple_email.id}/media_logo.png')
     assert response.status_code == 200
-    with default_storage.open(settings.MEDIA_ROOT / 'logo.png') as f:
+    with default_storage.open(settings.MEDIA_ROOT / 'media_logo.png') as f:
         assert b''.join(response.streaming_content) == f.read()
 
 
     # Test Staticfiles
-    response = client.get(f'/sendmail/track/{simple_email.id}/images/logo.jpg')
+    response = client.get(f'/sendmail/track/{simple_email.id}/images/static_logo.jpg')
     assert response.status_code == 200
 
     # Not found in staticfiles without DEBUG

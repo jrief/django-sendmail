@@ -87,7 +87,7 @@ def test_get_message(settings, simple_email, upload_images):
     settings.DEBUG = True
 
     html_with_inlines = (f"{{% load sendmail %}}\n "
-                         f"<img src='{{% inline_image '{'images/logo.jpg'}'%}}'"
+                         f"<img src='{{% inline_image '{'images/static_logo.jpg'}'%}}'"
                          f"{simple_email.html_message}")
     simple_email.html_message = html_with_inlines
 
@@ -111,7 +111,7 @@ def test_get_message(settings, simple_email, upload_images):
 
     assert isinstance(image := templated_email.attachments[0], MIMEImage)
 
-    assert get_header(image, 'Content-Type') == 'image/jpeg'
+    assert get_header(image, 'Content-Type') == 'image/png'
 
     assert get_header(image, 'Content-Disposition') == f'inline; filename="{cid}"'
 

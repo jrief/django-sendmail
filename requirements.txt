@@ -84,7 +84,6 @@ sphinxcontrib-serializinghtml==2.0.0
 sqlparse==0.5.1
 stack-data==0.6.3
 tomli==2.0.1
-tornado==6.4.1
 traitlets==5.14.3
 typing_extensions==4.12.2
 tzdata==2024.1
@@ -95,3 +94,4 @@ webencodings==0.5.1
 wheel==0.44.0
 zipp==3.20.0
 django-jsoneditor==0.2.4
+django-compressor==4.5.1
