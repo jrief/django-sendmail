@@ -9,115 +9,6 @@ from django.template.loader_tags import ExtendsNode, IncludeNode
 from compressor.offline.django import DjangoParser, handle_extendsnode
 
 
-def get_variables_structure(nodelist):
-    """
-    Analyzes a list of nodes and constructs a dictionary representing the
-    structure of variables referenced within those nodes. This function
-    processes different types of nodes, such as variable nodes, for-loop
-    nodes, and include nodes, to collect variable names and their
-    corresponding contexts within the process. Variable nodes are added to
-    the dictionary directly, while for-loop nodes add nested structures in
-    the form of lists. The function also handles nested nodelists
-    recursively.
-
-    Parameters:
-    nodelist : list
-        A list of nodes to be analyzed for variable structure.
-
-    Returns:
-    dict
-        A dictionary with variable names as keys and their corresponding
-        contexts as values. The values could be empty strings for standalone
-        variables, or lists of dictionaries for variables involved in loops.
-    """
-    variables = {}
-
-    for node in nodelist:
-        # Process nested nodelists recursively.
-        if hasattr(node, 'nodelist'):
-            nested_vars = get_variables_structure(node.nodelist)
-            variables.update(nested_vars)
-
-        # Handle variable nodes.
-        if isinstance(node, VariableNode):
-            var_name = node.filter_expression.var.var
-
-            is_recipient_context = False
-            if '.' in var_name:
-                prefix = var_name.split('.')[0]
-                var_name = var_name.split('.')[1]
-                is_recipient_context = prefix == 'recipient'
-
-            if not is_recipient_context:
-                variables[var_name] = ""
-
-        # Handle for-loop nodes.
-        elif isinstance(node, ForNode):
-            iterable_name = node.sequence.var.var
-            is_recipient_context = False
-
-            if '.' in iterable_name:
-                prefix = iterable_name.split('.')[0]
-                iterable_name = iterable_name.split('.')[1]
-                is_recipient_context = prefix == 'recipient'
-
-            loop_vars = get_variables_structure(node.nodelist_loop)
-
-            # Initialize a list if the iterable isn't already in the dictionary.
-            if iterable_name not in variables and not is_recipient_context:
-                variables[iterable_name] = []
-
-            # Append the loop variables as a dictionary inside the list.
-            variables[iterable_name].append(loop_vars)
-
-        elif isinstance(node, IncludeNode):
-            included_template = node.template.var
-            variables.update(extract_variable_names(included_template))
-
-    return variables
-
-
-def get_placeholders_names_from_nodes(nodelist):
-    """
-    Recursively extracts placeholder names from a given list of nodes. This function
-    traverses and processes nodes to collect all placeholder names present in the node
-    list and any nested nodes. It handles various possible node attributes and types,
-    such as `nodelist`, `nodelist_loop`, `NodeList`, token attributes with placeholders,
-    and the `IncludeNode`.
-
-    Args:
-        nodelist: A list of nodes to be processed.
-
-    Returns:
-        A list of extracted placeholder names found within the nodes.
-    """
-    placeholders_names = []
-
-    for node in nodelist:
-        if hasattr(node, 'nodelist'):
-            placeholders_names.extend(get_placeholders_names_from_nodes(node.nodelist))
-        if hasattr(node, 'nodelist_loop'):
-            placeholders_names.extend(get_placeholders_names_from_nodes(node.nodelist_loop))
-        if isinstance(node, NodeList):
-            placeholders_names.extend(get_placeholders_names_from_nodes(node))
-
-        elif hasattr(node, 'token') and 'placeholder' in node.token.contents:
-            token_parts = node.token.contents.split()
-            if len(token_parts) >= 2 and token_parts[0] == 'placeholder':
-                placeholder_name = token_parts[1].strip("'\"")
-                placeholders_names.append(placeholder_name)
-
-        elif isinstance(node, IncludeNode):
-            included_template = node.template.var
-            placeholders_names.extend(process_template(included_template))
-
-        # elif isinstance(node, ExtendsNode):
-        #     parent_template = node.get_parent(None)
-        #     placeholders_names.extend(process_template(parent_template.name))
-
-    return placeholders_names
-
-
 def handle_includenode(includenode, context):
     """
     Process an IncludeNode to include the content of the referenced template.
@@ -172,6 +63,26 @@ class SendmailParser(DjangoParser):
                 for node in self.walk_nodes(node, original, context):
                     yield node
 
+    def walk_context_nodes(self, node, original=None, context=None, iterable=None):
+
+        if original is None:
+            original = node
+
+        for node in self.get_nodelist(node, original, context):
+            if isinstance(node, VariableNode):
+                if iterable:
+                    node.loc = iterable
+                yield node
+            else:
+                iter_list = iterable
+                if isinstance(node, ForNode):
+                    seq = node.sequence.var.var
+                    seq = seq.split('.')[-1]
+                    iter_list = [*iter_list, seq] if iter_list else [seq]
+                for node in self.walk_context_nodes(node, original, context, iterable=iter_list):
+                    yield node
+
+
 
 def process_template(template_name):
     """
@@ -213,9 +124,31 @@ def extract_variable_names(template_name):
     Returns:
         dict:The structure of variables extracted from the template's nodelist.
     """
-    template = loader.get_template(template_name, using='sendmail')
-    nodelist = template.template.nodelist
-    return get_variables_structure(nodelist)
+    parser = SendmailParser(charset='utf-8')
+    template = parser.parse(template_name)
+    nodes = parser.walk_context_nodes(template, original=template)
+    list_nodes = list(nodes)
+    structure = {}
+    for node in list_nodes:
+        loc = getattr(node, 'loc', [])
+        key = node.filter_expression.var.var
+
+        if key.startswith('recipient'):
+            continue
+
+        key = key.split('.')[-1]
+        current = structure
+        for i in loc:
+            if i not in current:
+                current[i] = []
+            if not current[i]:
+                current[i].append({})
+            current = current[i][-1]
+        current[key] = ''
+
+    return structure
+
+
 
 
 def get_ckeditor_variables(template):
