@@ -117,7 +117,7 @@ if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
         'NAME': os.getenv('DB_NAME', 'new_post_office'),
         'USER': os.getenv('DB_USER', 'post_office'),
         'PASSWORD': os.getenv('DB_PASSWORD','post_office'),
-        'HOST': os.getenv('DB_HOST','127.0.0.1'),
+        'HOST': os.getenv('DB_HOST','localhost'),
         'PORT': os.getenv("DB_PORT", '5432'),
     }
 
@@ -171,38 +171,34 @@ PLACEHOLDERS_NAMES_CACHE_TIMEOUT = 0
 # EMAIL_HOST_PASSWORD = 'test'
 #print(EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
 
-TEMPLATES = [
-    {
-        'BACKEND': 'sendmail.template.backends.sendmail.SendMailTemplates',
-        'APP_DIRS': True,
-        'DIRS': [os.path.join(BASE_DIR / 'demoapp' / 'templates')],
-        'OPTIONS': {
-            'context_processors': [
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.media',
-                'django.template.context_processors.static',
-                'django.template.context_processors.tz',
-                'django.template.context_processors.request',
-            ]
-        }
+TEMPLATES = [{
+    'BACKEND': 'sendmail.template.backends.sendmail.SendMailTemplates',
+    'APP_DIRS': True,
+    'DIRS': [os.path.join(BASE_DIR / 'demoapp' / 'templates')],
+    'OPTIONS': {
+        'context_processors': [
+            'django.contrib.auth.context_processors.auth',
+            'django.template.context_processors.debug',
+            'django.template.context_processors.i18n',
+            'django.template.context_processors.media',
+            'django.template.context_processors.static',
+            'django.template.context_processors.tz',
+            'django.template.context_processors.request',
+        ]
+    }
+}, {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [],
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
     },
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-
-]
+}]
 
 SENDMAIL = {
     'TRACKING_ENABLED': True,
@@ -230,7 +226,7 @@ SENDMAIL = {
 }
 WSGI_APPLICATION = "demoapp.wsgi.application"
 #EMAIL_ADDRESS_MODEL = 'sendmail.EmailAddress'
-EMAIL_ADDRESS_MODEL = 'custom_user.CustomEmailAddress'
+EMAIL_ADDRESS_MODEL = 'sendmail.CustomEmailAddress'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
 # Database
@@ -241,9 +237,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator", },
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
@@ -278,7 +272,7 @@ CKEDITOR_CONFIGS = {
              'JustifyRight', 'JustifyBlock'],
             ['Link', 'Unlink'],
             ['Image'],
-            ['Format']  # Adding headers (e.g., Heading 1, Heading 2, etc.)
+            ['Format'],  # Adding headers (e.g., Heading 1, Heading 2, etc.)
         ],
         'format_tags': 'p;h1;h2;h3;pre',  # Define the available formats (headers and others)
     }
