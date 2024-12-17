@@ -126,7 +126,7 @@ def test_backend_image_attachments(settings):
     message = EmailMessage('subject', 'body', 'from@example.com',
                            ['recipient@example.com'])
 
-    filename = pathlib.Path(__file__).parent / 'assets/logo.png'
+    filename = pathlib.Path(__file__).parent / 'assets/media_logo.png'
     with open(filename, 'rb') as fh:
         fileobj = File(fh, name='dummy.png')
         image = MIMEImage(fileobj.read())
