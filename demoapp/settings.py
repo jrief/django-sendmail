@@ -219,6 +219,7 @@ SENDMAIL = {
         'ses': 'django_ses.SESBackend'
     },
     'EMAIL_TEMPLATES': [
+        ('email/demo.html', _("Demo")),
         ('email/default.html', _('Default')),
         ('email/placeholders.html', _('Placeholders')),
         ('email/in.html', _('Incoming')),
