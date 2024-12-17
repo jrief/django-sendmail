@@ -1,0 +1,45 @@
+{% load i18n sendmail %}
+
+{# This is a simple transactional email template taken from https://github.com/leemunroe/responsive-html-email-template/ #}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>{{ subject }}</title>
+	{% block styles %}{% include "./style.css.html" %}{% endblock %}
+</head>
+
+<body>
+	<table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+		<tr>
+			<td>&nbsp;</td>
+			<td class="container">
+
+				{% block container %}
+				<div class="content">{# START CENTERED WHITE CONTENT #}
+
+					{% block preheader %}{% endblock %}
+
+					<table role="presentation" border="0" cellpadding="0" cellspacing="0" class="main">
+						<tr>
+							<td class="wrapper">
+								{% block content %}{% placeholder "Main Content" %}{% endblock %}
+							</td>
+						</tr>
+					</table>
+
+					{% block footer %}{% endblock footer %}
+
+				</div>{# END CENTERED WHITE CONTENT #}
+				{% endblock container %}
+
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+</body>
+
+</html>
