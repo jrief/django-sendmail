@@ -1,9 +1,12 @@
 import re
 
 from django.template import loader
-from django.template.base import NodeList, VariableNode
+from django.template.base import Node, NodeList, VariableNode
+from django.template.context import Context
 from django.template.defaulttags import ForNode
-from django.template.loader_tags import IncludeNode
+from django.template.loader_tags import ExtendsNode, IncludeNode
+
+from compressor.offline.django import DjangoParser, handle_extendsnode
 
 
 def get_variables_structure(nodelist):
@@ -115,6 +118,61 @@ def get_placeholders_names_from_nodes(nodelist):
     return placeholders_names
 
 
+def handle_includenode(includenode, context):
+    """
+    Process an IncludeNode to include the content of the referenced template.
+
+    Args:
+        includenode (IncludeNode): The IncludeNode to process.
+        context (Context): The context in which to render the included template.
+
+    Returns:
+        NodeList: The nodelist of the included template.
+    """
+    included_template = includenode.template.resolve(context)
+    if isinstance(included_template, str):
+        included_template = loader.get_template(included_template)
+    return included_template.template.nodelist
+
+
+class SendmailParser(DjangoParser):
+    def get_nodelist(self, node, original, context=None):
+        if isinstance(node, ExtendsNode):
+            if context is None:
+                context = Context()
+            context.template = original
+            return handle_extendsnode(node, context)
+
+        if isinstance(node, IncludeNode):
+            if context is None:
+                context = Context()
+            context.template = original
+            return handle_includenode(node, context)
+
+        # Check if node is an ``{% if ... %}`` switch with true and false branches
+        nodelist = []
+        if isinstance(node, Node):
+            for attr in node.child_nodelists:
+                # see https://github.com/django-compressor/django-compressor/pull/825
+                # and linked issues/PRs for a discussion on the `None) or []` part
+                nodelist.extend(getattr(node, attr, None) or [])
+        else:
+            nodelist = getattr(node, "nodelist", [])
+        return nodelist
+
+    def walk_nodes(self, node, original=None, context=None):
+        from sendmail.templatetags.sendmail import PlaceholderNode
+
+        if original is None:
+            original = node
+        for node in self.get_nodelist(node, original, context):
+            if isinstance(node, PlaceholderNode):
+                yield node
+            else:
+                for node in self.walk_nodes(node, original, context):
+                    yield node
+
+
 def process_template(template_name):
     """
     Process a template to extract placeholder names.
@@ -133,9 +191,10 @@ def process_template(template_name):
         list[str]: A list of placeholder names extracted from the nodes of the
         specified template.
     """
-    template = loader.get_template(template_name, using='sendmail')
-    nodelist = template.template.nodelist
-    return get_placeholders_names_from_nodes(nodelist)
+    parser = SendmailParser(charset='utf-8')
+    template = parser.parse(template_name)
+    nodes = parser.walk_nodes(template, original=template)
+    return map(lambda node: node.name, nodes)
 
 
 def extract_variable_names(template_name):

@@ -2,18 +2,18 @@ import uuid
 from email.mime.image import MIMEImage
 from urllib.parse import quote
 
-from django import template
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
+from django.template import Library, Node
 from django.urls import reverse
 from django.utils.html import SafeString
 
 from sendmail.settings import get_tracking_domain, get_tracking_enabled
 from sendmail.utils import get_path_from_static
 
-register = template.Library()
+register = Library()
 
 
 @register.simple_tag(takes_context=True)
@@ -45,9 +45,21 @@ def inline_image(context, file):
     return f'cid:{cid}'
 
 
-@register.simple_tag
-def placeholder(name: str) -> str:
-    return f"{{{{{name}}}}}"
+class PlaceholderNode(Node):
+    def __init__(self, name):
+        self.name = name
+
+    def render(self, context):
+        return context.get(self.name, '')
+
+
+@register.tag
+def placeholder(parser, token):
+    _, name = token.split_contents()
+    if not (name.startswith('\'') and name.endswith('\'') or name.startswith('"') and name.endswith('"')):
+        raise ValueError("Placeholder name must be quoted.")
+    return PlaceholderNode(name[1:-1])
+
 
 if get_tracking_enabled():
 
@@ -77,7 +89,3 @@ if get_tracking_enabled():
 
         url = reverse('sendmail:click', args=[email_id])
         return f"{build_url(url)}?target_uri={quote(target_uri)}"
-
-
-
-

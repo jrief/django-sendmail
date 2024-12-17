@@ -1,0 +1,7 @@
+{% extends "test/extended_base.html" %}
+{% load sendmail %}
+
+{% block content %}
+	{{ block.super }}
+	{% placeholder "after" %}
+{% endblock %}
