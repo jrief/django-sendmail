@@ -126,11 +126,11 @@ def test_staticfiles(settings, collectstatic):
 def test_track_link(settings):
     from sendmail.templatetags.sendmail import tracker_link
 
-    media_link = 'images/logo.jpg'
+    media_link = 'media_logo.png'
 
     assert tracker_link(target_img=media_link, context={}) == ''
 
-    assert tracker_link(target_img=media_link, context={'email_id': 5}) == 'https://example.com/sendmail/track/5/images/logo.jpg'
+    assert tracker_link(target_img=media_link, context={'email_id': 5}) == 'https://example.com/sendmail/track/5/media_logo.png'
     # settings.MEDIA_ROOT = settings.BASE_DIR
     settings.DEBUG = True
     staticfiles_link = 'images/static_logo.jpg'
