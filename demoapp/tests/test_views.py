@@ -54,7 +54,7 @@ def test_track(settings, simple_email, client, collectstatic):
 
 
     # Test Staticfiles
-    response = client.get(f'/sendmail/track/{simple_email.id}/images/logo.jpg')
+    response = client.get(f'/sendmail/track/{simple_email.id}/images/static_logo.jpg')
     assert response.status_code == 200
 
     # Not found in staticfiles without DEBUG

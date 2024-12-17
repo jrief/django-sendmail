@@ -33,7 +33,7 @@ def test_absolute_path(settings):
     template._attached_images = []
     context = Context({'dry_run': False})
     context.template = template
-    path = settings.MEDIA_ROOT / 'logo.png'
+    path = settings.MEDIA_ROOT / 'media_logo.png'
     print(path)
     result = inline_media_image(context, path)
     assert result.startswith('cid:')
@@ -115,7 +115,7 @@ def test_staticfiles(settings, collectstatic):
     context = Context({'dry_run': False})
     context.template = template
 
-    filename = 'images/logo.jpg'
+    filename = 'images/static_logo.jpg'
     result = inline_image(context, filename)
     assert result.startswith('cid:')
     assert len(template._attached_images) == 1
