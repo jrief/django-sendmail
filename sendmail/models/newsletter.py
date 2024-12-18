@@ -76,7 +76,8 @@ class Newsletter(models.Model):
                                 max_length=12,
                                 null=True,
                                 blank=True,
-                                choices=settings.LANGUAGES,)
+                                choices=settings.LANGUAGES,
+                                help_text='Set to None if you want to use recipients preferred language. ')
 
     scheduled_time = models.DateTimeField(
         _('Scheduled Time'), blank=True, null=True, db_index=True, help_text=_('The scheduled sending time')

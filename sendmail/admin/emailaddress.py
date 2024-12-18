@@ -26,8 +26,24 @@ class EmailAddressAdmin(admin.ModelAdmin):
 
 
 
+def merge_recipients_lists(modeladmin, request, queryset):
+    all_recipients = set()
+    for recipients_list in queryset:
+        all_recipients.update(recipients_list.recipients.all())
+
+    merged_name = '+'.join(recipients_list.name for recipients_list in queryset)
+
+    new_list = modeladmin.model.objects.create(name=merged_name)
+    new_list.recipients.set(all_recipients)
+    new_list.save()
+
+    modeladmin.message_user(
+        request,
+        f'Recipients list "{merged_name}" created successfully.'
+    )
 
 
 @admin.register(RecipientsList)
 class RecipientsAdmin(admin.ModelAdmin):
     filter_horizontal = ['recipients']
+    actions = [merge_recipients_lists]
