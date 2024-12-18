@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -75,7 +76,7 @@ class Newsletter(models.Model):
                                 max_length=12,
                                 null=True,
                                 blank=True,
-                                choices=[])
+                                choices=settings.LANGUAGES,)
 
     scheduled_time = models.DateTimeField(
         _('Scheduled Time'), blank=True, null=True, db_index=True, help_text=_('The scheduled sending time')
@@ -159,6 +160,12 @@ class Newsletter(models.Model):
                 self.result = RESULT.partial
 
             self.save()
+
+    def clean(self):
+        if self.language and self.language not in self.emailmerge.get_available_languages():
+            raise ValidationError(f"EmailMerge is not filled for {self.language} language.")
+
+        super().clean()
 
     def create(self):
         """

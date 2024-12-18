@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models.fields.json import JSONField
 
+from sendmail.admin.admin_utils import get_language_name
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.models.newsletter import RESULT
 from sendmail.models.newsletter import STATUS as NewsletterStatus
@@ -42,6 +43,23 @@ class NewsletterAdmin(admin.ModelAdmin):
     }
 
     list_filter = ['status', 'result']
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == 'language':
+            obj_id = request.resolver_match.kwargs.get('object_id')
+
+            if obj_id:
+                emailmerge = Newsletter.objects.get(pk=obj_id).emailmerge
+                choices = [(None, '----------')]
+                available_languages = [(lang, get_language_name(lang))
+                                       for lang in emailmerge.get_available_languages()]
+
+                choices.extend(available_languages)
+
+
+                kwargs['choices'] = choices
+
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
 
     def get_list_display(self, request):
         list_display = (
