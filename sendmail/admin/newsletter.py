@@ -25,7 +25,7 @@ requeue_failed.short_description = 'Requeue failed emails'
 
 
 def recreate(modeladmin, request, queryset):
-    for newsletter in queryset.prefetch_related('attachments'):
+    for newsletter in queryset:
         modeladmin.recreate(newsletter)
 
 
@@ -36,13 +36,46 @@ recreate.short_description = 'Recreate the newsletter'
 class NewsletterAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'to_recipients', 'status', 'result', 'total_emails', 'queued_emails', 'sent_emails', 'failed_emails',)
-    filter_horizontal = ['attachments']
     actions = [requeue_failed, recreate]
     formfield_overrides = {
         JSONField: {'widget': JSONEditor},
     }
 
     list_filter = ['status', 'result']
+
+
+
+    def get_fieldsets(self, request, obj = None):
+        fieldsets = [
+            (None, {
+                'fields': ('name', 'emailmerge', 'to_recipients', 'email_from', 'language'),
+            }),
+            ('Schedule', {
+                'fields': ('scheduled_time', 'expires_at', 'priority'),
+                'classes': ('collapse',)
+            }),
+            ('Context', {
+                'fields': ('context',),
+                'classes': ('collapse',),
+            }),
+            ('Headers', {
+                'fields': ('headers',),
+                'classes': ('collapse',),
+            }),
+        ]
+
+        if not self.has_change_permission(request, obj):
+            fields = ['status', 'result', 'total_emails', 'sent_emails', 'failed_emails',
+                           'queued_emails',]
+            if get_tracking_enabled():
+                fields.extend(['opened', 'clicked'])
+
+            fieldsets.append(('Result', {
+                'fields': fields,
+                              'classes': ('collapse',)
+            }))
+
+        return fieldsets
 
     def formfield_for_choice_field(self, db_field, request, **kwargs):
         if db_field.name == 'language':
@@ -91,9 +124,8 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     def recreate(self, obj):
         instance_data = {}
-        attachments = obj.attachments.all()
         for field in obj._meta.get_fields():
-            if not field.auto_created and not field.name == 'attachments':
+            if not field.auto_created:
                 instance_data[field.name] = getattr(obj, field.name)
 
         obj.delete()
@@ -105,7 +137,6 @@ class NewsletterAdmin(admin.ModelAdmin):
         instance_data['result'] = None
 
         new_instance = Newsletter.objects.create(**instance_data)
-        new_instance.attachments.set(attachments)
         new_instance.save()
 
         return new_instance

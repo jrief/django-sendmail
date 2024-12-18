@@ -100,14 +100,17 @@ class EmailAdmin(admin.ModelAdmin):
             fields.insert(0, 'message_id')
         fieldsets = [(None, {'fields': fields})]
         has_plaintext_content, has_html_content = False, False
-        for part in obj.email_message().message().walk():
-            if not isinstance(part, SafeMIMEText):
-                continue
-            content_type = part.get_content_type()
-            if content_type == 'text/plain':
-                has_plaintext_content = True
-            elif content_type == 'text/html':
-                has_html_content = True
+        try:
+            for part in obj.email_message().message().walk():
+                if not isinstance(part, SafeMIMEText):
+                    continue
+                content_type = part.get_content_type()
+                if content_type == 'text/plain':
+                    has_plaintext_content = True
+                elif content_type == 'text/html':
+                    has_html_content = True
+        except Exception as e:
+            has_plaintext_content = True
 
         if has_html_content:
             fieldsets.append((_('HTML Email'), {'fields': ['render_subject', 'render_html_body']}))
@@ -119,15 +122,21 @@ class EmailAdmin(admin.ModelAdmin):
         return fieldsets
 
     def render_subject(self, instance):
-        message = instance.email_message()
-        return message.subject
+        try:
+            message = instance.email_message()
+            return message.subject
+        except Exception:
+            return "Rendering exception"
 
     render_subject.short_description = _('Subject')
 
     def render_plaintext_body(self, instance):
-        for message in instance.email_message().message().walk():
-            if isinstance(message, SafeMIMEText) and message.get_content_type() == 'text/plain':
-                return format_html('<pre>{}</pre>', message.get_payload())
+        try:
+            for message in instance.email_message().message().walk():
+                if isinstance(message, SafeMIMEText) and message.get_content_type() == 'text/plain':
+                    return format_html('<pre>{}</pre>', message.get_payload())
+        except Exception as e:
+            return format_html('<pre>{}</pre>', f"Rendering failed: {str(e)}")
 
     render_plaintext_body.short_description = _('Mail Body')
 
@@ -135,10 +144,13 @@ class EmailAdmin(admin.ModelAdmin):
         re.compile('cid:([0-9a-f]{32})')
         url = reverse('admin:sendmail_email_image', kwargs={'pk': instance.id, 'content_id': 32 * '0'})
         url.replace(32 * '0', r'\1')
-        for message in instance.email_message().message().walk():
-            if isinstance(message, SafeMIMEText) and message.get_content_type() == 'text/html':
-                payload = message.get_payload(decode=True).decode('utf-8')
-                return clean_html(payload)
+        try:
+            for message in instance.email_message().message().walk():
+                if isinstance(message, SafeMIMEText) and message.get_content_type() == 'text/html':
+                    payload = message.get_payload(decode=True).decode('utf-8')
+                    return clean_html(payload)
+        except Exception as e:
+            return format_html('<pre>{}</pre>', f"Rendering failed: {str(e)}")
 
     render_html_body.short_description = _('HTML Body')
 

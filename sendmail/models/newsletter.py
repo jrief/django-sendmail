@@ -44,6 +44,17 @@ class Newsletter(models.Model):
                             max_length=255,
                             unique=True)
 
+    to_recipients = models.ForeignKey(RecipientsList,
+                                      verbose_name=_('Recipients List'),
+                                      on_delete=models.CASCADE, )
+
+    emailmerge = models.ForeignKey(
+        EmailMergeModel,
+        verbose_name=_('EmailMerge'),
+        on_delete=models.CASCADE,
+        help_text=_('Changing this erases existing context')
+    )
+
     status = models.PositiveSmallIntegerField(_('Status'),
                                               choices=STATUS_CHOICES,
                                               db_index=True,
@@ -68,9 +79,6 @@ class Newsletter(models.Model):
                                   blank=True,
                                   null=True)
 
-    to_recipients = models.ForeignKey(RecipientsList,
-                                      verbose_name=_('To recipients'),
-                                      on_delete=models.CASCADE, )
 
     language = models.CharField(_('Force to Language'),
                                 max_length=12,
@@ -92,23 +100,11 @@ class Newsletter(models.Model):
     # html_message = models.TextField(_('HTML Message'), blank=True)
     headers = models.JSONField(_('Headers'), blank=True, null=True)
 
-    emailmerge = models.ForeignKey(
-        EmailMergeModel,
-        verbose_name=_('EmailMerge'),
-        on_delete=models.CASCADE,
-        help_text=_('Changing this erases existing context')
-    )
 
     context = models.JSONField(_('Context'),
                                blank=True,
                                null=True)
 
-    attachments = models.ManyToManyField(
-        Attachment,
-        related_name='attachments',
-        verbose_name=_('Attachments'),
-        blank=True,
-    )
 
     total_emails = models.PositiveSmallIntegerField(_('Total Emails'), default=0, editable=False)
     sent_emails = models.PositiveSmallIntegerField(_('Sent Emails'), default=0, editable=False)
@@ -190,7 +186,6 @@ class Newsletter(models.Model):
             'language': self.language,
             'scheduled_time': self.scheduled_time,
             'expires_at': self.expires_at,
-            'attachments': self.attachments.all(),
             'headers': dict(self.headers or {}),
             'newsletter': self,
         }

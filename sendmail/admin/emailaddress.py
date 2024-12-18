@@ -42,6 +42,8 @@ def merge_recipients_lists(modeladmin, request, queryset):
         f'Recipients list "{merged_name}" created successfully.'
     )
 
+merge_recipients_lists.short_description = 'Create a new merged list from selected'
+
 
 @admin.register(RecipientsList)
 class RecipientsAdmin(admin.ModelAdmin):
