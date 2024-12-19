@@ -206,7 +206,7 @@ SENDMAIL = {
     'TEMPLATE_ENGINE': 'sendmail',
     'CELERY_ENABLED': True,
     'MAX_RETRIES': 0,
-    'BATCH_SIZE': 200,
+    'BATCH_SIZE': 100,
     'BATCH_DELIVERY_TIMEOUT': 30,
     'MESSAGE_ID_ENABLED': True,
     'DEFAULT_PRIORITY': 'medium',
