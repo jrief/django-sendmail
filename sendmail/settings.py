@@ -133,6 +133,9 @@ def get_email_address_setting():
 # def get_override_recipients():
 #     return get_config().get('OVERRIDE_RECIPIENTS', None)
 
+def get_break_after_batch():
+    return get_config().get('BREAK_AFTER_BATCH', False)
+
 
 def get_max_retries():
     return get_config().get('MAX_RETRIES', 0)

@@ -12,7 +12,7 @@ from django.db import transaction
 from django.utils.timezone import now
 
 from sendmail.mail import _send_bulk, get_queued
-from sendmail.settings import get_celery_enabled
+from sendmail.settings import get_celery_enabled, get_break_after_batch
 from sendmail.utils import cleanup_expired_mails
 
 try:
@@ -43,6 +43,9 @@ else:
                     _send_bulk(queued_emails, uses_multiprocessing=False)
                 except Exception as e:
                     raise e
+
+            if get_break_after_batch():
+                break
 
             db_connection.close()
 
