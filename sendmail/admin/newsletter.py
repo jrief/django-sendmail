@@ -64,7 +64,7 @@ class NewsletterAdmin(admin.ModelAdmin):
             }),
         ]
 
-        if not self.has_change_permission(request, obj):
+        if not self.has_change_permission(request, obj) and obj:
             fields = ['status', 'result', 'total_emails', 'sent_emails', 'failed_emails',
                            'queued_emails',]
             if get_tracking_enabled():
