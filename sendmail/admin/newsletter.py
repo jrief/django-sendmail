@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.db.models.fields.json import JSONField
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from sendmail.admin.admin_utils import get_language_name
 from sendmail.models.emailmodel import STATUS, EmailModel
@@ -50,15 +53,15 @@ class NewsletterAdmin(admin.ModelAdmin):
             (None, {
                 'fields': ('name', 'emailmerge', 'to_recipients', 'email_from', 'language'),
             }),
-            ('Schedule', {
+            (_('Schedule'), {
                 'fields': ('scheduled_time', 'expires_at', 'priority'),
                 'classes': ('collapse',)
             }),
-            ('Context', {
+            (_('Context'), {
                 'fields': ('context',),
                 'classes': ('collapse',),
             }),
-            ('Headers', {
+            (_('Headers'), {
                 'fields': ('headers',),
                 'classes': ('collapse',),
             }),
@@ -70,7 +73,7 @@ class NewsletterAdmin(admin.ModelAdmin):
             if get_tracking_enabled():
                 fields.extend(['opened', 'clicked'])
 
-            fieldsets.append(('Result', {
+            fieldsets.append((_('Result'), {
                 'fields': fields,
                               'classes': ('collapse',)
             }))
@@ -148,7 +151,7 @@ class NewsletterAdmin(admin.ModelAdmin):
     def queued_emails(self, obj):
         return EmailModel.objects.filter(newsletter=obj, status=STATUS.queued).count()
 
-    queued_emails.short_description = 'Queued Emails'
+    queued_emails.short_description = _('Queued Emails')
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
@@ -159,10 +162,19 @@ class NewsletterAdmin(admin.ModelAdmin):
                 can_send = True
 
         extra_context['show_newsletter_send'] = can_send
+        extra_context['show_reparse'] = can_send
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
     def response_change(self, request, obj):
         if "_send_many" in request.POST:
             obj.create()
+
+        if "_reparse" in request.POST:
+            obj.reparse_context()
+            return redirect(
+                reverse(
+                    'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
+                    args=[obj.pk]
+                ))
 
         return super().response_change(request, obj)

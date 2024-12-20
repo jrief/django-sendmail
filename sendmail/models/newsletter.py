@@ -52,7 +52,6 @@ class Newsletter(models.Model):
         EmailMergeModel,
         verbose_name=_('EmailMerge'),
         on_delete=models.CASCADE,
-        help_text=_('Changing this erases existing context')
     )
 
     status = models.PositiveSmallIntegerField(_('Status'),
@@ -113,28 +112,6 @@ class Newsletter(models.Model):
 
     def __str__(self):
         return self.name
-
-    def construct_default_json(self):
-        """
-        Constructs a default JSON-like dictionary containing template variables.
-
-        The method generates a dictionary of variables, with the variable names
-        as keys and empty strings as values. It differentiates between scenarios
-        where an email merge template is used and where custom text variables
-        need to be extracted. In the case of an email merge, it combines variables
-        from the template file and additional variables from the CKEditor. When an
-        email merge isn't used, the method extracts custom variables from various
-        text sources such as 'subject', 'message', and 'html_message', filtering
-        out variables that start with 'recipient'.
-
-        Returns:
-            dict: A dictionary with variable names as keys and empty strings as values.
-
-        """
-        template_vars = extract_variable_names(self.emailmerge.template_file)
-        ckeditor_vars = get_ckeditor_variables(self.emailmerge)
-        vars_dict = {**template_vars, **{var: '' for var in ckeditor_vars}}
-        return vars_dict
 
     def check_status(self):
         """
@@ -199,17 +176,16 @@ class Newsletter(models.Model):
 
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            old_instance = Newsletter.objects.get(pk=self.pk)
-            if old_instance.emailmerge != self.emailmerge:
-                # If you change emailmerge all the context should be erased
-                self.context = None
 
         if not self.context:
             # If no context, create and save a default schema
-            self.context = self.construct_default_json()
+            self.context = self.emailmerge.construct_default_json()
 
         super().save(*args, **kwargs)
+
+    def reparse_context(self):
+        self.context = self.emailmerge.construct_default_json()
+        self.save()
 
     class Meta:
         app_label = 'sendmail'

@@ -45,14 +45,34 @@ def test_extract_vars():
             {'var1': '',
              'var_true': '',
              'var_false': '',
-             'list': [
-                 {
-                     'var_loop': ''
-                 }
-             ],
+             'var_loop': '',
              'var_inner': '',
              'var_inner_true': '',
              'var_block': ''})
+
+
+def test_parse_nested_objects():
+    data = {
+        'controller': {
+            'stats': {
+                'likes': '',
+                'stars': '',
+            },
+            'topic': '',
+            'subtopic': '',
+            'subsubtopic': ''
+        },
+        'updates': [
+            {
+                'extra_values': {
+                    'reposts': '',
+                },
+                'interactions': '',
+            },
+        ],
+    }
+
+    assert extract_variable_names('test/nested_jsons.html') == data
 
 
 @pytest.mark.django_db

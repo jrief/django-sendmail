@@ -22,6 +22,7 @@ WORKDIR /app/demoapp
 RUN pip install -r /app/demoapp/tests/requirements/test_requirements.txt
 RUN pip install uWSGI
 
+RUN python manage.py makemigrations --no-input
 RUN python manage.py migrate --no-input
 RUN python manage.py collectstatic --no-input
 

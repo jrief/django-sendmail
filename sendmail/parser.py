@@ -78,7 +78,9 @@ class SendmailParser(DjangoParser):
                 if isinstance(node, ForNode):
                     seq = node.sequence.var.var
                     seq = seq.split('.')[-1]
-                    iter_list = [*iter_list, seq] if iter_list else [seq]
+                    loopvar = node.loopvars[0]
+                    layer = (seq, loopvar)
+                    iter_list = [*iter_list, layer] if iter_list else [layer]
                 for node in self.walk_context_nodes(node, original, context, iterable=iter_list):
                     yield node
 
@@ -107,6 +109,17 @@ def process_template(template_name):
     nodes = parser.walk_nodes(template, original=template)
     return map(lambda node: node.name, nodes)
 
+def merge_nested_dicts(dict1, dict2):
+    merged = dict1.copy()  # Start with a copy of the first dictionary
+    for key, value in dict2.items():
+        if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+            # If the key exists in both and both values are dictionaries, merge them recursively
+            merged[key] = merge_nested_dicts(merged[key], value)
+        else:
+            # Otherwise, overwrite or add the key-value pair
+            merged[key] = value
+    return merged
+
 
 def extract_variable_names(template_name):
     """
@@ -130,21 +143,53 @@ def extract_variable_names(template_name):
     list_nodes = list(nodes)
     structure = {}
     for node in list_nodes:
-        loc = getattr(node, 'loc', [])
+        loc = getattr(node, 'loc', [])  # Tuple of format (sequence, loopvar)
         key = node.filter_expression.var.var
 
         if key.startswith('recipient'):
             continue
 
-        key = key.split('.')[-1]
+        parts = key.split('.')
+
+        part_found = False
+        layers = []
+
+        # Find to what list variable belong
+        for seq, var in loc:
+            if not part_found:
+                if var == parts[0]:
+                    part_found = True
+                layers.append(seq)
+
+        # If not found -> It is in global scope
+        layers = layers if part_found else []
+
+        # If part of loop -> first part is a sequence name
+        m = 0 if not layers else 1
+        n = len(parts) - m
+
+        # Wrappers are objects exclude lists where element is
+        wrappers = parts[-n:-1]
+        key = parts[-1]
         current = structure
-        for i in loc:
+        for i in layers:
             if i not in current:
                 current[i] = []
             if not current[i]:
                 current[i].append({})
             current = current[i][-1]
-        current[key] = ''
+
+        if wrappers:
+            nested_dict = {key: ""}
+            for wrapper in reversed(wrappers):
+                nested_dict = {wrapper: nested_dict}
+
+            if not current or not isinstance(current, dict):
+                current.update(nested_dict)
+            else:
+                current.update(merge_nested_dicts(current, nested_dict))
+        else:
+            current[key] = ''
 
     return structure
 
@@ -166,7 +211,7 @@ def get_ckeditor_variables(template):
     """
     vars = []
 
-    for content in template.contents.all():
+    for content in template.contents.filter(used_template_file=template.template_file):
         vars.extend(get_custom_vars(content.content))
 
     vars = list(set(vars))

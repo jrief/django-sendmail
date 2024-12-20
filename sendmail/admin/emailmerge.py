@@ -4,6 +4,7 @@ from django.contrib import admin, messages
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
 from django.forms import BaseInlineFormSet, TextInput
+from django.db.models.fields.json import JSONField
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.text import Truncator
@@ -16,6 +17,11 @@ from sendmail.mail import send
 from sendmail.models.emailmerge import EmailMergeContentModel, EmailMergeModel
 from sendmail.models.emailmodel import STATUS
 from sendmail.settings import get_default_language, get_email_templates, get_languages_list
+
+try:
+    from jsoneditor.forms import JSONEditor
+except ImportError:
+    JSONEditor = None
 
 
 class SubjectField(TextInput):
@@ -147,9 +153,10 @@ class EmailMergeAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['name', 'description', 'template_file']}),
         (_("Extra Recipients"), {'fields': ['extra_recipients'], 'classes': ['collapse']}),
+        (_("Demo Context"), {'fields': ['demo_context'], 'classes': ['collapse']}),
     ]
     inlines = [EmailMergeContentInline, PlaceholderContentInline]
-    formfield_overrides = {models.CharField: {'widget': SubjectField}}
+    formfield_overrides = {models.CharField: {'widget': SubjectField}, JSONField: {'widget': JSONEditor}}
     filter_horizontal = ['extra_recipients']
 
     class Media:
@@ -166,7 +173,7 @@ class EmailMergeAdmin(admin.ModelAdmin):
             return
 
         try:
-            email = send(recipients=admin_email, emailmerge=obj, priority='now', language=language)
+            email = send(recipients=admin_email, emailmerge=obj, priority='now', language=language, context=obj.demo_context)
             if email.status == STATUS.sent:
                 messages.success(request, "Email sent successfully to {admin_email}".format(admin_email=admin_email))
             else:
@@ -188,18 +195,28 @@ class EmailMergeAdmin(admin.ModelAdmin):
             language_choices = []
 
         extra_context['show_send'] = True
+        extra_context['show_reparse'] = True
         extra_context['language_options'] = language_choices
         extra_context['email'] = email
         return super().change_view(request, str(object_id), form_url=form_url, extra_context=extra_context)
 
     def response_change(self, request, obj):
-        if "_send_email" in request.POST:
-            self.send_email_view(request, obj)
-            return redirect(
+
+        redirect_response = redirect(
                 reverse(
                     'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
                     args=[obj.pk]
                 ))
+
+        if "_send_email" in request.POST:
+            self.send_email_view(request, obj)
+            return redirect_response
+
+        if "_reparse" in request.POST:
+            obj.reparse_context()
+            return redirect_response
+
+
 
         return super().response_change(request, obj)
 

@@ -105,3 +105,7 @@ def test_render_template(test_template):
                    '</html>').strip()
 
     assert clean == html_string
+
+@pytest.mark.django_db
+def test_demo_context(template):
+    assert template.demo_context == {'test_var': ''}

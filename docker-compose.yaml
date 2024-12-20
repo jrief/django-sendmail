@@ -10,7 +10,7 @@ services:
 
     environment:
         - USE_POSTGRES=True
-        - DB_NAME=sendmail
+        - DB_NAME=sendmail_db
         - DB_USER=sendmail
         - DB_PASSWORD=sendmail
         - DB_HOST=db
@@ -34,7 +34,7 @@ services:
       volumes:
           - postgres_data:/var/lib/posgresql/data
       environment:
-          - POSTGRES_DB=sendmail
+          - POSTGRES_DB=sendmail_db
           - POSTGRES_USER=sendmail
           - POSTGRES_PASSWORD=sendmail
       ports:
@@ -52,8 +52,7 @@ services:
       container_name: celery
       build:
           context: .
-          dockerfile: ./deploy/sendmail/Dockerfile
-      command: python -m celery -A demoapp worker -l info --concurrency=5
+          dockerfile: ./deploy/celery/Dockerfile
       volumes:
           - static:/app/staticfiles
           - media:/app/workdir/media
@@ -62,7 +61,27 @@ services:
           -  sendmail
       environment:
           - USE_POSTGRES=True
-          - DB_NAME=sendmail
+          - DB_NAME=sendmail_db
+          - DB_USER=sendmail
+          - DB_PASSWORD=sendmail
+          - DB_HOST=db
+          - DB_PORT=5432
+          - CELERY_BROKER_URL=redis://redis:6379/0  # Use Redis as the broker
+          - EMAIL_HOST=mailpit
+
+  celery_beat:
+      container_name: celery_beat
+      build:
+          context: .
+          dockerfile: ./deploy/celery/Dockerfile
+      command: python -m celery -A demoapp beat -l info
+      depends_on:
+          - redis
+          - sendmail
+          - celery
+      environment:
+          - USE_POSTGRES=True
+          - DB_NAME=sendmail_db
           - DB_USER=sendmail
           - DB_PASSWORD=sendmail
           - DB_HOST=db

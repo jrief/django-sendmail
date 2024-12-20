@@ -8,8 +8,9 @@ from sendmail import cache
 from sendmail.cache_utils import get_placeholder_names, get_placeholders
 from sendmail.logutils import setup_loghandlers
 from sendmail.sanitizer import clean_html
-from sendmail.settings import get_email_address_setting, get_template_engine
+from sendmail.settings import get_email_address_setting
 from sendmail.validators import validate_template_syntax
+from sendmail.parser import extract_variable_names, get_ckeditor_variables
 
 logger = setup_loghandlers('INFO')
 
@@ -41,6 +42,12 @@ class EmailMergeModel(models.Model):
         get_email_address_setting(),
         blank=True,
         help_text='extra bcc recipients',
+    )
+    demo_context = models.JSONField(
+        blank=True,
+        null=True,
+        verbose_name=_("Demo context"),
+        help_text=_("Example context for previewing the email template."),
     )
 
     class Meta:
@@ -95,6 +102,31 @@ class EmailMergeModel(models.Model):
 
         return final_content
 
+    def construct_default_json(self):
+        """
+        Constructs a default JSON-like dictionary containing template variables.
+
+        The method generates a dictionary of variables, with the variable names
+        as keys and empty strings as values. It differentiates between scenarios
+        where an email merge template is used and where custom text variables
+        need to be extracted. In the case of an email merge, it combines variables
+        from the template file and additional variables from the CKEditor. When an
+        email merge isn't used, the method extracts custom variables from various
+        text sources such as 'subject', 'message', and 'html_message', filtering
+        out variables that start with 'recipient'.
+
+        Returns:
+            dict: A dictionary with variable names as keys and empty strings as values.
+
+        """
+        template_vars = extract_variable_names(self.template_file)
+        if self.pk:
+            ckeditor_vars = get_ckeditor_variables(self)
+        else:
+            ckeditor_vars = []
+        vars_dict = {**template_vars, **{var: '' for var in ckeditor_vars}}
+        return vars_dict
+
     def get_available_languages(self):
         return list(self.translated_contents.values_list('language', flat=True))
 
@@ -103,10 +135,25 @@ class EmailMergeModel(models.Model):
         self.contents.exclude(language__in=available_languages).delete()
 
     def save(self, *args, **kwargs):
-        template = super().save(*args, **kwargs)
         cache.delete(self.name, category='template')
 
+        if self.pk:
+            old_instance = EmailMergeModel.objects.get(pk=self.pk)
+            if old_instance.template_file != self.template_file:
+                # If you change template_file all the context should be erased
+                self.demo_context = None
+
+        if not self.demo_context:
+            self.demo_context = self.construct_default_json()
+
+
+        template = super().save(*args, **kwargs)
+
         return template
+
+    def reparse_context(self):
+        self.demo_context = self.construct_default_json()
+        self.save()
 
 
 class EmailMergeContentModel(models.Model):

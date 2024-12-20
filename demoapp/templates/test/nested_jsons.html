@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Some</title>
+</head>
+<body>
+	{{ controller.topic }}
+	{{ controller.stats.stars }}
+	{{ controller.stats.likes }}
+
+	{% for new in updates %}
+	{{ controller.subtopic }}
+		{% for upd in new.changes %}
+			{{ controller.subsubtopic }}
+		{% endfor %}
+	{{ new.interactions }}
+	{{ new.extra_values.reposts }}
+	{% endfor %}
+</body>
+</html>

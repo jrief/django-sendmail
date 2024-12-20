@@ -222,6 +222,7 @@ SENDMAIL = {
         ('email/in.html', _('Incoming')),
         ('email/uni.html', _('University')),
         ('email/contexed_uni.html', _('Contexed')),
+        ('email/test_updated_parser.html', 'Test updated parser'),
         ('email/tracker.html', _('Tracker')),
     ],
 }
