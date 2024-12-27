@@ -5,3 +5,6 @@ omit =
     */sendmail/tests/*
     */sendmail/admin/*
     */demoapp/*
+    */sendmail/django_compressor.py
+    */sendmail/config.py
+    */sendmail/checks.py

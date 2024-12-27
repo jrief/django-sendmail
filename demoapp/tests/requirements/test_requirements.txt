@@ -12,4 +12,3 @@ pytest-cov
 redis
 requests
 django-jsoneditor
-django-compressor

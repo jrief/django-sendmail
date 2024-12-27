@@ -1,12 +1,13 @@
 import re
-
-from django.template import loader
+from django import template
+from django.template import loader, TemplateSyntaxError, TemplateDoesNotExist
 from django.template.base import Node, NodeList, VariableNode
 from django.template.context import Context
 from django.template.defaulttags import ForNode
+from django.template.loader import get_template
 from django.template.loader_tags import ExtendsNode, IncludeNode
 
-from compressor.offline.django import DjangoParser, handle_extendsnode
+from sendmail.django_compressor import handle_extendsnode
 
 
 def handle_includenode(includenode, context):
@@ -26,7 +27,19 @@ def handle_includenode(includenode, context):
     return included_template.template.nodelist
 
 
-class SendmailParser(DjangoParser):
+class SendmailParser:
+
+    def __init__(self, charset):
+        self.charset = charset
+
+    def parse(self, template_name):
+        try:
+            return get_template(template_name).template
+        except template.TemplateSyntaxError as e:
+            raise TemplateSyntaxError(str(e))
+        except template.TemplateDoesNotExist as e:
+            raise TemplateDoesNotExist(str(e))
+
     def get_nodelist(self, node, original, context=None):
         if isinstance(node, ExtendsNode):
             if context is None:
