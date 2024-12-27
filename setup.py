@@ -20,7 +20,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     package_data={'': ['README.md']},
-    install_requires=['Django>=4.0', 'django-ckeditor>=6.0', 'lxml>=5.0', 'nh3=>0.2'],
+    install_requires=['Django>=4.0', 'django-ckeditor>=6.0', 'lxml>=5.0', 'nh3>=0.2'],
     extras_require={
         'jsoneditor': ['django-jsoneditor>=0.2.0']
     },
