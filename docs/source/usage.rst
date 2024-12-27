@@ -564,9 +564,21 @@ Resulting 2 emails will be sent using ``django-ses`` backend.
 Management commands
 ------------------------
 
-- send_queued_mail - send queued emails, those are not successfully sent are marked as failed or requeued depending on :ref:`settings`.
+Sendmail commands are available under ``sendmail`` namespace and can be triggered as following:
 
-.. list-table:: send_queued_mail arguments
+``python manage.py sendmail <subcommand> [arguments]``
+
+example: ``python manage.py all -p 4``
+
+- python manage.py sendmail -h - Show help message.
+
+- python manage.py sendmail --version - Show installed version of sendmail.
+
+- all - send all queued emails, those are not successfully sent are marked as failed or requeued depending on :ref:`settings`.
+
+- batch - send one batch of queued emails. Batch size is defined in settings(:ref:`Batch Size`).
+
+.. list-table:: all and batch arguments
    :widths: 50 100
    :header-rows: 1
 
@@ -593,7 +605,7 @@ Management commands
    * - --batch-size or -b
      - Limits number of emails being deleted in a batch. Defaults to ``1000``.
 
-- dblocks - when ``sendmail`` is sending emails using ``send_queued_mail`` management command it blocks the entire database.
+- dblocks - when ``sendmail`` is sending emails using ``all`` or ``batch`` management command it blocks the entire database.
   You can use this command to manage these DB locks.
 
 .. list-table:: dblocks

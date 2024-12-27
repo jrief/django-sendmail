@@ -1,5 +1,6 @@
 from multiprocessing import Pool
 
+from sendmail.management.commands.subcommands.base import SubcommandsCommand
 from django.core.management.base import BaseCommand
 from django.db import connection as db_connection
 
@@ -9,9 +10,11 @@ from sendmail.settings import get_batch_delivery_timeout
 from sendmail.utils import split_emails
 
 
-class Command(BaseCommand):
+class SendBatch(SubcommandsCommand):
     processes = 1
     log_level = 2
+    help_string = 'Send one queued batch of emails.'
+    command_name = 'batch'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -34,23 +37,22 @@ class Command(BaseCommand):
 
     def send_queued_mail_until_done(self):
         try:
-            with db_lock('send_queued_mail_until_done'):
-                self.stdout.write('Acquired lock for sending queued email')
-                while True:
-                    try:
-                        self.send_queued()
-                    except Exception as e:
-                        self.stderr.write(str(e))
+            with db_lock('send_queued_mail_batch'):
+                self.stdout.write('Acquired lock for sending queued batch')
+                try:
+                    self.send_queued()
+                except Exception as e:
+                    self.stderr.write(str(e))
 
-                    db_connection.close()
+                db_connection.close()
 
-                    if not get_queued().exists():
-                        break
         except TimeoutException:
             self.stderr.write('Sending queued mail requires too long, terminating now.')
 
         except LockedException:
             self.stderr.write('Failed to acquire lock, terminating now.')
+
+
 
     def send_queued(self):
         queued_emails = get_queued()
@@ -98,3 +100,28 @@ class Command(BaseCommand):
                           f" {total_requeued} requeued.")
 
         return total_sent, total_failed, total_requeued
+
+
+class SendQueuedMail(SendBatch):
+    help_string = 'Send queued mails until done.'
+    command_name = 'all'
+    def send_queued_mail_until_done(self):
+        try:
+            with db_lock('send_queued_mail_until_done'):
+                self.stdout.write('Acquired lock for sending queued email')
+                while True:
+                    try:
+                        self.send_queued()
+                    except Exception as e:
+                        self.stderr.write(str(e))
+
+                    db_connection.close()
+
+                    if not get_queued().exists():
+                        break
+        except TimeoutException:
+            self.stderr.write('Sending queued mail requires too long, terminating now.')
+
+        except LockedException:
+            self.stderr.write('Failed to acquire lock, terminating now.')
+

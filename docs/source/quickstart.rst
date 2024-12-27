@@ -91,11 +91,11 @@ The above command will put your email on the queue so you can use the command in
 your webapp without slowing down the request/response cycle too much.
 To actually send them out, run:
 
-``python manage.py send_queued_mail``
+``python manage.py sendmail all``
 
 
 You can schedule this management command to run regularly via cron:
 
 .. code-block::
 
-    * * * * * (/usr/bin/python manage.py send_queued_mail >> send_mail.log 2>&1)
+    * * * * * (/usr/bin/python manage.py sendmail all >> send_mail.log 2>&1)

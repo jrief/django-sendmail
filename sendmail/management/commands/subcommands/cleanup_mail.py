@@ -4,10 +4,12 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 
 from sendmail.utils import cleanup_expired_mails
+from sendmail.management.commands.subcommands.base import SubcommandsCommand
 
 
-class Command(BaseCommand):
-    help = 'Place deferred messages back in the queue.'
+class Command(SubcommandsCommand):
+    help_string = 'Place deferred messages back in the queue.'
+    command_name = 'cleanup_mail'
 
     def add_arguments(self, parser):
         parser.add_argument(

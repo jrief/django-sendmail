@@ -1,6 +1,5 @@
 import datetime
 import os
-import timeit
 from unittest import mock
 
 import pytest
@@ -8,11 +7,14 @@ from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.utils.timezone import now
 
-from sendmail.mail import send
+from sendmail.config import settings
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.utils import set_recipients
+
+def call_sendmail(*args, **kwargs):
+    return call_command('sendmail', *args, **kwargs)
 
 
 @pytest.mark.django_db
@@ -28,11 +30,11 @@ def test_cleanup_mail_with_orphaned_attachments():
     email.attachments.add(attachment)
     attachment_path = attachment.file.name
 
-    call_command('cleanup_mail', days=30)
+    call_sendmail('cleanup_mail', days=30)
     assert EmailModel.objects.count() == 0
     assert Attachment.objects.count() == 1
 
-    call_command('cleanup_mail', '-da', days=30)
+    call_sendmail('cleanup_mail', '-da', days=30)
     assert EmailModel.objects.count() == 0
     assert Attachment.objects.count() == 0
 
@@ -51,7 +53,7 @@ def test_cleanup_mail_with_orphaned_attachments():
     # Simulate that the files have been deleted by accidents
     os.remove(attachment_path)
 
-    call_command('cleanup_mail', '-da', days=30)
+    call_sendmail('cleanup_mail', '-da', days=30)
     assert EmailModel.objects.count() == 0
     assert Attachment.objects.count() == 0
 
@@ -66,41 +68,50 @@ def test_cleanup_mail():
 
     # The command shouldn't delete today's email
     email = EmailModel.objects.create(from_email='from@example.com', language='en')
-    call_command('cleanup_mail', days=30)
+    call_sendmail('cleanup_mail', days=30)
     assert EmailModel.objects.count() == 1
 
     # Email older than 30 days should be deleted
     email.created = now() - datetime.timedelta(days=31)
     email.save()
-    call_command('cleanup_mail', days=30)
+    call_sendmail('cleanup_mail', days=30)
     assert EmailModel.objects.count() == 0
 
 
 @pytest.mark.django_db
 def test_send_queued_mail():
     with mock.patch('django.db.connection.close', return_value=None):
-        call_command('send_queued_mail', processes=1)
+        call_sendmail('all', processes=1)
 
         EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en')
         EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en')
-        call_command('send_queued_mail', processes=1)
+        call_sendmail('all', processes=1)
         assert EmailModel.objects.filter(status=STATUS.sent).count() == 2
         assert EmailModel.objects.filter(status=STATUS.queued).count() == 0
+
+@pytest.mark.django_db
+def test_send_batch():
+    with mock.patch('django.db.connection.close', return_value=None):
+        queue = [EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en') for _ in range(200)]
+
+        call_sendmail('batch', processes=1)
+        assert EmailModel.objects.filter(status=STATUS.sent).count() == 100
+        assert EmailModel.objects.filter(status=STATUS.queued).count() == 100
 
 
 @pytest.mark.django_db
 def test_successful_deliveries_log():
     with mock.patch('django.db.connection.close', return_value=None):
         email = EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en')
-        call_command('send_queued_mail', log_level=0)
+        call_sendmail('all', log_level=0)
         assert email.logs.count() == 0
 
         email = EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en')
-        call_command('send_queued_mail', log_level=1)
+        call_sendmail('all', log_level=1)
         assert email.logs.count() == 0
 
         email = EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en')
-        call_command('send_queued_mail', log_level=2)
+        call_sendmail('all', log_level=2)
         assert email.logs.count() == 1
 
 
@@ -117,7 +128,7 @@ def test_failed_deliveries_logging():
         )
         set_recipients(email, [recipient])
 
-        call_command('send_queued_mail', log_level=0)
+        call_sendmail('all', log_level=0)
         assert email.logs.count() == 0
 
         email = EmailModel.objects.create(
@@ -125,14 +136,14 @@ def test_failed_deliveries_logging():
         )
         set_recipients(email, [recipient])
 
-        call_command('send_queued_mail', log_level=1)
+        call_sendmail('all', log_level=1)
         assert email.logs.count() == 1
 
         email = EmailModel.objects.create(
             from_email='from@example.com', status=STATUS.queued, backend_alias='error', language='en'
         )
         set_recipients(email, [recipient])
-        call_command('send_queued_mail', log_level=2)
+        call_sendmail('all', log_level=2)
         assert email.logs.count() == 1
 
 

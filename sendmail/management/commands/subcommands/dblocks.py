@@ -2,10 +2,12 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import localtime, now
 
 from sendmail.models.dbmutex import DBMutex
+from sendmail.management.commands.subcommands.base import SubcommandsCommand
 
 
-class Command(BaseCommand):
-    help = "Manage DB locks."
+class Command(SubcommandsCommand):
+    help_string = "Manage DB locks."
+    command_name = "dblocks"
 
     def add_arguments(self, parser):
         parser.add_argument('-d', '--delete', dest='delete_expired', action='store_true',
