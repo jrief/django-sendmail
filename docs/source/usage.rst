@@ -444,7 +444,7 @@ When needed base file was created, users can create 2-phase templates using it. 
 
 1. Open admin interface and click create new EmailMergeModel.
 2. Enter a name which will be used as an template alias for sending.
-3. Click "Save and continue editing" (This event is also triggered when a base file is changing)
+3. Click "Save and continue editing" (This event is also triggered when a template file is changing)
 4. Forms for placeholders editing will appear with defaults, such as:
 
     Placeholder: <name>, Language: <lang_code>
@@ -617,17 +617,18 @@ Alternatively to calling send you can enqueue emails directly from admin interfa
 For this you can create RecipientLists, which are just named lists of EmailAddress objects.
 
 As soon as your RecipientList is created you can create and send your Newsletter.
-For this simply:
 
-- Open your admin interface and select template if you want to use one. Note, that template is mutually exclusive with subject, message and HTML message.
+For this simply create new Newsletter object:
 
-- Click "Save and Continue". Your context will be populated with variables found in template and placeholders.
+- Set name, RecipientList and choose EmailMerge to be used.
+
+    Sendmail has its own context parser. To use it simply click ``Reparse Context`` button,
+    you should reparse it everytime you change the EmailMerge.
+
+- Parser will generate the structure of expected context, you can then fill values or add objects to the list.
 
 .. note::
-
-    User variable (``{{var}}``) in template wont be correctly found if its name contains ``.`` and it is outside ``{% for %}`` tag.
-
-- Fill in values for your context keys. Note, you wont see recipient context keys, because those are filled automatically for each recipient.
+    Note, you wont see recipient context keys, because those are filled automatically for each recipient.
 
 - You can specify other optional parameters which will be passed to each created email.
 

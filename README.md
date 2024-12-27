@@ -196,11 +196,13 @@ You can use relative path from your `templates` folder or absolute file path.
         Example: This is a simple mail created by #generator#
     - If you have more than 1 language configured you will be able to fill values for all languages in `LANGUAGES`:
     
-        - Create element in inline with desired language
+        - Create element in Email Template Contents inline with desired language
         - Click `Save and Continue Editing`
         - Fill in placeholders
 
     - Save your instance.
+    - You can now send test email with created object using `Send test email button`. 
+      In test email you can make use of `demo context` that can be refreshed using `Reparse Context` button.
 - To send an email with the created template:
 
 ```python

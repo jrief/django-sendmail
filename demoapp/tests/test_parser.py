@@ -64,6 +64,12 @@ def test_parse_nested_objects():
         },
         'updates': [
             {
+                'changes':[
+                    {
+                        'timestamp': ''
+                    }
+                ],
+
                 'extra_values': {
                     'reposts': '',
                 },
