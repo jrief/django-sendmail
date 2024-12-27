@@ -24,7 +24,7 @@ except (ImportError, NotImplementedError):
 
     def queued_mail_handler(sender, **kwargs):
         """
-        To be called by :func:`post_office.signals.email_queued.send()` for triggering asynchronous
+        To be called by :func:`sendmail.signals.email_queued.send()` for triggering asynchronous
         mail delivery – if provided by an external queue, such as Celery.
         """
 else:
