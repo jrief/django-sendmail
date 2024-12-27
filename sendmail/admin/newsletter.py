@@ -110,8 +110,12 @@ class NewsletterAdmin(admin.ModelAdmin):
     def opened(self, obj):
         return EmailModel.objects.filter(opened_at__isnull=False, newsletter=obj).count()
 
+    opened.short_description = _('Opened')
+
     def clicked(self, obj):
         return EmailModel.objects.filter(clicked_at__isnull=False, newsletter=obj).count()
+
+    clicked.short_description = _('Clicked')
 
     def click_rate(self, obj):
         if not obj.sent_emails:

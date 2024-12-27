@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-20 16:19+0100\n"
+"POT-Creation-Date: 2024-12-27 13:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,60 +36,87 @@ msgstr "Файл шаблону для створення емейлу"
 msgid "Select the base email template file"
 msgstr "Виберіть файл шаблону"
 
-#: admin/emailmerge.py:109
+#: admin/emailmerge.py:112
 msgid "Extra Attachements"
 msgstr "Додаткові Прикріплення"
 
-#: admin/emailmerge.py:153
+#: admin/emailmerge.py:155
 msgid "Extra Recipients"
 msgstr "Додаткові отримувачі"
 
-#: admin/emailmerge.py:202
-#, fuzzy, python-brace-format
-#| msgid "Select the base email template file"
-msgid "Send test email to {email}"
-msgstr "Виберіть файл шаблону"
+#: admin/emailmerge.py:156
+msgid "Demo Context"
+msgstr "Контекст"
 
-#: admin/emailmerge.py:220 models/emailmerge.py:30
+#: admin/emailmerge.py:226 models/emailmerge.py:30
 msgid "Description"
 msgstr "Опис"
 
-#: admin/emailmerge.py:227
+#: admin/emailmerge.py:233
 msgid "Languages"
 msgstr "Мови"
 
-#: admin/emailmodel.py:68 models/emailaddress.py:25
+#: admin/emailmodel.py:77 models/emailaddress.py:25
 msgid "To"
 msgstr "Кому"
 
-#: admin/emailmodel.py:79 admin/emailmodel.py:116 models/emailmerge.py:113
-#: models/emailmodel.py:46 models/newsletter.py:56
+#: admin/emailmodel.py:88 admin/emailmodel.py:131 models/emailmerge.py:172
+#: models/emailmodel.py:44
 msgid "Subject"
 msgstr "Тема"
 
-#: admin/emailmodel.py:85
+#: admin/emailmodel.py:94
 msgid "Use Template"
 msgstr "Використовувати Шаблон"
 
-#: admin/emailmodel.py:104
+#: admin/emailmodel.py:116
 msgid "HTML Email"
 msgstr "HTML Емейл"
 
-#: admin/emailmodel.py:106 admin/emailmodel.py:108
+#: admin/emailmodel.py:118 admin/emailmodel.py:120
 msgid "Text Email"
 msgstr "Текст Емейла"
 
-#: admin/emailmodel.py:123
+#: admin/emailmodel.py:141
 msgid "Mail Body"
 msgstr "Контент Емейла"
 
-#: admin/emailmodel.py:134
+#: admin/emailmodel.py:155
 msgid "HTML Body"
 msgstr "HTML Контент"
 
+#: admin/newsletter.py:56
+msgid "Schedule"
+msgstr "Запланований час"
+
+#: admin/newsletter.py:60 models/emailmodel.py:75 models/newsletter.py:103
+msgid "Context"
+msgstr "Контекст"
+
+#: admin/newsletter.py:64 models/attachment.py:39 models/emailmodel.py:70
+#: models/newsletter.py:100
+msgid "Headers"
+msgstr "Заголовки"
+
+#: admin/newsletter.py:76 models/newsletter.py:63
+msgid "Result"
+msgstr "Результат"
+
+#: admin/newsletter.py:113 models/emailmodel.py:63
+msgid "Opened"
+msgstr "Відкрито"
+
+#: admin/newsletter.py:118 models/emailmodel.py:66
+msgid "Clicked"
+msgstr "Натиснуто"
+
+#: admin/newsletter.py:158
+msgid "Queued Emails"
+msgstr "У черзі"
+
 #: apps.py:7
 msgid "SendMail"
-msgstr ""
+msgstr "SendMail"
 
 #: models/attachment.py:30
 msgid "File"
@@ -103,19 +130,15 @@ msgstr "Ім'я"
 msgid "The original filename"
 msgstr "Ім'я вихідного файлу"
 
-#: models/attachment.py:34 models/newsletter.py:79
+#: models/attachment.py:34
 msgid "Emails"
 msgstr "Емейли"
-
-#: models/attachment.py:39 models/emailmodel.py:66
-msgid "Headers"
-msgstr "Заголовки"
 
 #: models/attachment.py:43
 msgid "Attachment"
 msgstr "Прикріплення"
 
-#: models/attachment.py:44 models/newsletter.py:75
+#: models/attachment.py:44
 msgid "Attachments"
 msgstr "Прикріплення"
 
@@ -176,124 +199,136 @@ msgid "Template file"
 msgstr "Використовувати Шаблон"
 
 #: models/emailmerge.py:49
+msgid "Demo context"
+msgstr "Контекст"
+
+#: models/emailmerge.py:50
+msgid "Example context for previewing the email template."
+msgstr "Тестовий контекст для перевірки шаблону"
+
+#: models/emailmerge.py:55
 msgid "Email Merge Object"
 msgstr ""
 
-#: models/emailmerge.py:50
+#: models/emailmerge.py:56
 msgid "Email Merge Objects"
 msgstr ""
 
-#: models/emailmerge.py:118 models/emailmerge.py:198
+#: models/emailmerge.py:177 models/emailmerge.py:254
 msgid "Content"
 msgstr "Контент"
 
-#: models/emailmerge.py:124
+#: models/emailmerge.py:183
 msgid "Extra Attachments"
 msgstr "Додаткові Прикріплення"
 
-#: models/emailmerge.py:173
+#: models/emailmerge.py:229
 msgid "Email Template Content"
 msgstr "Контент шаблона"
 
-#: models/emailmerge.py:174
+#: models/emailmerge.py:230
 msgid "Email Template Contents"
 msgstr "Контенти шаблону"
 
-#: models/emailmerge.py:194
+#: models/emailmerge.py:250
 msgid "Placeholder name"
 msgstr "Назва заповнювача"
 
-#: models/emailmodel.py:32 models/newsletter.py:17
+#: models/emailmodel.py:30 models/newsletter.py:25
 msgid "low"
 msgstr "низький"
 
-#: models/emailmodel.py:33 models/newsletter.py:18
+#: models/emailmodel.py:31 models/newsletter.py:26
 msgid "medium"
 msgstr "середній"
 
-#: models/emailmodel.py:34 models/newsletter.py:19
+#: models/emailmodel.py:32 models/newsletter.py:27
 msgid "high"
 msgstr "високий"
 
-#: models/emailmodel.py:35 models/newsletter.py:20
+#: models/emailmodel.py:33
 msgid "now"
 msgstr "зараз"
 
-#: models/emailmodel.py:38 models/log.py:15
+#: models/emailmodel.py:36 models/log.py:15
 msgid "sent"
 msgstr "відправлено"
 
-#: models/emailmodel.py:39 models/log.py:15
+#: models/emailmodel.py:37 models/log.py:15
 msgid "failed"
 msgstr "помилка"
 
-#: models/emailmodel.py:40
+#: models/emailmodel.py:38 models/newsletter.py:33
 msgid "queued"
 msgstr "у черзі"
 
-#: models/emailmodel.py:41
+#: models/emailmodel.py:39
 msgid "requeued"
 msgstr "повторно у черзі"
 
-#: models/emailmodel.py:44
+#: models/emailmodel.py:42
 msgid "Email From"
 msgstr "Емейл від"
 
-#: models/emailmodel.py:47 models/log.py:23 models/newsletter.py:57
+#: models/emailmodel.py:45 models/log.py:23
 msgid "Message"
 msgstr "Повідомлення"
 
-#: models/emailmodel.py:48 models/newsletter.py:58
+#: models/emailmodel.py:46
 msgid "HTML Message"
 msgstr "HTML Повідомлення"
 
-#: models/emailmodel.py:54 models/log.py:21
+#: models/emailmodel.py:52 models/log.py:21 models/newsletter.py:57
 msgid "Status"
 msgstr "Статус"
 
-#: models/emailmodel.py:55 models/newsletter.py:30
+#: models/emailmodel.py:53 models/newsletter.py:73
 msgid "Priority"
 msgstr "Пріорітет"
 
-#: models/emailmodel.py:59 models/newsletter.py:49
+#: models/emailmodel.py:57 models/newsletter.py:90
 msgid "Scheduled Time"
 msgstr "Запланований час"
 
-#: models/emailmodel.py:59 models/newsletter.py:49
+#: models/emailmodel.py:57 models/newsletter.py:90
 msgid "The scheduled sending time"
 msgstr "Запланований час відправки"
 
-#: models/emailmodel.py:62 models/newsletter.py:53
+#: models/emailmodel.py:60 models/newsletter.py:94
 msgid "Expires"
 msgstr "Кінець строку придатності"
 
-#: models/emailmodel.py:62 models/newsletter.py:53
+#: models/emailmodel.py:60 models/newsletter.py:94
 msgid "Email won't be sent after this timestamp"
 msgstr "Емейл не буде відправленим після цього часу"
 
-#: models/emailmodel.py:68 models/newsletter.py:64
+#: models/emailmodel.py:63
+msgid "Email opening time"
+msgstr "Час відкриття"
+
+#: models/emailmodel.py:66
+msgid "Email first click time"
+msgstr "Час натискання"
+
+#: models/emailmodel.py:72
 msgid "EmailMergeModel"
 msgstr ""
 
-#: models/emailmodel.py:71 models/newsletter.py:68
-msgid "Context"
-msgstr "Контекст"
-
-#: models/emailmodel.py:72
+#: models/emailmodel.py:76
 msgid "Backend alias"
 msgstr "Бекенд"
 
-#: models/emailmodel.py:76
+#: models/emailmodel.py:81
 msgctxt "Email address"
 msgid "Email"
 msgstr "Емейл"
 
-#: models/emailmodel.py:77
+#: models/emailmodel.py:82
 msgctxt "Email addresses"
 msgid "Emails"
 msgstr "Емейли"
 
-#: models/emailmodel.py:242
+#: models/emailmodel.py:248
 msgid "The scheduled time may not be later than the expires time."
 msgstr "Запланована дата відправки не може бути після кінця строку придатності"
 
@@ -313,43 +348,79 @@ msgstr "Лог"
 msgid "Logs"
 msgstr "Логи"
 
-#: models/newsletter.py:23
+#: models/newsletter.py:31
+msgid "draft"
+msgstr "чернетка"
+
+#: models/newsletter.py:32
+msgid "creation"
+msgstr "створення"
+
+#: models/newsletter.py:34
+msgid "completed"
+msgstr "виконано"
+
+#: models/newsletter.py:38
+msgid "all failed"
+msgstr "помилка"
+
+#: models/newsletter.py:39
+msgid "all successful"
+msgstr "усі успішно"
+
+#: models/newsletter.py:40
+msgid "partially successful"
+msgstr "частково успішно"
+
+#: models/newsletter.py:43
 msgid "Newsletter name"
 msgstr "Назва розсилання"
 
-#: models/newsletter.py:32
-msgid "From email"
-msgstr "Відправник"
-
-#: models/newsletter.py:39
-msgid "To recipients"
-msgstr "Отримувачі"
-
-#: models/newsletter.py:42
-msgid "Force to Language"
-msgstr "Мова"
-
-#: models/newsletter.py:158
-msgid "Newsletter"
-msgstr "Розсилання"
-
-#: models/newsletter.py:159
-msgid "Newsletters"
-msgstr "Розсилання"
-
-#: models/recipients_list.py:10
-msgid "List Name"
-msgstr "Прізвище"
-
-#: models/recipients_list.py:15
-msgid "Recipients"
-msgstr "Отримувачі"
-
-#: models/recipients_list.py:26
+#: models/newsletter.py:48 models/recipients_list.py:24
 msgid "Recipients List"
 msgstr "Список отримувачів"
 
-#: models/recipients_list.py:27
+#: models/newsletter.py:53
+msgid "EmailMerge"
+msgstr "Емейл"
+
+#: models/newsletter.py:75
+msgid "From email"
+msgstr "Відправник"
+
+#: models/newsletter.py:82
+msgid "Force to Language"
+msgstr "Мова"
+
+#: models/newsletter.py:108
+msgid "Total Emails"
+msgstr "Усього листів"
+
+#: models/newsletter.py:109
+msgid "Sent Emails"
+msgstr "Кіл-сть відправлено"
+
+#: models/newsletter.py:110
+msgid "Failed Emails"
+msgstr "Помилок"
+
+#: models/newsletter.py:192
+msgid "Newsletter"
+msgstr "Розсилання"
+
+#: models/newsletter.py:193
+msgid "Newsletters"
+msgstr "Розсилання"
+
+#: models/recipients_list.py:8
+msgid "List Name"
+msgstr "Назва списку"
+
+#: models/recipients_list.py:13
+msgid "Recipients"
+msgstr "Отримувачі"
+
+#: models/recipients_list.py:25
 msgid "Recipients Lists"
 msgstr "Списки отримувачів"
 
@@ -361,40 +432,56 @@ msgstr "Встановіть 'nh3' для коректного рендерен�
 msgid "Resend"
 msgstr "Надіслати заново"
 
-#: templates/admin/sendmail/emailmergemodel/submit_line.html:4
-#: templates/admin/sendmail/newsletter/submit_line.html:4
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:6
+#: templates/admin/sendmail/newsletter/submit_line.html:5
 msgid "Save"
 msgstr "Зберегти"
 
-#: templates/admin/sendmail/emailmergemodel/submit_line.html:5
-#: templates/admin/sendmail/newsletter/submit_line.html:5
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:7
+#: templates/admin/sendmail/newsletter/submit_line.html:6
 msgid "Save as new"
 msgstr "Зберегти як новий"
 
-#: templates/admin/sendmail/emailmergemodel/submit_line.html:6
-#: templates/admin/sendmail/newsletter/submit_line.html:6
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:8
+#: templates/admin/sendmail/newsletter/submit_line.html:7
 msgid "Save and add another"
 msgstr "Зберегти та додати ще"
 
-#: templates/admin/sendmail/emailmergemodel/submit_line.html:7
-#: templates/admin/sendmail/newsletter/submit_line.html:7
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:9
+#: templates/admin/sendmail/newsletter/submit_line.html:8
 msgid "Save and continue editing"
 msgstr "Зберегти та продовжити редагування"
 
-#: templates/admin/sendmail/emailmergemodel/submit_line.html:7
-#: templates/admin/sendmail/newsletter/submit_line.html:7
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:9
+#: templates/admin/sendmail/newsletter/submit_line.html:8
 msgid "Save and view"
 msgstr "Зберегти та продивитись"
 
-#: templates/admin/sendmail/emailmergemodel/submit_line.html:11
-#: templates/admin/sendmail/newsletter/submit_line.html:11
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:12
+#: templates/admin/sendmail/newsletter/submit_line.html:17
 msgid "Close"
 msgstr "Закрити"
 
 #: templates/admin/sendmail/emailmergemodel/submit_line.html:15
-#: templates/admin/sendmail/newsletter/submit_line.html:15
+msgid "Send test email to %(email)s in"
+msgstr "Відправити тестовий лист на"
+
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:21
+#: templates/admin/sendmail/newsletter/submit_line.html:13
+msgid "Reparse Context"
+msgstr "Синхронізувати Контекст"
+
+#: templates/admin/sendmail/emailmergemodel/submit_line.html:25
+#: templates/admin/sendmail/newsletter/submit_line.html:21
 msgid "Delete"
 msgstr "Видалити"
+
+#: templates/admin/sendmail/newsletter/submit_line.html:10
+msgid "Send"
+msgstr "Відравити"
+
+#~ msgid "To recipients"
+#~ msgstr "Отримувачі"
 
 #~ msgid "Base File"
 #~ msgstr "Файл шаблону"
