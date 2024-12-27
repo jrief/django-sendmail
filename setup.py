@@ -20,9 +20,16 @@ setup(
     zip_safe=False,
     include_package_data=True,
     package_data={'': ['README.md']},
-    install_requires=['Django>=4', 'django-ckeditor>=6', 'lxml>=5', 'nh3'],
+    install_requires=['Django>=4.0', 'django-ckeditor>=6.0', 'lxml>=5.0', 'nh3=>0.2'],
     extras_require={
         'jsoneditor': ['django-jsoneditor>=0.2.0']
+    },
+    keywords=[
+        'django', 'email', 'sendmail', 'template', 'async', 'celery'
+    ],
+    project_urls={
+        'Documentation': 'https://django-sendmail.readthedocs.io/en/latest/',
+        'Source': 'https://github.com/jrief/django-sendmail'
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
