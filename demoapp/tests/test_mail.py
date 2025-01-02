@@ -1,24 +1,20 @@
 import logging
 import tempfile
 from datetime import timedelta
-from unittest.mock import patch
-from zoneinfo import ZoneInfo
 
 import pytest
 from django.core.exceptions import ValidationError
 from django.db import connection
-from django.db.utils import InterfaceError
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from django.core.files.base import ContentFile
 
 from sendmail.mail import _send_bulk, create_email, get_queued, send, send_many, split_into_batches
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress, Recipient
-from sendmail.models.emailmerge import EmailMergeModel, PlaceholderContent
+from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel
-from sendmail.settings import get_available_backends
 
-#from django.conf import settings
 
 
 @pytest.fixture
@@ -478,7 +474,6 @@ def test_get_queued():
     assert list(get_queued()) == [queued_email, past_email]
 
 
-from django.core import mail
 
 
 @pytest.mark.django_db
@@ -572,7 +567,6 @@ def test_extra_recipients(template):
     assert extra[1].address.email == 'bcc2@email.com'
 
 
-from django.core.files.base import ContentFile
 
 
 @pytest.fixture
@@ -598,7 +592,7 @@ def template_with_extra_attachments(settings, template):
 def test_extra_attachments(template_with_extra_attachments):
     # Retrieve the template with the extra attachments already set up
     template = template_with_extra_attachments
-    en_translation = template.translated_contents.get(language='en')
+    template.translated_contents.get(language='en')
 
     # No need to create the attachment again since the fixture already does that
     recipients = ['mrec1@gmail.com', 'mrec2@gmail.com']

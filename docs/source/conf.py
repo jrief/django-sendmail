@@ -15,6 +15,7 @@ from sendmail import VERSION
 project = 'sendmail'
 copyright = '2024, Mykhailo Poienko'
 author = 'Mykhailo Poienko'
+version = release = '.'.join(map(str,VERSION))
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -1,14 +1,9 @@
 from copy import copy
 
-from django.template.base import VariableNode, TextNode, NodeList
+from django.template import loader
+from django.template.base import NodeList, TextNode, VariableNode
 from django.template.defaulttags import IfNode
-from django.template.loader_tags import (
-    BLOCK_CONTEXT_KEY,
-    ExtendsNode,
-    BlockNode,
-    BlockContext,
-)
-
+from django.template.loader_tags import BLOCK_CONTEXT_KEY, BlockContext, BlockNode, ExtendsNode
 
 
 def handle_extendsnode(extendsnode, context):
@@ -90,4 +85,20 @@ def expand_blocknode(node, block_stack, block_context):
     if popped_block is not None:
         block_context.push(node.name, popped_block)
     return expanded_nodelist
+
+def handle_includenode(includenode, context):
+    """
+    Process an IncludeNode to include the content of the referenced template.
+
+    Args:
+        includenode (IncludeNode): The IncludeNode to process.
+        context (Context): The context in which to render the included template.
+
+    Returns:
+        NodeList: The nodelist of the included template.
+    """
+    included_template = includenode.template.resolve(context)
+    if isinstance(included_template, str):
+        included_template = loader.get_template(included_template)
+    return included_template.template.nodelist
 

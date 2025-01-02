@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
@@ -81,7 +80,7 @@ if USE_S3 := os.getenv('DJANGO_USE_S3', '') in ['1', 'True', 'true']:
             }
         }
     }
-    MEDIA_URL = f"http://127.0.0.1:9000/media/"
+    MEDIA_URL = "http://127.0.0.1:9000/media/"
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'workdir' / 'media'
@@ -218,10 +217,7 @@ SENDMAIL = {
     'EMAIL_TEMPLATES': [
         ('email/demo.html', _("Demo")),
         ('email/default.html', _('Default')),
-        ('email/placeholders.html', _('Placeholders')),
         ('email/in.html', _('Incoming')),
-        ('email/uni.html', _('University')),
-        ('email/contexed_uni.html', _('Contexed')),
         ('email/test_updated_parser.html', 'Test updated parser'),
         ('email/tracker.html', _('Tracker')),
     ],

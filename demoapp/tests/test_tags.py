@@ -6,7 +6,7 @@ from django.core.files.images import ImageFile
 from django.template import Context
 
 from sendmail.template.tags.media_inline import inline_media_image
-from sendmail.templatetags.sendmail import inline_image, placeholder
+from sendmail.templatetags.sendmail import inline_image
 
 
 @pytest.mark.django_db
@@ -83,9 +83,6 @@ def test_media_urls(settings):
     assert template._attached_images[0].get_payload(decode=True) == open(abs_path, 'rb').read()
 
 
-# def test_placeholders():
-#     assert placeholder('', 'test') == '{{test}}'
-
 
 def test_static(settings):
     #settings.STATICFILES_DIRS = [str(settings.BASE_DIR / 'demoapp' / 'tests' / 'assets')]
@@ -144,8 +141,9 @@ def test_track_link(settings):
     assert tracker_link(target_img='invalid.png', context={'email_id': 5, 'target_uri': 'https://google.com'}) == ''
 
 def test_click_link():
-    from sendmail.templatetags.sendmail import click_link
     from urllib.parse import quote
+
+    from sendmail.templatetags.sendmail import click_link
 
     target_uri = 'https://google.com'
     quoted = quote(target_uri)

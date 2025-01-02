@@ -8,7 +8,6 @@ from sendmail.models.emailmodel import PRIORITY, STATUS, EmailModel, render_mess
 from sendmail.settings import get_template_engine
 from sendmail.utils import set_recipients
 
-#from django.conf import settings
 
 
 @pytest.fixture

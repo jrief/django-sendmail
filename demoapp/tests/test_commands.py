@@ -7,11 +7,11 @@ from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.utils.timezone import now
 
-from sendmail.config import settings
 from sendmail.models.attachment import Attachment
 from sendmail.models.emailaddress import EmailAddress
 from sendmail.models.emailmodel import STATUS, EmailModel
 from sendmail.utils import set_recipients
+
 
 def call_sendmail(*args, **kwargs):
     return call_command('sendmail', *args, **kwargs)
@@ -92,7 +92,7 @@ def test_send_queued_mail():
 @pytest.mark.django_db
 def test_send_batch():
     with mock.patch('django.db.connection.close', return_value=None):
-        queue = [EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en') for _ in range(200)]
+        _ = [EmailModel.objects.create(from_email='from@example.com', status=STATUS.queued, language='en') for _ in range(200)]
 
         call_sendmail('batch', processes=1)
         assert EmailModel.objects.filter(status=STATUS.sent).count() == 100
@@ -122,7 +122,7 @@ def test_failed_deliveries_logging():
     """
 
     with mock.patch('django.db.connection.close', return_value=None):
-        recipient = EmailAddress.objects.create(email=f'to@example.com')
+        recipient = EmailAddress.objects.create(email='to@example.com')
         email = EmailModel.objects.create(
             from_email='from@example.com', status=STATUS.queued, backend_alias='error', language='en'
         )

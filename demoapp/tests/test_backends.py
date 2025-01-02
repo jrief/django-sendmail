@@ -1,6 +1,5 @@
-import os
+
 import pathlib
-from datetime import timedelta
 from email.mime.image import MIMEImage
 
 import pytest

@@ -1,6 +1,5 @@
 import time
 from datetime import timedelta
-from multiprocessing import Process
 
 import pytest
 

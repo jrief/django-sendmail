@@ -32,11 +32,7 @@ def test_creation(test_template):
     assert en_content.subject == 'test_subject'
     assert en_content.content == 'test_content'
 
-    de_content = main.translated_contents.create(language='de')
-
-    # assert de_content.subject == 'Subject, language: de'
-    #
-    # assert de_content.content == 'Content, language: de'
+    main.translated_contents.create(language='de')
 
     placeholders_base = PlaceholderContent.objects.values_list('used_template_file', flat=True)
 

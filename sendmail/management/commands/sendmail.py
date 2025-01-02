@@ -1,9 +1,11 @@
 from collections import OrderedDict
+
 import sendmail
 from sendmail.management.commands.subcommands.base import SubcommandsCommand
 from sendmail.management.commands.subcommands.cleanup_mail import Command as CleanupMailCommand
-from sendmail.management.commands.subcommands.send_queued_mail import SendBatch, SendQueuedMail
 from sendmail.management.commands.subcommands.dblocks import Command as DBLocksCommand
+from sendmail.management.commands.subcommands.send_queued_mail import SendBatch, SendQueuedMail
+
 
 class Command(SubcommandsCommand):
     command_name = "sendmail"

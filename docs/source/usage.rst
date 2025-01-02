@@ -411,8 +411,6 @@ in.html
 
 All placeholders in the previous example will be parsed successfully and provided for users.
 
-.. warning::
-    Placeholders are not recognized in child templates when using the Django {% extends %} tag.
 
 Inlines
 ^^^^^^^^^^^^^^^

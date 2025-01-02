@@ -1,30 +1,14 @@
 import re
+
 from django import template
-from django.template import loader, TemplateSyntaxError, TemplateDoesNotExist
-from django.template.base import Node, NodeList, VariableNode
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.template.base import Node, VariableNode
 from django.template.context import Context
 from django.template.defaulttags import ForNode
 from django.template.loader import get_template
 from django.template.loader_tags import ExtendsNode, IncludeNode
 
-from sendmail.django_compressor import handle_extendsnode
-
-
-def handle_includenode(includenode, context):
-    """
-    Process an IncludeNode to include the content of the referenced template.
-
-    Args:
-        includenode (IncludeNode): The IncludeNode to process.
-        context (Context): The context in which to render the included template.
-
-    Returns:
-        NodeList: The nodelist of the included template.
-    """
-    included_template = includenode.template.resolve(context)
-    if isinstance(included_template, str):
-        included_template = loader.get_template(included_template)
-    return included_template.template.nodelist
+from sendmail.django_compressor import handle_extendsnode, handle_includenode
 
 
 class SendmailParser:

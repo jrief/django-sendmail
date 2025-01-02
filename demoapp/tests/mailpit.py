@@ -17,7 +17,7 @@ class MailpitConnector:
             try:
                 response = self.info()
                 self.already_running = attempts == 0
-            except requests.exceptions.ConnectionError as e:
+            except requests.exceptions.ConnectionError:
                 print("\nStarting Mailpit server\n")
                 self.process = subprocess.Popen([MAILPIT_BINARY])
                 sleep(0.2)

@@ -1,8 +1,7 @@
-from django.core.management.base import BaseCommand
 from django.utils.timezone import localtime, now
 
-from sendmail.models.dbmutex import DBMutex
 from sendmail.management.commands.subcommands.base import SubcommandsCommand
+from sendmail.models.dbmutex import DBMutex
 
 
 class Command(SubcommandsCommand):

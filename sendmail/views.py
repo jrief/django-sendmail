@@ -1,7 +1,7 @@
 
 from django.conf import settings
-from django.contrib.messages.storage import default_storage
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.validators import URLValidator
 from django.http import FileResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect
@@ -49,7 +49,7 @@ def click(request, pk):
 
     try:
         URLValidator()(target_uri)
-    except:
+    except ValidationError:
         return HttpResponseBadRequest("Invalid 'target_uri' parameter")
 
     if not email.clicked_at:

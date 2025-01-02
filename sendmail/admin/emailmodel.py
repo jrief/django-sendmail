@@ -109,7 +109,8 @@ class EmailAdmin(admin.ModelAdmin):
                     has_plaintext_content = True
                 elif content_type == 'text/html':
                     has_html_content = True
-        except Exception as e:
+        except: #noqa:E722
+            # If any exception happens, put its description in content field
             has_plaintext_content = True
 
         if has_html_content:
@@ -125,7 +126,7 @@ class EmailAdmin(admin.ModelAdmin):
         try:
             message = instance.email_message()
             return message.subject
-        except Exception:
+        except: #noqa:E722
             return "Rendering exception"
 
     render_subject.short_description = _('Subject')

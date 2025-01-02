@@ -10,4 +10,4 @@ def test_connections():
     assert isinstance(connections['slow_backend'], SlowTestBackend)
 
     with pytest.raises(KeyError):
-        conn = connections['not_valid']
+        _ = connections['not_valid']

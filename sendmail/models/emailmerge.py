@@ -7,10 +7,10 @@ from django.utils.translation import gettext_lazy as _
 from sendmail import cache
 from sendmail.cache_utils import get_placeholder_names, get_placeholders
 from sendmail.logutils import setup_loghandlers
+from sendmail.parser import extract_variable_names, get_ckeditor_variables
 from sendmail.sanitizer import clean_html
 from sendmail.settings import get_email_address_setting
 from sendmail.validators import validate_template_syntax
-from sendmail.parser import extract_variable_names, get_ckeditor_variables
 
 logger = setup_loghandlers('INFO')
 

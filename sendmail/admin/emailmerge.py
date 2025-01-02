@@ -3,8 +3,8 @@ from django.conf import settings
 from django.contrib import admin, messages
 from django.db import models
 from django.db.models import Case, IntegerField, Value, When
-from django.forms import BaseInlineFormSet, TextInput
 from django.db.models.fields.json import JSONField
+from django.forms import BaseInlineFormSet, TextInput
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.text import Truncator

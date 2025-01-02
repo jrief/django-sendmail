@@ -6,10 +6,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from sendmail import mail
-from sendmail.models.attachment import Attachment
 from sendmail.models.emailmerge import EmailMergeModel
 from sendmail.models.recipients_list import RecipientsList
-from sendmail.parser import extract_variable_names, get_ckeditor_variables, get_custom_vars
 from sendmail.validators import validate_email_with_name
 
 STATUS = namedtuple('STATUS', 'draft creation queued completed')._make(range(4))
