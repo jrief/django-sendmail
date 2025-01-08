@@ -32,6 +32,7 @@ Installing nh3 is strongly encouraged for security reasons. Only with installed 
 [![PyPI](https://img.shields.io/pypi/pyversions/django-sendmail.svg)]()
 [![PyPI version](https://img.shields.io/pypi/v/django-sendmail.svg)](https://pypi.org/project/django-sendmail/)
 [![PyPI](https://img.shields.io/pypi/l/django-sendmail.svg)]()
+[![Published on Django Packages](https://img.shields.io/badge/Published%20on-Django%20Packages-0c3c26)](https://djangopackages.org/packages/p/django-sendmail/)
 
 
 ```sh
